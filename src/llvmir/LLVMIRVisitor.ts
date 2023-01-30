@@ -91,6 +91,8 @@ import { MdFieldOrIntContext } from "./LLVMIRParser";
 import { DiSPFlagContext } from "./LLVMIRParser";
 import { FuncAttributeContext } from "./LLVMIRParser";
 import { TypeContext } from "./LLVMIRParser";
+import { VoidTypeContext } from "./LLVMIRParser";
+import { OpaqueTypeContext } from "./LLVMIRParser";
 import { ParamsContext } from "./LLVMIRParser";
 import { ParamContext } from "./LLVMIRParser";
 import { ParamAttributeContext } from "./LLVMIRParser";
@@ -1024,6 +1026,20 @@ export interface LLVMIRVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitType?: (ctx: TypeContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by `LLVMIRParser.voidType`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitVoidType?: (ctx: VoidTypeContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by `LLVMIRParser.opaqueType`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitOpaqueType?: (ctx: OpaqueTypeContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by `LLVMIRParser.params`.

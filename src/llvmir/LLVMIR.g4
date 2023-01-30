@@ -116,7 +116,7 @@ terminator:
 localDefTerm: LocalIdent '=' valueTerminator;
 valueTerminator: invokeTerm | callBrTerm | catchSwitchTerm;
 retTerm:
-	'ret' 'void' (',' metadataAttachment)*
+	'ret' voidType (',' metadataAttachment)*
 	// Value return.
 	| 'ret' concreteType value (',' metadataAttachment)*;
 brTerm: 'br' label (',' metadataAttachment)*;
@@ -311,8 +311,8 @@ funcAttribute:
 	| unwindTable
 	| vectorScaleRange;
 type:
-	'void'
-	| 'opaque'
+	voidType
+	| opaqueType
 	| type '(' params ')'
 	| intType
 	| floatType
@@ -326,6 +326,8 @@ type:
 	| mmxType
 	| tokenType
 	| metadataType;
+voidType: symbol='void';
+opaqueType: symbol='opaque';
 params:
 	ellipsis = '...'?
 	| param (',' param)* (',' ellipsis = '...')?;

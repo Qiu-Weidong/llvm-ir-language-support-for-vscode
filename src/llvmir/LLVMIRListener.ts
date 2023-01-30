@@ -91,6 +91,8 @@ import { MdFieldOrIntContext } from "./LLVMIRParser";
 import { DiSPFlagContext } from "./LLVMIRParser";
 import { FuncAttributeContext } from "./LLVMIRParser";
 import { TypeContext } from "./LLVMIRParser";
+import { VoidTypeContext } from "./LLVMIRParser";
+import { OpaqueTypeContext } from "./LLVMIRParser";
 import { ParamsContext } from "./LLVMIRParser";
 import { ParamContext } from "./LLVMIRParser";
 import { ParamAttributeContext } from "./LLVMIRParser";
@@ -1373,6 +1375,28 @@ export interface LLVMIRListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitType?: (ctx: TypeContext) => void;
+
+	/**
+	 * Enter a parse tree produced by `LLVMIRParser.voidType`.
+	 * @param ctx the parse tree
+	 */
+	enterVoidType?: (ctx: VoidTypeContext) => void;
+	/**
+	 * Exit a parse tree produced by `LLVMIRParser.voidType`.
+	 * @param ctx the parse tree
+	 */
+	exitVoidType?: (ctx: VoidTypeContext) => void;
+
+	/**
+	 * Enter a parse tree produced by `LLVMIRParser.opaqueType`.
+	 * @param ctx the parse tree
+	 */
+	enterOpaqueType?: (ctx: OpaqueTypeContext) => void;
+	/**
+	 * Exit a parse tree produced by `LLVMIRParser.opaqueType`.
+	 * @param ctx the parse tree
+	 */
+	exitOpaqueType?: (ctx: OpaqueTypeContext) => void;
 
 	/**
 	 * Enter a parse tree produced by `LLVMIRParser.params`.

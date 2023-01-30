@@ -9,7 +9,7 @@ target triple = "x86_64-pc-linux-gnu"
 
 declare noundef i32 @printf(i8* nocapture noundef readonly, ...) local_unnamed_addr
 
-define i32 @main() {
+define i32 @main(i32 %argc, i8 ** %argv) {
   br label %"funny:label"
 
 "funny:label":
