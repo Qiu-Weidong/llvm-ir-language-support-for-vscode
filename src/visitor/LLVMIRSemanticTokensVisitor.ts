@@ -12,8 +12,8 @@ export class LLVMIRSemanticTokensVisitor extends LLVMIRBaseVisitor {
     this.builder = builder;
   }
   // 一个辅助函数
-  highlightToken(token: Token | undefined, type: string) {
-    if (token && type != 'none')
+  highlightToken(token: Token | undefined, type: string | undefined) {
+    if (token && type)
       this.builder.push(
         new Range(
           new Position(token.line - 1, token.charPositionInLine),
@@ -26,8 +26,7 @@ export class LLVMIRSemanticTokensVisitor extends LLVMIRBaseVisitor {
   // 如果没有处理的则按照默认处理
   visitTerminal(node: TerminalNode): void {
     const symbol = node.symbol;
-    const type = LLVMIRSemanticTokensVisitor.tokenMap.get(node.symbol.type)
-      || 'keyword';
+    const type = LLVMIRSemanticTokensVisitor.tokenMap.get(node.symbol.type);
 
     this.highlightToken(symbol, type);
   }
@@ -35,7 +34,7 @@ export class LLVMIRSemanticTokensVisitor extends LLVMIRBaseVisitor {
   visitComdatDef(ctx: ComdatDefContext): void {
     ctx.ComdatName().accept(this);
     this.highlightToken(ctx._selectionKind, 'property');
-    this.visitChildren(ctx);
+    // this.visitChildren(ctx);
   }
 
   visitTypeDef(ctx: TypeDefContext): void {
@@ -173,7 +172,6 @@ export class LLVMIRSemanticTokensVisitor extends LLVMIRBaseVisitor {
 
   // 最后面留一张 token map
   static tokenMap: Map<number, string> = new Map([
-    [/**, */15, 'none'],
     [/*IntLit*/489, 'number'], [/*FloatLit*/490, 'number'], [/*StringLit*/491, 'string'],
     [/*GlobalIdent*/492, 'variable'], [/*LocalIdent*/493, 'variable'], [/**LabelIdent */494, 'label'],
     [/**AttrGroupId */495, 'typeParameter'], [/**ComdatName */496, 'interface'], [/**MetadataName */497, 'property'],

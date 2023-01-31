@@ -40,7 +40,7 @@
     "watch": "webpack --watch",
     "package": "webpack --mode production --devtool hidden-source-map",
     "lint": "eslint src --ext ts",
-    "antlr4ts": "antlr4ts src/llvmir/LLVMIR.g4 -visitor -o src/llvmir/"
+    "antlr4ts": "antlr4ts src/llvmir/LLVMIRLexer.g4 src/llvmir/LLVMIRParser.g4 -visitor -o src/llvmir/"
   },
   "devDependencies": {
     "@types/glob": "^8.0.0",
