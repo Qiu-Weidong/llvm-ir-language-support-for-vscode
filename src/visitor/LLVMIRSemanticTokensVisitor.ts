@@ -26,7 +26,7 @@ export class LLVMIRSemanticTokensVisitor extends LLVMIRBaseVisitor {
   // 如果没有处理的则按照默认处理
   visitTerminal(node: TerminalNode): void {
     const symbol = node.symbol;
-    const type = LLVMIRSemanticTokensVisitor.tokenMap.get(node.symbol.type);
+    const type = LLVMIRSemanticTokensVisitor.getTokenType(symbol.type);
 
     this.highlightToken(symbol, type);
   }
@@ -113,15 +113,6 @@ export class LLVMIRSemanticTokensVisitor extends LLVMIRBaseVisitor {
     this.highlightToken(symbol, 'function');
     this.visitChildren(ctx);
   }
-  // basicBlock: LabelIdent? instruction* terminator;
-  visitBasicBlock(ctx: BasicBlockContext): void {
-    const label = ctx.LabelIdent()?.symbol;
-    if(label) {
-      this.highlightToken(label, 'label');
-    }
-    ctx.instruction().forEach(inst => inst.accept(this));
-    ctx.terminator().accept(this);
-  }
 
   visitBoolConst(ctx: BoolConstContext): void {
     this.highlightToken(ctx.start, 'number');
@@ -140,40 +131,11 @@ export class LLVMIRSemanticTokensVisitor extends LLVMIRBaseVisitor {
     ctx.StringLit()?.accept(this);
   }
 
-  // fenceInst: 'fence' syncScope? atomicOrdering (',' metadataAttachment)*;
-  visitFenceInst(ctx: FenceInstContext): void { 
-    this.highlightToken(ctx.KwFence().symbol, 'operator');
-    ctx.syncScope()?.accept(this);
-    ctx.atomicOrdering().accept(this);
-    ctx.metadataAttachment().forEach(metadata => metadata.accept(this));
-  }
   // localDefInst: LocalIdent '=' valueInstruction;
   visitLocalDefInst(ctx: LocalDefInstContext): void { 
     const symbol = ctx.LocalIdent().symbol;
     this.highlightToken(symbol, 'parameter');
     ctx.valueInstruction().accept(this);
-  }
-
-  visitStoreInst(ctx: StoreInstContext): void {
-    this.highlightToken(ctx.KwStore().symbol, 'operator');
-    this.visitChildren(ctx);
-  }
-
-  visitValueInstruction(ctx: ValueInstructionContext): void {
-    // 第一个符号是运算符
-    this.highlightToken(ctx.start, 'operator');
-    this.visitChildren(ctx);
-  }
-
-  visitRetTerm(ctx: RetTermContext): void {
-    this.highlightToken(ctx.KwRet().symbol, 'operator');
-    this.visitChildren(ctx);
-  }
-
-  visitBrTerm(ctx: BrTermContext): void {
-    this.highlightToken(ctx.KwBr().symbol, 'operator');
-    ctx.label().accept(this);
-    ctx.metadataAttachment().forEach(data => data.accept(this));
   }
 
   visitLabel(ctx: LabelContext): void {
@@ -188,6 +150,14 @@ export class LLVMIRSemanticTokensVisitor extends LLVMIRBaseVisitor {
     [/**AttrGroupId */37, 'typeParameter'], [/**ComdatName */38, 'interface'], [/**MetadataName */39, 'property'],
     [/**MetadataId */40, 'property'], [/**IntType */41, 'type'],
   ]);
+
+  private static getTokenType(tokentype: number): string {
+    // 52 ~ 109 是为 操作符
+    if(tokentype >= 52 && tokentype <= 123) return 'operator';
+    else {
+      return LLVMIRSemanticTokensVisitor.tokenMap.get(tokentype) || 'none';
+    }
+  }
 
 }
 

@@ -121,42 +121,42 @@ terminator:
 localDefTerm: LocalIdent '=' valueTerminator;
 valueTerminator: invokeTerm | callBrTerm | catchSwitchTerm;
 retTerm:
-        KwRet voidType (',' metadataAttachment)*
+        OpRet voidType (',' metadataAttachment)*
         // Value return.
-        | KwRet concreteType value (',' metadataAttachment)*;
-brTerm: KwBr label (',' metadataAttachment)*;
+        | OpRet concreteType value (',' metadataAttachment)*;
+brTerm: OpBr label (',' metadataAttachment)*;
 condBrTerm:
-        KwBr IntType value ',' label ',' label (
+        OpBr IntType value ',' label ',' label (
                 ',' metadataAttachment
         )*;
 switchTerm:
-        KwSwitch typeValue ',' label '[' case* ']' (
+        OpSwitch typeValue ',' label '[' case* ']' (
                 ',' metadataAttachment
         )*;
 indirectBrTerm:
-        KwIndirectbr typeValue ',' '[' (label (',' label)?)? ']' (
+        OpIndirectbr typeValue ',' '[' (label (',' label)?)? ']' (
                 ',' metadataAttachment
         )*;
-resumeTerm: KwResume typeValue (',' metadataAttachment)*;
+resumeTerm: OpResume typeValue (',' metadataAttachment)*;
 catchRetTerm:
-        KwCatchret KwFrom value KwTo label (',' metadataAttachment)*;
+        OpCatchret KwFrom value KwTo label (',' metadataAttachment)*;
 cleanupRetTerm:
-        KwCleanupret KwFrom value KwUnwind unwindTarget (
+        OpCleanupret KwFrom value KwUnwind unwindTarget (
                 ',' metadataAttachment
         )*;
-unreachableTerm: KwUnreachable (',' metadataAttachment)*;
+unreachableTerm: OpUnreachable (',' metadataAttachment)*;
 invokeTerm:
-        KwInvoke callingConv? returnAttribute* addrSpace? type value '(' args ')' funcAttribute* (
+        OpInvoke callingConv? returnAttribute* addrSpace? type value '(' args ')' funcAttribute* (
                 '[' (operandBundle ',')+ ']'
         )? KwTo label KwUnwind label (',' metadataAttachment)*;
 callBrTerm:
-        KwCallbr callingConv? returnAttribute* addrSpace? type value '(' args ')' funcAttribute* (
+        OpCallbr callingConv? returnAttribute* addrSpace? type value '(' args ')' funcAttribute* (
                 '[' (operandBundle ',')+ ']'
         )? KwTo label '[' (label (',' label)*)? ']' (
                 ',' metadataAttachment
         )*;
 catchSwitchTerm:
-        KwCatchswitch KwWithin exceptionPad '[' handlers ']' KwUnwind unwindTarget (
+        OpCatchswitch KwWithin exceptionPad '[' handlers ']' KwUnwind unwindTarget (
                 ',' metadataAttachment
         )*;
 label: KwLabel LocalIdent;
@@ -697,15 +697,15 @@ callInst:
 vaargInst:
         OpVaArg typeValue ',' type (',' metadataAttachment)*;
 landingPadInst:
-        KwLandingpad type cleanUp = KwCleanup? clause* (
+        OpLandingpad type cleanUp = KwCleanup? clause* (
                 ',' metadataAttachment
         )*;
 catchPadInst:
-        KwCatchpad KwWithin LocalIdent '[' (
+        OpCatchpad KwWithin LocalIdent '[' (
                 exceptionArg (',' exceptionArg)*
         )? ']' (',' metadataAttachment)*;
 cleanupPadInst:
-        KwCleanuppad KwWithin exceptionPad '[' (
+        OpCleanuppad KwWithin exceptionPad '[' (
                 exceptionArg (',' exceptionArg)*
         )? ']' (',' metadataAttachment)*;
 

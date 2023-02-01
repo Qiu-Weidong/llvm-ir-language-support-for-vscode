@@ -1,5 +1,6 @@
 grammar LLVMIR;
 
+
 compilationUnit: topLevelEntity* EOF;
 
 targetDef: targetDataLayout | targetTriple;
@@ -116,42 +117,42 @@ terminator:
 localDefTerm: LocalIdent '=' valueTerminator;
 valueTerminator: invokeTerm | callBrTerm | catchSwitchTerm;
 retTerm:
-        KwRet voidType (',' metadataAttachment)*
+        OpRet voidType (',' metadataAttachment)*
         // Value return.
-        | KwRet concreteType value (',' metadataAttachment)*;
-brTerm: KwBr label (',' metadataAttachment)*;
+        | OpRet concreteType value (',' metadataAttachment)*;
+brTerm: OpBr label (',' metadataAttachment)*;
 condBrTerm:
-        KwBr IntType value ',' label ',' label (
+        OpBr IntType value ',' label ',' label (
                 ',' metadataAttachment
         )*;
 switchTerm:
-        KwSwitch typeValue ',' label '[' case* ']' (
+        OpSwitch typeValue ',' label '[' case* ']' (
                 ',' metadataAttachment
         )*;
 indirectBrTerm:
-        KwIndirectbr typeValue ',' '[' (label (',' label)?)? ']' (
+        OpIndirectbr typeValue ',' '[' (label (',' label)?)? ']' (
                 ',' metadataAttachment
         )*;
-resumeTerm: KwResume typeValue (',' metadataAttachment)*;
+resumeTerm: OpResume typeValue (',' metadataAttachment)*;
 catchRetTerm:
-        KwCatchret KwFrom value KwTo label (',' metadataAttachment)*;
+        OpCatchret KwFrom value KwTo label (',' metadataAttachment)*;
 cleanupRetTerm:
-        KwCleanupret KwFrom value KwUnwind unwindTarget (
+        OpCleanupret KwFrom value KwUnwind unwindTarget (
                 ',' metadataAttachment
         )*;
-unreachableTerm: KwUnreachable (',' metadataAttachment)*;
+unreachableTerm: OpUnreachable (',' metadataAttachment)*;
 invokeTerm:
-        KwInvoke callingConv? returnAttribute* addrSpace? type value '(' args ')' funcAttribute* (
+        OpInvoke callingConv? returnAttribute* addrSpace? type value '(' args ')' funcAttribute* (
                 '[' (operandBundle ',')+ ']'
         )? KwTo label KwUnwind label (',' metadataAttachment)*;
 callBrTerm:
-        KwCallbr callingConv? returnAttribute* addrSpace? type value '(' args ')' funcAttribute* (
+        OpCallbr callingConv? returnAttribute* addrSpace? type value '(' args ')' funcAttribute* (
                 '[' (operandBundle ',')+ ']'
         )? KwTo label '[' (label (',' label)*)? ']' (
                 ',' metadataAttachment
         )*;
 catchSwitchTerm:
-        KwCatchswitch KwWithin exceptionPad '[' handlers ']' KwUnwind unwindTarget (
+        OpCatchswitch KwWithin exceptionPad '[' handlers ']' KwUnwind unwindTarget (
                 ',' metadataAttachment
         )*;
 label: KwLabel LocalIdent;
@@ -423,46 +424,46 @@ threadLocal: KwThreadLocal ('(' tlsModel ')')?;
 metadataType: KwMetadata;
 
 // expr
-bitCastExpr: KwBitcast '(' typeConst KwTo type ')';
+bitCastExpr: OpBitcast '(' typeConst KwTo type ')';
 getElementPtrExpr:
         KwGetelementptr inBounds? '(' type ',' typeConst (
                 ',' gepIndex
         )* ')';
 gepIndex: inRange = KwInrange? typeConst;
-addrSpaceCastExpr: KwAddrspacecast '(' typeConst KwTo type ')';
-intToPtrExpr: KwInttoptr '(' typeConst KwTo type ')';
-iCmpExpr: KwIcmp iPred '(' typeConst ',' typeConst ')';
-fCmpExpr: KwFcmp fPred '(' typeConst ',' typeConst ')';
+addrSpaceCastExpr: OpAddrspacecast '(' typeConst KwTo type ')';
+intToPtrExpr: OpInttoptr '(' typeConst KwTo type ')';
+iCmpExpr: OpIcmp iPred '(' typeConst ',' typeConst ')';
+fCmpExpr: OpFcmp fPred '(' typeConst ',' typeConst ')';
 selectExpr:
-        KwSelect '(' typeConst ',' typeConst ',' typeConst ')';
-truncExpr: KwTrunc '(' typeConst KwTo type ')';
-zExtExpr: KwZext '(' typeConst KwTo type ')';
-sExtExpr: KwSext '(' typeConst KwTo type ')';
-fpTruncExpr: KwFptrunc '(' typeConst KwTo type ')';
-fpExtExpr: KwFpext '(' typeConst KwTo type ')';
-fpToUiExpr: KwFptoui '(' typeConst KwTo type ')';
-fpToSiExpr: KwFptosi '(' typeConst KwTo type ')';
-uiToFpExpr: KwUitofp '(' typeConst KwTo type ')';
-siToFpExpr: KwSitofp '(' typeConst KwTo type ')';
-ptrToIntExpr: KwPtrtoint '(' typeConst KwTo type ')';
+        OpSelect '(' typeConst ',' typeConst ',' typeConst ')';
+truncExpr: OpTrunc '(' typeConst KwTo type ')';
+zExtExpr: OpZext '(' typeConst KwTo type ')';
+sExtExpr: OpSext '(' typeConst KwTo type ')';
+fpTruncExpr: OpFptrunc '(' typeConst KwTo type ')';
+fpExtExpr: OpFpext '(' typeConst KwTo type ')';
+fpToUiExpr: OpFptoui '(' typeConst KwTo type ')';
+fpToSiExpr: OpFptosi '(' typeConst KwTo type ')';
+uiToFpExpr: OpUitofp '(' typeConst KwTo type ')';
+siToFpExpr: OpSitofp '(' typeConst KwTo type ')';
+ptrToIntExpr: OpPtrtoint '(' typeConst KwTo type ')';
 extractElementExpr:
-        KwExtractelement '(' typeConst ',' typeConst ')';
+        OpExtractelement '(' typeConst ',' typeConst ')';
 insertElementExpr:
-        KwInsertelement '(' typeConst ',' typeConst ',' typeConst ')';
+        OpInsertelement '(' typeConst ',' typeConst ',' typeConst ')';
 shuffleVectorExpr:
-        KwShufflevector '(' typeConst ',' typeConst ',' typeConst ')';
-shlExpr: KwShl overflowFlag* '(' typeConst ',' typeConst ')';
+        OpShufflevector '(' typeConst ',' typeConst ',' typeConst ')';
+shlExpr: OpShl overflowFlag* '(' typeConst ',' typeConst ')';
 lShrExpr:
-        KwLshr exact = KwExact? '(' typeConst ',' typeConst ')';
+        OpLshr exact = KwExact? '(' typeConst ',' typeConst ')';
 aShrExpr:
-        KwAshr exact = KwExact? '(' typeConst ',' typeConst ')';
-andExpr: KwAnd '(' typeConst ',' typeConst ')';
-orExpr: KwOr '(' typeConst ',' typeConst ')';
-xorExpr: KwXor '(' typeConst ',' typeConst ')';
-addExpr: KwAdd overflowFlag* '(' typeConst ',' typeConst ')';
-subExpr: KwSub overflowFlag* '(' typeConst ',' typeConst ')';
-mulExpr: KwMul overflowFlag* '(' typeConst ',' typeConst ')';
-fNegExpr: KwFneg '(' typeConst ')';
+        OpAshr exact = KwExact? '(' typeConst ',' typeConst ')';
+andExpr: OpAnd '(' typeConst ',' typeConst ')';
+orExpr: OpOr '(' typeConst ',' typeConst ')';
+xorExpr: OpXor '(' typeConst ',' typeConst ')';
+addExpr: OpAdd overflowFlag* '(' typeConst ',' typeConst ')';
+subExpr: OpSub overflowFlag* '(' typeConst ',' typeConst ')';
+mulExpr: OpMul overflowFlag* '(' typeConst ',' typeConst ')';
+fNegExpr: OpFneg '(' typeConst ')';
 
 // instructions
 localDefInst: LocalIdent '=' valueInstruction;
@@ -529,116 +530,116 @@ valueInstruction:
         | cleanupPadInst;
 storeInst:
         // Store.
-        KwStore volatile = KwVolatile? typeValue ',' typeValue (
+        OpStore volatile = KwVolatile? typeValue ',' typeValue (
                 ',' align
         )? (',' metadataAttachment)*
         // atomic=KwAtomic store.
-        | KwStore atomic = KwAtomic volatile = KwVolatile? typeValue ',' typeValue syncScope?
+        | OpStore atomic = KwAtomic volatile = KwVolatile? typeValue ',' typeValue syncScope?
                 atomicOrdering (',' align)? (',' metadataAttachment)*;
 
 syncScope: KwSyncscope '(' StringLit ')';
 
 fenceInst:
-        KwFence syncScope? atomicOrdering (',' metadataAttachment)*;
+        OpFence syncScope? atomicOrdering (',' metadataAttachment)*;
 fNegInst:
-        KwFneg fastMathFlag* typeValue (',' metadataAttachment)*;
+        OpFneg fastMathFlag* typeValue (',' metadataAttachment)*;
 addInst:
-        KwAdd overflowFlag* typeValue ',' value (
+        OpAdd overflowFlag* typeValue ',' value (
                 ',' metadataAttachment
         )*;
 fAddInst:
-        KwFadd fastMathFlag* typeValue ',' value (
+        OpFadd fastMathFlag* typeValue ',' value (
                 ',' metadataAttachment
         )*;
 subInst:
-        KwSub overflowFlag* typeValue ',' value (
+        OpSub overflowFlag* typeValue ',' value (
                 ',' metadataAttachment
         )*;
 fSubInst:
-        KwFsub fastMathFlag* typeValue ',' value (
+        OpFsub fastMathFlag* typeValue ',' value (
                 ',' metadataAttachment
         )*;
 mulInst:
-        KwMul overflowFlag* typeValue ',' value (
+        OpMul overflowFlag* typeValue ',' value (
                 ',' metadataAttachment
         )*;
 fMulInst:
-        KwFmul fastMathFlag* typeValue ',' value (
+        OpFmul fastMathFlag* typeValue ',' value (
                 ',' metadataAttachment
         )*;
 uDivInst:
-        KwUdiv exact = KwExact? typeValue ',' value (
+        OpUdiv exact = KwExact? typeValue ',' value (
                 ',' metadataAttachment
         )*;
 sDivInst:
-        KwSdiv exact = KwExact? typeValue ',' value (
+        OpSdiv exact = KwExact? typeValue ',' value (
                 ',' metadataAttachment
         )*;
 fDivInst:
-        KwFdiv fastMathFlag* typeValue ',' value (
+        OpFdiv fastMathFlag* typeValue ',' value (
                 ',' metadataAttachment
         )*;
-uRemInst: KwUrem typeValue ',' value ( ',' metadataAttachment)*;
-sRemInst: KwSrem typeValue ',' value ( ',' metadataAttachment)*;
+uRemInst: OpUrem typeValue ',' value ( ',' metadataAttachment)*;
+sRemInst: OpSrem typeValue ',' value ( ',' metadataAttachment)*;
 fRemInst:
-        KwFrem fastMathFlag* typeValue ',' value (
+        OpFrem fastMathFlag* typeValue ',' value (
                 ',' metadataAttachment
         )*;
 shlInst:
-        KwShl overflowFlag* typeValue ',' value (
+        OpShl overflowFlag* typeValue ',' value (
                 ',' metadataAttachment
         )*;
 lShrInst:
-        KwLshr exact = KwExact? typeValue ',' value (
+        OpLshr exact = KwExact? typeValue ',' value (
                 ',' metadataAttachment
         )*;
 aShrInst:
-        KwAshr exact = KwExact? typeValue ',' value (
+        OpAshr exact = KwExact? typeValue ',' value (
                 ',' metadataAttachment
         )*;
-andInst: KwAnd typeValue ',' value ( ',' metadataAttachment)*;
-orInst: KwOr typeValue ',' value ( ',' metadataAttachment)*;
-xorInst: KwXor typeValue ',' value ( ',' metadataAttachment)*;
+andInst: OpAnd typeValue ',' value ( ',' metadataAttachment)*;
+orInst: OpOr typeValue ',' value ( ',' metadataAttachment)*;
+xorInst: OpXor typeValue ',' value ( ',' metadataAttachment)*;
 extractElementInst:
-        KwExtractelement typeValue ',' typeValue (
+        OpExtractelement typeValue ',' typeValue (
                 ',' metadataAttachment
         )*;
 insertElementInst:
-        KwInsertelement typeValue ',' typeValue ',' typeValue (
+        OpInsertelement typeValue ',' typeValue ',' typeValue (
                 ',' metadataAttachment
         )*;
 shuffleVectorInst:
-        KwShufflevector typeValue ',' typeValue ',' typeValue (
+        OpShufflevector typeValue ',' typeValue ',' typeValue (
                 ',' metadataAttachment
         )*;
 extractValueInst:
-        KwExtractvalue typeValue (',' IntLit)+ (
+        OpExtractvalue typeValue (',' IntLit)+ (
                 ',' metadataAttachment
         )*;
 insertValueInst:
-        KwInsertvalue typeValue ',' typeValue (',' IntLit)+ (
+        OpInsertvalue typeValue ',' typeValue (',' IntLit)+ (
                 ',' metadataAttachment
         )*;
 allocaInst:
-        KwAlloca inAllocaTok = KwInalloca? swiftError = KwSwifterror? type (
+        OpAlloca inAllocaTok = KwInalloca? swiftError = KwSwifterror? type (
                 ',' typeValue
         )? (',' align)? (',' addrSpace)? (',' metadataAttachment)*;
 loadInst:
         // Load.
-        KwLoad volatile = KwVolatile? type ',' typeValue (',' align)? (
+        OpLoad volatile = KwVolatile? type ',' typeValue (',' align)? (
                 ',' metadataAttachment
         )*
         // atomic=KwAtomic load.
-        | KwLoad atomic = KwAtomic volatile = KwVolatile? type ',' typeValue syncScope? atomicOrdering (
+        | OpLoad atomic = KwAtomic volatile = KwVolatile? type ',' typeValue syncScope? atomicOrdering (
                 ',' align
         )? (',' metadataAttachment)*;
 cmpXchgInst:
-        KwCmpxchg weak = KwWeak? volatile = KwVolatile? typeValue ',' typeValue ',' typeValue syncScope?
+        OpCmpxchg weak = KwWeak? volatile = KwVolatile? typeValue ',' typeValue ',' typeValue syncScope?
                 atomicOrdering atomicOrdering (',' align)? (
                 ',' metadataAttachment
         )*;
 atomicRMWInst:
-        KwAtomicrmw volatile = KwVolatile? atomicOp typeValue ',' typeValue syncScope? atomicOrdering (
+        OpAtomicrmw volatile = KwVolatile? atomicOp typeValue ',' typeValue syncScope? atomicOrdering (
                 ',' align
         )? (',' metadataAttachment)*;
 getElementPtrInst:
@@ -646,61 +647,61 @@ getElementPtrInst:
                 ',' metadataAttachment
         )*;
 truncInst:
-        KwTrunc typeValue KwTo type (',' metadataAttachment)*;
-zExtInst: KwZext typeValue KwTo type ( ',' metadataAttachment)*;
-sExtInst: KwSext typeValue KwTo type ( ',' metadataAttachment)*;
+        OpTrunc typeValue KwTo type (',' metadataAttachment)*;
+zExtInst: OpZext typeValue KwTo type ( ',' metadataAttachment)*;
+sExtInst: OpSext typeValue KwTo type ( ',' metadataAttachment)*;
 fpTruncInst:
-        KwFptrunc typeValue KwTo type (',' metadataAttachment)*;
+        OpFptrunc typeValue KwTo type (',' metadataAttachment)*;
 fpExtInst:
-        KwFpext typeValue KwTo type (',' metadataAttachment)*;
+        OpFpext typeValue KwTo type (',' metadataAttachment)*;
 fpToUiInst:
-        KwFptoui typeValue KwTo type (',' metadataAttachment)*;
+        OpFptoui typeValue KwTo type (',' metadataAttachment)*;
 fpToSiInst:
-        KwFptosi typeValue KwTo type (',' metadataAttachment)*;
+        OpFptosi typeValue KwTo type (',' metadataAttachment)*;
 uiToFpInst:
-        KwUitofp typeValue KwTo type (',' metadataAttachment)*;
+        OpUitofp typeValue KwTo type (',' metadataAttachment)*;
 siToFpInst:
-        KwSitofp typeValue KwTo type (',' metadataAttachment)*;
+        OpSitofp typeValue KwTo type (',' metadataAttachment)*;
 ptrToIntInst:
-        KwPtrtoint typeValue KwTo type (',' metadataAttachment)*;
+        OpPtrtoint typeValue KwTo type (',' metadataAttachment)*;
 intToPtrInst:
-        KwInttoptr typeValue KwTo type (',' metadataAttachment)*;
+        OpInttoptr typeValue KwTo type (',' metadataAttachment)*;
 bitCastInst:
-        KwBitcast typeValue KwTo type (',' metadataAttachment)*;
+        OpBitcast typeValue KwTo type (',' metadataAttachment)*;
 addrSpaceCastInst:
-        KwAddrspacecast typeValue KwTo type (',' metadataAttachment)*;
+        OpAddrspacecast typeValue KwTo type (',' metadataAttachment)*;
 iCmpInst:
-        KwIcmp iPred typeValue ',' value (',' metadataAttachment)*;
+        OpIcmp iPred typeValue ',' value (',' metadataAttachment)*;
 fCmpInst:
-        KwFcmp fastMathFlag* fPred typeValue ',' value (
+        OpFcmp fastMathFlag* fPred typeValue ',' value (
                 ',' metadataAttachment
         )*;
 phiInst:
-        KwPhi fastMathFlag* type (inc (',' inc)*) (
+        OpPhi fastMathFlag* type (inc (',' inc)*) (
                 ',' metadataAttachment
         )*;
 selectInst:
-        KwSelect fastMathFlag* typeValue ',' typeValue ',' typeValue (
+        OpSelect fastMathFlag* typeValue ',' typeValue ',' typeValue (
                 ',' metadataAttachment
         )*;
-freezeInst: KwFreeze typeValue;
+freezeInst: OpFreeze typeValue;
 callInst:
-        tail = (KwMusttail | KwNotail | KwTail)? KwCall fastMathFlag* callingConv? returnAttribute*
+        tail = (KwMusttail | KwNotail | KwTail)? OpCall fastMathFlag* callingConv? returnAttribute*
                 addrSpace? type value '(' args ')' funcAttribute* (
                 '[' operandBundle (',' operandBundle)* ']'
         )? (',' metadataAttachment)*;
 vaargInst:
-        KwVaArg typeValue ',' type (',' metadataAttachment)*;
+        OpVaArg typeValue ',' type (',' metadataAttachment)*;
 landingPadInst:
-        KwLandingpad type cleanUp = KwCleanup? clause* (
+        OpLandingpad type cleanUp = KwCleanup? clause* (
                 ',' metadataAttachment
         )*;
 catchPadInst:
-        KwCatchpad KwWithin LocalIdent '[' (
+        OpCatchpad KwWithin LocalIdent '[' (
                 exceptionArg (',' exceptionArg)*
         )? ']' (',' metadataAttachment)*;
 cleanupPadInst:
-        KwCleanuppad KwWithin exceptionPad '[' (
+        OpCleanuppad KwWithin exceptionPad '[' (
                 exceptionArg (',' exceptionArg)*
         )? ']' (',' metadataAttachment)*;
 
@@ -894,21 +895,21 @@ fastMathFlag:
         | KwNsz
         | KwReassoc;
 atomicOp:
-        KwAdd
-        | KwAnd
-        | KwFadd
-        | KwFmax
-        | KwFmin
-        | KwFsub
-        | KwMax
-        | KwMin
-        | KwNand
-        | KwOr
-        | KwSub
-        | KwUmax
-        | KwUmin
-        | KwXchg
-        | KwXor;
+        OpAdd
+        | OpAnd
+        | OpFadd
+        | OpFmax
+        | OpFmin
+        | OpFsub
+        | OpMax
+        | OpMin
+        | OpNand
+        | OpOr
+        | OpSub
+        | OpUmax
+        | OpUmin
+        | OpXchg
+        | OpXor;
 floatKind:
         KwHalf
         | KwBfloat
@@ -1357,6 +1358,8 @@ virtualityField: KwVirtualityLabel DwarfVirtuality;
 vtableHolderField: KwVtableHolderLabel mdField;
 
 
+
+
 // 这些要放到前面去
 DIExpression: '!DIExpression';
 DIArgList: '!DIArgList';
@@ -1443,6 +1446,83 @@ DwarfVirtuality:
 DwarfMacinfo: 'DW_MACINFO_' (AsciiLetter | DecimalDigit | '_')*;
 DwarfOp: 'DW_OP_' (AsciiLetter | DecimalDigit | '_')*;
 
+/*************************************************************************************************************
+ ************************************************ lexer ******************************************************
+ *************************************************************************************************************/
+// 操作符
+OpFmax: 'fmax';
+OpFmin: 'fmin';
+OpMax: 'max';
+OpMin: 'min';
+OpNand: 'nand';
+OpUmax: 'umax';
+OpUmin: 'umin';
+OpXchg: 'xchg';
+OpBitcast: 'bitcast';
+OpAddrspacecast: 'addrspacecast';
+OpInttoptr: 'inttoptr';
+OpIcmp: 'icmp';
+OpFcmp: 'fcmp';
+OpSelect: 'select';
+OpTrunc: 'trunc';
+OpZext: 'zext';
+OpSext: 'sext';
+OpFptrunc: 'fptrunc';
+OpFpext: 'fpext';
+OpFptoui: 'fptoui';
+OpFptosi: 'fptosi';
+OpUitofp: 'uitofp';
+OpSitofp: 'sitofp';
+OpPtrtoint: 'ptrtoint';
+OpExtractelement: 'extractelement';
+OpInsertelement: 'insertelement';
+OpShufflevector: 'shufflevector';
+OpShl: 'shl';
+OpLshr: 'lshr';
+OpAshr: 'ashr';
+OpAnd: 'and';
+OpOr: 'or';
+OpXor: 'xor';
+OpAdd: 'add';
+OpSub: 'sub';
+OpMul: 'mul';
+OpFneg: 'fneg';
+OpStore: 'store';
+OpFence: 'fence';
+OpFadd: 'fadd';
+OpFsub: 'fsub';
+OpFmul: 'fmul';
+OpUdiv: 'udiv';
+OpSdiv: 'sdiv';
+OpFdiv: 'fdiv';
+OpUrem: 'urem';
+OpSrem: 'srem';
+OpFrem: 'frem';
+OpExtractvalue: 'extractvalue';
+OpInsertvalue: 'insertvalue';
+OpAlloca: 'alloca';
+OpLoad: 'load';
+OpCmpxchg: 'cmpxchg';
+OpAtomicrmw: 'atomicrmw';
+OpPhi: 'phi';
+OpFreeze: 'freeze';
+OpCall: 'call';
+OpVaArg: 'va_arg';
+OpCatchpad: 'catchpad';
+OpCleanuppad: 'cleanuppad';
+OpRet: 'ret';
+OpBr: 'br';
+OpSwitch: 'switch';
+OpIndirectbr: 'indirectbr';
+OpResume: 'resume';
+OpCatchret: 'catchret';
+OpCleanupret: 'cleanupret';
+OpUnreachable: 'unreachable';
+OpInvoke: 'invoke';
+OpCallbr: 'callbr';
+OpCatchswitch: 'catchswitch';
+OpLandingpad: 'landingpad';
+
 // 在最后再增添点词法分析 注意，KwNone 和 KwDefault 需要特判
 KwSourceFilename: 'source_filename';
 KwTarget: 'target';
@@ -1469,20 +1549,9 @@ KwGc: 'gc';
 KwPrefix: 'prefix';
 KwPrologue: 'prologue';
 KwPersonality: 'personality';
-KwRet: 'ret';
-KwBr: 'br';
-KwSwitch: 'switch';
-KwIndirectbr: 'indirectbr';
-KwResume: 'resume';
-KwCatchret: 'catchret';
 KwFrom: 'from';
 KwTo: 'to';
-KwCleanupret: 'cleanupret';
 KwUnwind: 'unwind';
-KwUnreachable: 'unreachable';
-KwInvoke: 'invoke';
-KwCallbr: 'callbr';
-KwCatchswitch: 'catchswitch';
 KwWithin: 'within';
 KwLabel: 'label';
 KwCaller: 'caller';
@@ -1550,70 +1619,17 @@ KwPtr: 'ptr';
 KwAddrspace: 'addrspace';
 KwThreadLocal: 'thread_local';
 KwMetadata: 'metadata';
-KwBitcast: 'bitcast';
 KwGetelementptr: 'getelementptr';
 KwInrange: 'inrange';
-KwAddrspacecast: 'addrspacecast';
-KwInttoptr: 'inttoptr';
-KwIcmp: 'icmp';
-KwFcmp: 'fcmp';
-KwSelect: 'select';
-KwTrunc: 'trunc';
-KwZext: 'zext';
-KwSext: 'sext';
-KwFptrunc: 'fptrunc';
-KwFpext: 'fpext';
-KwFptoui: 'fptoui';
-KwFptosi: 'fptosi';
-KwUitofp: 'uitofp';
-KwSitofp: 'sitofp';
-KwPtrtoint: 'ptrtoint';
-KwExtractelement: 'extractelement';
-KwInsertelement: 'insertelement';
-KwShufflevector: 'shufflevector';
-KwShl: 'shl';
-KwLshr: 'lshr';
 KwExact: 'exact';
-KwAshr: 'ashr';
-KwAnd: 'and';
-KwOr: 'or';
-KwXor: 'xor';
-KwAdd: 'add';
-KwSub: 'sub';
-KwMul: 'mul';
-KwFneg: 'fneg';
-KwStore: 'store';
 KwVolatile: 'volatile';
 KwAtomic: 'atomic';
 KwSyncscope: 'syncscope';
-KwFence: 'fence';
-KwFadd: 'fadd';
-KwFsub: 'fsub';
-KwFmul: 'fmul';
-KwUdiv: 'udiv';
-KwSdiv: 'sdiv';
-KwFdiv: 'fdiv';
-KwUrem: 'urem';
-KwSrem: 'srem';
-KwFrem: 'frem';
-KwExtractvalue: 'extractvalue';
-KwInsertvalue: 'insertvalue';
-KwAlloca: 'alloca';
-KwLoad: 'load';
-KwCmpxchg: 'cmpxchg';
 KwWeak: 'weak';
-KwAtomicrmw: 'atomicrmw';
-KwPhi: 'phi';
-KwFreeze: 'freeze';
 KwMusttail: 'musttail';
 KwNotail: 'notail';
 KwTail: 'tail';
-KwCall: 'call';
-KwVaArg: 'va_arg';
-KwLandingpad: 'landingpad';
 KwCleanup: 'cleanup';
-KwCatchpad: 'catchpad';
-KwCleanuppad: 'cleanuppad';
 KwCatch: 'catch';
 KwFilter: 'filter';
 KwExternWeak: 'extern_weak';
@@ -1775,14 +1791,6 @@ KwNinf: 'ninf';
 KwNnan: 'nnan';
 KwNsz: 'nsz';
 KwReassoc: 'reassoc';
-KwFmax: 'fmax';
-KwFmin: 'fmin';
-KwMax: 'max';
-KwMin: 'min';
-KwNand: 'nand';
-KwUmax: 'umax';
-KwUmin: 'umin';
-KwXchg: 'xchg';
 KwHalf: 'half';
 KwBfloat: 'bfloat';
 KwFloat: 'float';
@@ -1906,5 +1914,4 @@ Ellipsis: '...';
 LAngleBrackets: '<';
 RAngleBrackets: '>';
 Asterisk: '*';
-
 
