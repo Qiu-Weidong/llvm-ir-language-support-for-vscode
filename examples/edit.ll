@@ -7,6 +7,8 @@ define void @main() {
   ret void
 }
 
+%mytype = type { %mytype*, i32 }
+
 define  i32 @add() !llvm.loop !0 {
  
   ret void
