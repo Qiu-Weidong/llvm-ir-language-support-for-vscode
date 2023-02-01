@@ -169,7 +169,7 @@ metadataNode:
         // appear in named metadata. Remove this logic if they become plain Metadata.
         | diExpression;
 diExpression:
-        '!DIExpression' '(' (
+        DIExpression '(' (
                 diExpressionField (',' diExpressionField)*
         )? ')';
 diExpressionField: IntLit | DwarfAttEncoding | DwarfOp;
@@ -211,7 +211,7 @@ boolConst: KwTrue | KwFalse;
 intConst: IntLit;
 floatConst: FloatLit;
 nullConst: KwNull;
-noneConst: KwNone;
+noneConst: Kwnone;
 structConst:
         '{' (typeConst (',' typeConst)*)? '}'
         | '<' '{' ( typeConst (',' typeConst)*)? '}' '>';
@@ -735,7 +735,7 @@ internalLinkage:
         | KwWeakOdr;
 linkage: internalLinkage | externalLinkage;
 preemption: KwDsoLocal | KwDsoPreemptable;
-visibility: KwDefault | KwHidden | KwProtected;
+visibility: Kwdefault | KwHidden | KwProtected;
 dllStorageClass: KwDllexport | KwDllimport;
 tlsModel: KwInitialexec | KwLocaldynamic | KwLocalexec;
 unnamedAddr: KwLocalUnnamedAddr | KwUnnamedAddr;

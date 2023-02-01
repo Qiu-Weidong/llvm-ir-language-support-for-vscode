@@ -3,1358 +3,1389 @@ grammar LLVMIR;
 compilationUnit: topLevelEntity* EOF;
 
 targetDef: targetDataLayout | targetTriple;
-sourceFilename: 'source_filename' '=' StringLit;
-targetDataLayout: 'target' 'datalayout' '=' StringLit;
-targetTriple: 'target' 'triple' '=' StringLit;
+sourceFilename: KwSourceFilename '=' StringLit;
+targetDataLayout: KwTarget KwDatalayout '=' StringLit;
+targetTriple: KwTarget KwTriple '=' StringLit;
 
 topLevelEntity:
-	sourceFilename
-	| targetDef
-	| moduleAsm
-	| typeDef
-	| comdatDef
-	| globalDecl
-	| globalDef
-	| indirectSymbolDef
-	| funcDecl
-	| funcDef
-	| attrGroupDef
-	| namedMetadataDef
-	| metadataDef
-	| useListOrder
-	| useListOrderBB;
-moduleAsm: 'module' 'asm' StringLit;
-typeDef: LocalIdent '=' 'type' type;
+        sourceFilename
+        | targetDef
+        | moduleAsm
+        | typeDef
+        | comdatDef
+        | globalDecl
+        | globalDef
+        | indirectSymbolDef
+        | funcDecl
+        | funcDef
+        | attrGroupDef
+        | namedMetadataDef
+        | metadataDef
+        | useListOrder
+        | useListOrderBB;
+moduleAsm: KwModule KwAsm StringLit;
+typeDef: LocalIdent '=' KwType type;
 comdatDef:
-	ComdatName '=' 'comdat' selectionKind = (
-		'any'
-		| 'exactmatch'
-		| 'largest'
-		| 'nodeduplicate'
-		| 'samesize'
-	);
+        ComdatName '=' KwComdat selectionKind = (
+                KwAny
+                | KwExactmatch
+                | KwLargest
+                | KwNodeduplicate
+                | KwSamesize
+        );
 globalDecl:
-	GlobalIdent '=' externalLinkage preemption? visibility? dllStorageClass? threadLocal?
-		unnamedAddr? addrSpace? externallyInitialized? immutable type (
-		',' globalField
-	)* (',' metadataAttachment)* funcAttribute*;
+        GlobalIdent '=' externalLinkage preemption? visibility? dllStorageClass? threadLocal?
+                unnamedAddr? addrSpace? externallyInitialized? immutable type (
+                ',' globalField
+        )* (',' metadataAttachment)* funcAttribute*;
 globalDef:
-	GlobalIdent '=' internalLinkage? preemption? visibility? dllStorageClass? threadLocal?
-		unnamedAddr? addrSpace? externallyInitialized? immutable type constant (
-		',' globalField
-	)* (',' metadataAttachment)* funcAttribute*;
+        GlobalIdent '=' internalLinkage? preemption? visibility? dllStorageClass? threadLocal?
+                unnamedAddr? addrSpace? externallyInitialized? immutable type constant (
+                ',' globalField
+        )* (',' metadataAttachment)* funcAttribute*;
 
 indirectSymbolDef:
-	GlobalIdent '=' linkage? preemption? visibility? dllStorageClass? threadLocal? unnamedAddr?
-		indirectSymbolKind = ('alias' | 'ifunc') type ',' indirectSymbol (
-		',' partition
-	)*;
+        GlobalIdent '=' linkage? preemption? visibility? dllStorageClass? threadLocal? unnamedAddr?
+                indirectSymbolKind = (KwAlias | KwIfunc) type ',' indirectSymbol (
+                ',' partition
+        )*;
 
-funcDecl: 'declare' metadataAttachment* funcHeader;
-funcDef: 'define' funcHeader metadataAttachment* funcBody;
+funcDecl: KwDeclare metadataAttachment* funcHeader;
+funcDef: KwDefine funcHeader metadataAttachment* funcBody;
 attrGroupDef:
-	'attributes' AttrGroupId '=' '{' funcAttribute* '}';
+        KwAttributes AttrGroupId '=' '{' funcAttribute* '}';
 namedMetadataDef:
-	MetadataName '=' '!' '{' (metadataNode (',' metadataNode)*)? '}';
+        MetadataName '=' '!' '{' (metadataNode (',' metadataNode)*)? '}';
 metadataDef:
-	MetadataId '=' distinct? (mdTuple | specializedMDNode);
+        MetadataId '=' distinct? (mdTuple | specializedMDNode);
 useListOrder:
-	'uselistorder' typeValue ',' '{' IntLit (',' IntLit)* '}';
+        KwUselistorder typeValue ',' '{' IntLit (',' IntLit)* '}';
 useListOrderBB:
-	'uselistorder_bb' GlobalIdent ',' LocalIdent ',' '{' IntLit (
-		',' IntLit
-	)* '}';
+        KwUselistorderBb GlobalIdent ',' LocalIdent ',' '{' IntLit (
+                ',' IntLit
+        )* '}';
 
 funcHeader:
-	linkage? preemption? visibility? dllStorageClass? callingConv? returnAttribute* type GlobalIdent
-		'(' params ')' unnamedAddr? addrSpace? funcHdrField*;
+        linkage? preemption? visibility? dllStorageClass? callingConv? returnAttribute* type GlobalIdent
+                '(' params ')' unnamedAddr? addrSpace? funcHdrField*;
 indirectSymbol:
-	typeConst
-	| bitCastExpr
-	| getElementPtrExpr
-	| addrSpaceCastExpr
-	| intToPtrExpr;
+        typeConst
+        | bitCastExpr
+        | getElementPtrExpr
+        | addrSpaceCastExpr
+        | intToPtrExpr;
 callingConv: callingConvEnum | callingConvInt;
-callingConvInt: 'cc' IntLit;
+callingConvInt: KwCc IntLit;
 funcHdrField:
-	funcAttribute
-	| section
-	| partition
-	| comdat
-	| align
-	| gc
-	| prefix
-	| prologue
-	| personality;
-gc: 'gc' StringLit;
-prefix: 'prefix' typeConst;
-prologue: 'prologue' typeConst;
-personality: 'personality' typeConst;
+        funcAttribute
+        | section
+        | partition
+        | comdat
+        | align
+        | gc
+        | prefix
+        | prologue
+        | personality;
+gc: KwGc StringLit;
+prefix: KwPrefix typeConst;
+prologue: KwPrologue typeConst;
+personality: KwPersonality typeConst;
 returnAttribute: returnAttr | dereferenceable;
 funcBody: '{' basicBlock+ useListOrder* '}';
 basicBlock: LabelIdent? instruction* terminator;
 instruction: // Instructions producing values.
-	localDefInst
-	| valueInstruction
-	// Instructions not producing values.
-	| storeInst
-	| fenceInst;
+        localDefInst
+        | valueInstruction
+        // Instructions not producing values.
+        | storeInst
+        | fenceInst;
 terminator:
-	// Terminators producing values.
-	localDefTerm
-	| valueTerminator
-	// Terminators not producing values.
-	| retTerm
-	| brTerm
-	| condBrTerm
-	| switchTerm
-	| indirectBrTerm
-	| resumeTerm
-	| catchRetTerm
-	| cleanupRetTerm
-	| unreachableTerm;
+        // Terminators producing values.
+        localDefTerm
+        | valueTerminator
+        // Terminators not producing values.
+        | retTerm
+        | brTerm
+        | condBrTerm
+        | switchTerm
+        | indirectBrTerm
+        | resumeTerm
+        | catchRetTerm
+        | cleanupRetTerm
+        | unreachableTerm;
 localDefTerm: LocalIdent '=' valueTerminator;
 valueTerminator: invokeTerm | callBrTerm | catchSwitchTerm;
 retTerm:
-	'ret' voidType (',' metadataAttachment)*
-	// Value return.
-	| 'ret' concreteType value (',' metadataAttachment)*;
-brTerm: 'br' label (',' metadataAttachment)*;
+        KwRet voidType (',' metadataAttachment)*
+        // Value return.
+        | KwRet concreteType value (',' metadataAttachment)*;
+brTerm: KwBr label (',' metadataAttachment)*;
 condBrTerm:
-	'br' IntType value ',' label ',' label (
-		',' metadataAttachment
-	)*;
+        KwBr IntType value ',' label ',' label (
+                ',' metadataAttachment
+        )*;
 switchTerm:
-	'switch' typeValue ',' label '[' case* ']' (
-		',' metadataAttachment
-	)*;
+        KwSwitch typeValue ',' label '[' case* ']' (
+                ',' metadataAttachment
+        )*;
 indirectBrTerm:
-	'indirectbr' typeValue ',' '[' (label (',' label)?)? ']' (
-		',' metadataAttachment
-	)*;
-resumeTerm: 'resume' typeValue (',' metadataAttachment)*;
+        KwIndirectbr typeValue ',' '[' (label (',' label)?)? ']' (
+                ',' metadataAttachment
+        )*;
+resumeTerm: KwResume typeValue (',' metadataAttachment)*;
 catchRetTerm:
-	'catchret' 'from' value 'to' label (',' metadataAttachment)*;
+        KwCatchret KwFrom value KwTo label (',' metadataAttachment)*;
 cleanupRetTerm:
-	'cleanupret' 'from' value 'unwind' unwindTarget (
-		',' metadataAttachment
-	)*;
-unreachableTerm: 'unreachable' (',' metadataAttachment)*;
+        KwCleanupret KwFrom value KwUnwind unwindTarget (
+                ',' metadataAttachment
+        )*;
+unreachableTerm: KwUnreachable (',' metadataAttachment)*;
 invokeTerm:
-	'invoke' callingConv? returnAttribute* addrSpace? type value '(' args ')' funcAttribute* (
-		'[' (operandBundle ',')+ ']'
-	)? 'to' label 'unwind' label (',' metadataAttachment)*;
+        KwInvoke callingConv? returnAttribute* addrSpace? type value '(' args ')' funcAttribute* (
+                '[' (operandBundle ',')+ ']'
+        )? KwTo label KwUnwind label (',' metadataAttachment)*;
 callBrTerm:
-	'callbr' callingConv? returnAttribute* addrSpace? type value '(' args ')' funcAttribute* (
-		'[' (operandBundle ',')+ ']'
-	)? 'to' label '[' (label (',' label)*)? ']' (
-		',' metadataAttachment
-	)*;
+        KwCallbr callingConv? returnAttribute* addrSpace? type value '(' args ')' funcAttribute* (
+                '[' (operandBundle ',')+ ']'
+        )? KwTo label '[' (label (',' label)*)? ']' (
+                ',' metadataAttachment
+        )*;
 catchSwitchTerm:
-	'catchswitch' 'within' exceptionPad '[' handlers ']' 'unwind' unwindTarget (
-		',' metadataAttachment
-	)*;
-label: 'label' LocalIdent;
+        KwCatchswitch KwWithin exceptionPad '[' handlers ']' KwUnwind unwindTarget (
+                ',' metadataAttachment
+        )*;
+label: KwLabel LocalIdent;
 case: typeConst ',' label;
-unwindTarget: 'to' 'caller' | label;
+unwindTarget: KwTo KwCaller | label;
 handlers: label (',' label)*;
 metadataNode:
-	MetadataId
-	// Parse DIExpressions inline as a special case. They are still MDNodes, so they can still
-	// appear in named metadata. Remove this logic if they become plain Metadata.
-	| diExpression;
+        MetadataId
+        // Parse DIExpressions inline as a special case. They are still MDNodes, so they can still
+        // appear in named metadata. Remove this logic if they become plain Metadata.
+        | diExpression;
 diExpression:
-	'!DIExpression' '(' (
-		diExpressionField (',' diExpressionField)*
-	)? ')';
+        DIExpression '(' (
+                diExpressionField (',' diExpressionField)*
+        )? ')';
 diExpressionField: IntLit | DwarfAttEncoding | DwarfOp;
 
 globalField:
-	section
-	| partition
-	| comdat
-	| align
-	| sanitizerKind = (
-		'no_sanitize_address'
-		| 'no_sanitize_hwaddress'
-		| 'sanitize_address_dyninit'
-		| 'sanitize_memtag'
-	);
-section: 'section' StringLit;
-comdat: 'comdat' ('(' ComdatName ')')?;
-partition: 'partition' StringLit;
+        section
+        | partition
+        | comdat
+        | align
+        | sanitizerKind = (
+                KwNoSanitizeAddress
+                | KwNoSanitizeHwaddress
+                | KwSanitizeAddressDyninit
+                | KwSanitizeMemtag
+        );
+section: KwSection StringLit;
+comdat: KwComdat ('(' ComdatName ')')?;
+partition: KwPartition StringLit;
 
 constant:
-	boolConst
-	| intConst
-	| floatConst
-	| nullConst
-	| noneConst
-	| structConst
-	| arrayConst
-	| vectorConst
-	| zeroInitializerConst
-	// @42 @foo
-	| GlobalIdent
-	| undefConst
-	| poisonConst
-	| blockAddressConst
-	| dsoLocalEquivalentConst
-	| noCFIConst
-	| constantExpr;
-boolConst: 'true' | 'false';
+        boolConst
+        | intConst
+        | floatConst
+        | nullConst
+        | noneConst
+        | structConst
+        | arrayConst
+        | vectorConst
+        | zeroInitializerConst
+        // @42 @foo
+        | GlobalIdent
+        | undefConst
+        | poisonConst
+        | blockAddressConst
+        | dsoLocalEquivalentConst
+        | noCFIConst
+        | constantExpr;
+boolConst: KwTrue | KwFalse;
 intConst: IntLit;
 floatConst: FloatLit;
-nullConst: 'null';
-noneConst: 'none';
+nullConst: KwNull;
+noneConst: Kwnone;
 structConst:
-	'{' (typeConst (',' typeConst)*)? '}'
-	| '<' '{' ( typeConst (',' typeConst)*)? '}' '>';
+        '{' (typeConst (',' typeConst)*)? '}'
+        | '<' '{' ( typeConst (',' typeConst)*)? '}' '>';
 arrayConst:
-	'c' StringLit
-	| '[' (typeConst (',' typeConst)*)? ']';
+        KwC StringLit
+        | '[' (typeConst (',' typeConst)*)? ']';
 vectorConst: '<' (typeConst (',' typeConst)*)? '>';
-zeroInitializerConst: 'zeroinitializer';
-undefConst: 'undef';
-poisonConst: 'poison';
+zeroInitializerConst: KwZeroinitializer;
+undefConst: KwUndef;
+poisonConst: KwPoison;
 blockAddressConst:
-	'blockaddress' '(' GlobalIdent ',' LocalIdent ')';
-dsoLocalEquivalentConst: 'dso_local_equivalent' GlobalIdent;
-noCFIConst: 'no_cfi' GlobalIdent;
+        KwBlockaddress '(' GlobalIdent ',' LocalIdent ')';
+dsoLocalEquivalentConst: KwDsoLocalEquivalent GlobalIdent;
+noCFIConst: KwNoCfi GlobalIdent;
 constantExpr:
-	// Unary expressions
-	fNegExpr
-	// Binary expressions
-	| addExpr
-	| subExpr
-	| mulExpr
-	// Bitwise expressions
-	| shlExpr
-	| lShrExpr
-	| aShrExpr
-	| andExpr
-	| orExpr
-	| xorExpr
-	// Vector expressions
-	| extractElementExpr
-	| insertElementExpr
-	| shuffleVectorExpr
-	// Memory expressions
-	| getElementPtrExpr
-	// Conversion expressions
-	| truncExpr
-	| zExtExpr
-	| sExtExpr
-	| fpTruncExpr
-	| fpExtExpr
-	| fpToUiExpr
-	| fpToSiExpr
-	| uiToFpExpr
-	| siToFpExpr
-	| ptrToIntExpr
-	| intToPtrExpr
-	| bitCastExpr
-	| addrSpaceCastExpr
-	// Other expressions
-	| iCmpExpr
-	| fCmpExpr
-	| selectExpr;
+        // Unary expressions
+        fNegExpr
+        // Binary expressions
+        | addExpr
+        | subExpr
+        | mulExpr
+        // Bitwise expressions
+        | shlExpr
+        | lShrExpr
+        | aShrExpr
+        | andExpr
+        | orExpr
+        | xorExpr
+        // Vector expressions
+        | extractElementExpr
+        | insertElementExpr
+        | shuffleVectorExpr
+        // Memory expressions
+        | getElementPtrExpr
+        // Conversion expressions
+        | truncExpr
+        | zExtExpr
+        | sExtExpr
+        | fpTruncExpr
+        | fpExtExpr
+        | fpToUiExpr
+        | fpToSiExpr
+        | uiToFpExpr
+        | siToFpExpr
+        | ptrToIntExpr
+        | intToPtrExpr
+        | bitCastExpr
+        | addrSpaceCastExpr
+        // Other expressions
+        | iCmpExpr
+        | fCmpExpr
+        | selectExpr;
 typeConst: firstClassType constant;
 
 metadataAttachment: MetadataName mdNode;
 mdNode:
-	mdTuple
-	// !42
-	| MetadataId
-	//!{ ... }
-	| specializedMDNode;
+        mdTuple
+        // !42
+        | MetadataId
+        //!{ ... }
+        | specializedMDNode;
 mdTuple: '!' '{' (mdField (',' mdField)*)? '}';
 // metadataID: MetadataId;
 metadata:
-	typeValue
-	| mdString
-	// !{ ... }
-	| mdTuple
-	// !7
-	| MetadataId
-	| diArgList
-	| specializedMDNode;
+        typeValue
+        | mdString
+        // !{ ... }
+        | mdTuple
+        // !7
+        | MetadataId
+        | diArgList
+        | specializedMDNode;
 diArgList: '!DIArgList' '(' (typeValue (',' typeValue)*)? ')';
 typeValue: firstClassType value;
 value:
-	constant
-	// %42 %foo
-	| LocalIdent
-	// TODO: Move InlineAsm from Value to Callee and Invokee? Inline assembler expressions may only
-	// be used as the callee operand of a call or an invoke instruction.
-	| inlineAsm;
+        constant
+        // %42 %foo
+        | LocalIdent
+        // TODO: Move InlineAsm from Value to Callee and Invokee? Inline assembler expressions may only
+        // be used as the callee operand of a call or an invoke instruction.
+        | inlineAsm;
 inlineAsm:
-	'asm' sideEffect = 'sideeffect'? alignStackTok = 'alignstack'? intelDialect = 'inteldialect'?
-		unwind = 'unwind'? StringLit ',' StringLit;
+        KwAsm sideEffect = KwSideeffect? alignStackTok = KwAlignstack? intelDialect = KwInteldialect?
+                unwind = KwUnwind? StringLit ',' StringLit;
 mdString: '!' StringLit;
 mdFieldOrInt: IntLit | mdField;
 diSPFlag: IntLit | DispFlag;
 funcAttribute:
-	attrString
-	| attrPair
-	// not used in attribute groups.
-	| AttrGroupId
-	// used in functions. | align # NOTE: removed to resolve reduce/reduce conflict, see above. used
-	// in attribute groups.
-	| alignPair
-	| alignStack
-	| alignStackPair
-	| allocKind
-	| allocSize
-	| funcAttr
-	| preallocated
-	| unwindTable
-	| vectorScaleRange;
+        attrString
+        | attrPair
+        // not used in attribute groups.
+        | AttrGroupId
+        // used in functions. | align # NOTE: removed to resolve reduce/reduce conflict, see above. used
+        // in attribute groups.
+        | alignPair
+        | alignStack
+        | alignStackPair
+        | allocKind
+        | allocSize
+        | funcAttr
+        | preallocated
+        | unwindTable
+        | vectorScaleRange;
 type:
-	voidType
-	| opaqueType
-	| type '(' params ')'
-	| intType
-	| floatType
-	| type addrSpace? '*'
-	| opaquePointerType
-	| vectorType
-	| labelType
-	| arrayType
-	| structType
-	| namedType
-	| mmxType
-	| tokenType
-	| metadataType;
-voidType: symbol='void';
-opaqueType: symbol='opaque';
+        voidType
+        | opaqueType
+        | type '(' params ')'
+        | intType
+        | floatType
+        | type addrSpace? '*'
+        | opaquePointerType
+        | vectorType
+        | labelType
+        | arrayType
+        | structType
+        | namedType
+        | mmxType
+        | tokenType
+        | metadataType;
+voidType: symbol=KwVoid;
+opaqueType: symbol=KwOpaque;
 params:
-	ellipsis = '...'?
-	| param (',' param)* (',' ellipsis = '...')?;
+        ellipsis = '...'?
+        | param (',' param)* (',' ellipsis = '...')?;
 param: type paramAttribute* LocalIdent?;
 paramAttribute:
-	attrString
-	| attrPair
-	| align
-	| alignStack
-	| byRefAttr
-	| byval
-	| dereferenceable
-	| elementType
-	| inAlloca
-	| paramAttr
-	| preallocated
-	| structRetAttr;
+        attrString
+        | attrPair
+        | align
+        | alignStack
+        | byRefAttr
+        | byval
+        | dereferenceable
+        | elementType
+        | inAlloca
+        | paramAttr
+        | preallocated
+        | structRetAttr;
 attrString: StringLit;
 attrPair: StringLit '=' StringLit;
-align: 'align' IntLit | 'align' '(' IntLit ')';
-alignPair: 'align' '=' IntLit;
-alignStack: 'alignstack' '(' IntLit ')';
-alignStackPair: 'alignstack' '=' IntLit;
-allocKind: 'allockind' '(' StringLit ')';
-allocSize: 'allocsize' '(' IntLit (',' IntLit)? ')';
+align: KwAlign IntLit | KwAlign '(' IntLit ')';
+alignPair: KwAlign '=' IntLit;
+alignStack: KwAlignstack '(' IntLit ')';
+alignStackPair: KwAlignstack '=' IntLit;
+allocKind: KwAllockind '(' StringLit ')';
+allocSize: KwAllocsize '(' IntLit (',' IntLit)? ')';
 unwindTable:
-	'uwtable'
-	| 'uwtable' '(' unwindTableKind = ('async' | 'sync') ')';
+        KwUwtable
+        | KwUwtable '(' unwindTableKind = (KwAsync | KwSync) ')';
 vectorScaleRange:
-	'vscale_range' ('(' (IntLit | IntLit ',' IntLit) ')')?;
-byRefAttr: 'byref' '(' type ')';
-byval: 'byval' ( '(' type ')')?;
+        KwVscaleRange ('(' (IntLit | IntLit ',' IntLit) ')')?;
+byRefAttr: KwByref '(' type ')';
+byval: KwByval ( '(' type ')')?;
 dereferenceable:
-	'dereferenceable' '(' IntLit ')'
-	| 'dereferenceable_or_null' '(' IntLit ')';
-elementType: 'elementtype' '(' type ')';
-inAlloca: 'inalloca' '(' type ')';
+        KwDereferenceable '(' IntLit ')'
+        | KwDereferenceableOrNull '(' IntLit ')';
+elementType: KwElementtype '(' type ')';
+inAlloca: KwInalloca '(' type ')';
 paramAttr:
-	'allocalign'
-	| 'allocptr'
-	| 'immarg'
-	| 'inreg'
-	| 'nest'
-	| 'noalias'
-	| 'nocapture'
-	| 'nofree'
-	| 'nonnull'
-	| 'noundef'
-	| 'readnone'
-	| 'readonly'
-	| 'returned'
-	| 'signext'
-	| 'swiftasync'
-	| 'swifterror'
-	| 'swiftself'
-	| 'writeonly'
-	| 'zeroext';
-preallocated: 'preallocated' '(' type ')';
-structRetAttr: 'sret' '(' type ')';
+        KwAllocalign
+        | KwAllocptr
+        | KwImmarg
+        | KwInreg
+        | KwNest
+        | KwNoalias
+        | KwNocapture
+        | KwNofree
+        | KwNonnull
+        | KwNoundef
+        | KwReadnone
+        | KwReadonly
+        | KwReturned
+        | KwSignext
+        | KwSwiftasync
+        | KwSwifterror
+        | KwSwiftself
+        | KwWriteonly
+        | KwZeroext;
+preallocated: KwPreallocated '(' type ')';
+structRetAttr: KwSret '(' type ')';
 
 // funcType: type '(' params ')';
 firstClassType: concreteType | metadataType;
 concreteType:
-	intType
-	| floatType
-	| pointerType
-	| vectorType
-	| labelType
-	| arrayType
-	| structType
-	| namedType
-	| mmxType
-	| tokenType;
+        intType
+        | floatType
+        | pointerType
+        | vectorType
+        | labelType
+        | arrayType
+        | structType
+        | namedType
+        | mmxType
+        | tokenType;
 
 intType: IntType;
 floatType: floatKind;
 pointerType: type addrSpace? '*' | opaquePointerType;
 vectorType:
-	'<' IntLit 'x' type '>'
-	| '<' 'vscale' 'x' IntLit 'x' type '>';
-labelType: 'label';
-arrayType: '[' IntLit 'x' type ']';
+        '<' IntLit KwX type '>'
+        | '<' KwVscale KwX IntLit KwX type '>';
+labelType: KwLabel;
+arrayType: '[' IntLit KwX type ']';
 structType:
-	'{' (type (',' type)*)? '}'
-	| '<' '{' (type (',' type)*)? '}' '>';
+        '{' (type (',' type)*)? '}'
+        | '<' '{' (type (',' type)*)? '}' '>';
 namedType: LocalIdent;
-mmxType: 'x86_mmx';
-tokenType: 'token';
+mmxType: KwX86Mmx;
+tokenType: KwToken;
 
-opaquePointerType: 'ptr' addrSpace?;
-addrSpace: 'addrspace' '(' IntLit ')';
-threadLocal: 'thread_local' ('(' tlsModel ')')?;
-metadataType: 'metadata';
+opaquePointerType: KwPtr addrSpace?;
+addrSpace: KwAddrspace '(' IntLit ')';
+threadLocal: KwThreadLocal ('(' tlsModel ')')?;
+metadataType: KwMetadata;
 
 // expr
-bitCastExpr: 'bitcast' '(' typeConst 'to' type ')';
+bitCastExpr: KwBitcast '(' typeConst KwTo type ')';
 getElementPtrExpr:
-	'getelementptr' inBounds? '(' type ',' typeConst (
-		',' gepIndex
-	)* ')';
-gepIndex: inRange = 'inrange'? typeConst;
-addrSpaceCastExpr: 'addrspacecast' '(' typeConst 'to' type ')';
-intToPtrExpr: 'inttoptr' '(' typeConst 'to' type ')';
-iCmpExpr: 'icmp' iPred '(' typeConst ',' typeConst ')';
-fCmpExpr: 'fcmp' fPred '(' typeConst ',' typeConst ')';
+        KwGetelementptr inBounds? '(' type ',' typeConst (
+                ',' gepIndex
+        )* ')';
+gepIndex: inRange = KwInrange? typeConst;
+addrSpaceCastExpr: KwAddrspacecast '(' typeConst KwTo type ')';
+intToPtrExpr: KwInttoptr '(' typeConst KwTo type ')';
+iCmpExpr: KwIcmp iPred '(' typeConst ',' typeConst ')';
+fCmpExpr: KwFcmp fPred '(' typeConst ',' typeConst ')';
 selectExpr:
-	'select' '(' typeConst ',' typeConst ',' typeConst ')';
-truncExpr: 'trunc' '(' typeConst 'to' type ')';
-zExtExpr: 'zext' '(' typeConst 'to' type ')';
-sExtExpr: 'sext' '(' typeConst 'to' type ')';
-fpTruncExpr: 'fptrunc' '(' typeConst 'to' type ')';
-fpExtExpr: 'fpext' '(' typeConst 'to' type ')';
-fpToUiExpr: 'fptoui' '(' typeConst 'to' type ')';
-fpToSiExpr: 'fptosi' '(' typeConst 'to' type ')';
-uiToFpExpr: 'uitofp' '(' typeConst 'to' type ')';
-siToFpExpr: 'sitofp' '(' typeConst 'to' type ')';
-ptrToIntExpr: 'ptrtoint' '(' typeConst 'to' type ')';
+        KwSelect '(' typeConst ',' typeConst ',' typeConst ')';
+truncExpr: KwTrunc '(' typeConst KwTo type ')';
+zExtExpr: KwZext '(' typeConst KwTo type ')';
+sExtExpr: KwSext '(' typeConst KwTo type ')';
+fpTruncExpr: KwFptrunc '(' typeConst KwTo type ')';
+fpExtExpr: KwFpext '(' typeConst KwTo type ')';
+fpToUiExpr: KwFptoui '(' typeConst KwTo type ')';
+fpToSiExpr: KwFptosi '(' typeConst KwTo type ')';
+uiToFpExpr: KwUitofp '(' typeConst KwTo type ')';
+siToFpExpr: KwSitofp '(' typeConst KwTo type ')';
+ptrToIntExpr: KwPtrtoint '(' typeConst KwTo type ')';
 extractElementExpr:
-	'extractelement' '(' typeConst ',' typeConst ')';
+        KwExtractelement '(' typeConst ',' typeConst ')';
 insertElementExpr:
-	'insertelement' '(' typeConst ',' typeConst ',' typeConst ')';
+        KwInsertelement '(' typeConst ',' typeConst ',' typeConst ')';
 shuffleVectorExpr:
-	'shufflevector' '(' typeConst ',' typeConst ',' typeConst ')';
-shlExpr: 'shl' overflowFlag* '(' typeConst ',' typeConst ')';
+        KwShufflevector '(' typeConst ',' typeConst ',' typeConst ')';
+shlExpr: KwShl overflowFlag* '(' typeConst ',' typeConst ')';
 lShrExpr:
-	'lshr' exact = 'exact'? '(' typeConst ',' typeConst ')';
+        KwLshr exact = KwExact? '(' typeConst ',' typeConst ')';
 aShrExpr:
-	'ashr' exact = 'exact'? '(' typeConst ',' typeConst ')';
-andExpr: 'and' '(' typeConst ',' typeConst ')';
-orExpr: 'or' '(' typeConst ',' typeConst ')';
-xorExpr: 'xor' '(' typeConst ',' typeConst ')';
-addExpr: 'add' overflowFlag* '(' typeConst ',' typeConst ')';
-subExpr: 'sub' overflowFlag* '(' typeConst ',' typeConst ')';
-mulExpr: 'mul' overflowFlag* '(' typeConst ',' typeConst ')';
-fNegExpr: 'fneg' '(' typeConst ')';
+        KwAshr exact = KwExact? '(' typeConst ',' typeConst ')';
+andExpr: KwAnd '(' typeConst ',' typeConst ')';
+orExpr: KwOr '(' typeConst ',' typeConst ')';
+xorExpr: KwXor '(' typeConst ',' typeConst ')';
+addExpr: KwAdd overflowFlag* '(' typeConst ',' typeConst ')';
+subExpr: KwSub overflowFlag* '(' typeConst ',' typeConst ')';
+mulExpr: KwMul overflowFlag* '(' typeConst ',' typeConst ')';
+fNegExpr: KwFneg '(' typeConst ')';
 
 // instructions
 localDefInst: LocalIdent '=' valueInstruction;
 valueInstruction:
-	// Unary instructions
-	fNegInst
-	// Binary instructions
-	| addInst
-	| fAddInst
-	| subInst
-	| fSubInst
-	| mulInst
-	| fMulInst
-	| uDivInst
-	| sDivInst
-	| fDivInst
-	| uRemInst
-	| sRemInst
-	| fRemInst
-	// Bitwise instructions
-	| shlInst
-	| lShrInst
-	| aShrInst
-	| andInst
-	| orInst
-	| xorInst
-	// Vector instructions
-	| extractElementInst
-	| insertElementInst
-	| shuffleVectorInst
-	// Aggregate instructions
-	| extractValueInst
-	| insertValueInst
-	// Memory instructions
-	| allocaInst
-	| loadInst
-	| cmpXchgInst
-	| atomicRMWInst
-	| getElementPtrInst
-	// Conversion instructions
-	| truncInst
-	| zExtInst
-	| sExtInst
-	| fpTruncInst
-	| fpExtInst
-	| fpToUiInst
-	| fpToSiInst
-	| uiToFpInst
-	| siToFpInst
-	| ptrToIntInst
-	| intToPtrInst
-	| bitCastInst
-	| addrSpaceCastInst
-	// Other instructions
-	| iCmpInst
-	| fCmpInst
-	| phiInst
-	| selectInst
-	| freezeInst
-	| callInst
-	| vaargInst
-	| landingPadInst
-	| catchPadInst
-	| cleanupPadInst;
+        // Unary instructions
+        fNegInst
+        // Binary instructions
+        | addInst
+        | fAddInst
+        | subInst
+        | fSubInst
+        | mulInst
+        | fMulInst
+        | uDivInst
+        | sDivInst
+        | fDivInst
+        | uRemInst
+        | sRemInst
+        | fRemInst
+        // Bitwise instructions
+        | shlInst
+        | lShrInst
+        | aShrInst
+        | andInst
+        | orInst
+        | xorInst
+        // Vector instructions
+        | extractElementInst
+        | insertElementInst
+        | shuffleVectorInst
+        // Aggregate instructions
+        | extractValueInst
+        | insertValueInst
+        // Memory instructions
+        | allocaInst
+        | loadInst
+        | cmpXchgInst
+        | atomicRMWInst
+        | getElementPtrInst
+        // Conversion instructions
+        | truncInst
+        | zExtInst
+        | sExtInst
+        | fpTruncInst
+        | fpExtInst
+        | fpToUiInst
+        | fpToSiInst
+        | uiToFpInst
+        | siToFpInst
+        | ptrToIntInst
+        | intToPtrInst
+        | bitCastInst
+        | addrSpaceCastInst
+        // Other instructions
+        | iCmpInst
+        | fCmpInst
+        | phiInst
+        | selectInst
+        | freezeInst
+        | callInst
+        | vaargInst
+        | landingPadInst
+        | catchPadInst
+        | cleanupPadInst;
 storeInst:
-	// Store.
-	'store' volatile = 'volatile'? typeValue ',' typeValue (
-		',' align
-	)? (',' metadataAttachment)*
-	// atomic='atomic' store.
-	| 'store' atomic = 'atomic' volatile = 'volatile'? typeValue ',' typeValue syncScope?
-		atomicOrdering (',' align)? (',' metadataAttachment)*;
+        // Store.
+        KwStore volatile = KwVolatile? typeValue ',' typeValue (
+                ',' align
+        )? (',' metadataAttachment)*
+        // atomic=KwAtomic store.
+        | KwStore atomic = KwAtomic volatile = KwVolatile? typeValue ',' typeValue syncScope?
+                atomicOrdering (',' align)? (',' metadataAttachment)*;
 
-syncScope: 'syncscope' '(' StringLit ')';
+syncScope: KwSyncscope '(' StringLit ')';
 
 fenceInst:
-	'fence' syncScope? atomicOrdering (',' metadataAttachment)*;
+        KwFence syncScope? atomicOrdering (',' metadataAttachment)*;
 fNegInst:
-	'fneg' fastMathFlag* typeValue (',' metadataAttachment)*;
+        KwFneg fastMathFlag* typeValue (',' metadataAttachment)*;
 addInst:
-	'add' overflowFlag* typeValue ',' value (
-		',' metadataAttachment
-	)*;
+        KwAdd overflowFlag* typeValue ',' value (
+                ',' metadataAttachment
+        )*;
 fAddInst:
-	'fadd' fastMathFlag* typeValue ',' value (
-		',' metadataAttachment
-	)*;
+        KwFadd fastMathFlag* typeValue ',' value (
+                ',' metadataAttachment
+        )*;
 subInst:
-	'sub' overflowFlag* typeValue ',' value (
-		',' metadataAttachment
-	)*;
+        KwSub overflowFlag* typeValue ',' value (
+                ',' metadataAttachment
+        )*;
 fSubInst:
-	'fsub' fastMathFlag* typeValue ',' value (
-		',' metadataAttachment
-	)*;
+        KwFsub fastMathFlag* typeValue ',' value (
+                ',' metadataAttachment
+        )*;
 mulInst:
-	'mul' overflowFlag* typeValue ',' value (
-		',' metadataAttachment
-	)*;
+        KwMul overflowFlag* typeValue ',' value (
+                ',' metadataAttachment
+        )*;
 fMulInst:
-	'fmul' fastMathFlag* typeValue ',' value (
-		',' metadataAttachment
-	)*;
+        KwFmul fastMathFlag* typeValue ',' value (
+                ',' metadataAttachment
+        )*;
 uDivInst:
-	'udiv' exact = 'exact'? typeValue ',' value (
-		',' metadataAttachment
-	)*;
+        KwUdiv exact = KwExact? typeValue ',' value (
+                ',' metadataAttachment
+        )*;
 sDivInst:
-	'sdiv' exact = 'exact'? typeValue ',' value (
-		',' metadataAttachment
-	)*;
+        KwSdiv exact = KwExact? typeValue ',' value (
+                ',' metadataAttachment
+        )*;
 fDivInst:
-	'fdiv' fastMathFlag* typeValue ',' value (
-		',' metadataAttachment
-	)*;
-uRemInst: 'urem' typeValue ',' value ( ',' metadataAttachment)*;
-sRemInst: 'srem' typeValue ',' value ( ',' metadataAttachment)*;
+        KwFdiv fastMathFlag* typeValue ',' value (
+                ',' metadataAttachment
+        )*;
+uRemInst: KwUrem typeValue ',' value ( ',' metadataAttachment)*;
+sRemInst: KwSrem typeValue ',' value ( ',' metadataAttachment)*;
 fRemInst:
-	'frem' fastMathFlag* typeValue ',' value (
-		',' metadataAttachment
-	)*;
+        KwFrem fastMathFlag* typeValue ',' value (
+                ',' metadataAttachment
+        )*;
 shlInst:
-	'shl' overflowFlag* typeValue ',' value (
-		',' metadataAttachment
-	)*;
+        KwShl overflowFlag* typeValue ',' value (
+                ',' metadataAttachment
+        )*;
 lShrInst:
-	'lshr' exact = 'exact'? typeValue ',' value (
-		',' metadataAttachment
-	)*;
+        KwLshr exact = KwExact? typeValue ',' value (
+                ',' metadataAttachment
+        )*;
 aShrInst:
-	'ashr' exact = 'exact'? typeValue ',' value (
-		',' metadataAttachment
-	)*;
-andInst: 'and' typeValue ',' value ( ',' metadataAttachment)*;
-orInst: 'or' typeValue ',' value ( ',' metadataAttachment)*;
-xorInst: 'xor' typeValue ',' value ( ',' metadataAttachment)*;
+        KwAshr exact = KwExact? typeValue ',' value (
+                ',' metadataAttachment
+        )*;
+andInst: KwAnd typeValue ',' value ( ',' metadataAttachment)*;
+orInst: KwOr typeValue ',' value ( ',' metadataAttachment)*;
+xorInst: KwXor typeValue ',' value ( ',' metadataAttachment)*;
 extractElementInst:
-	'extractelement' typeValue ',' typeValue (
-		',' metadataAttachment
-	)*;
+        KwExtractelement typeValue ',' typeValue (
+                ',' metadataAttachment
+        )*;
 insertElementInst:
-	'insertelement' typeValue ',' typeValue ',' typeValue (
-		',' metadataAttachment
-	)*;
+        KwInsertelement typeValue ',' typeValue ',' typeValue (
+                ',' metadataAttachment
+        )*;
 shuffleVectorInst:
-	'shufflevector' typeValue ',' typeValue ',' typeValue (
-		',' metadataAttachment
-	)*;
+        KwShufflevector typeValue ',' typeValue ',' typeValue (
+                ',' metadataAttachment
+        )*;
 extractValueInst:
-	'extractvalue' typeValue (',' IntLit)+ (
-		',' metadataAttachment
-	)*;
+        KwExtractvalue typeValue (',' IntLit)+ (
+                ',' metadataAttachment
+        )*;
 insertValueInst:
-	'insertvalue' typeValue ',' typeValue (',' IntLit)+ (
-		',' metadataAttachment
-	)*;
+        KwInsertvalue typeValue ',' typeValue (',' IntLit)+ (
+                ',' metadataAttachment
+        )*;
 allocaInst:
-	'alloca' inAllocaTok = 'inalloca'? swiftError = 'swifterror'? type (
-		',' typeValue
-	)? (',' align)? (',' addrSpace)? (',' metadataAttachment)*;
+        KwAlloca inAllocaTok = KwInalloca? swiftError = KwSwifterror? type (
+                ',' typeValue
+        )? (',' align)? (',' addrSpace)? (',' metadataAttachment)*;
 loadInst:
-	// Load.
-	'load' volatile = 'volatile'? type ',' typeValue (',' align)? (
-		',' metadataAttachment
-	)*
-	// atomic='atomic' load.
-	| 'load' atomic = 'atomic' volatile = 'volatile'? type ',' typeValue syncScope? atomicOrdering (
-		',' align
-	)? (',' metadataAttachment)*;
+        // Load.
+        KwLoad volatile = KwVolatile? type ',' typeValue (',' align)? (
+                ',' metadataAttachment
+        )*
+        // atomic=KwAtomic load.
+        | KwLoad atomic = KwAtomic volatile = KwVolatile? type ',' typeValue syncScope? atomicOrdering (
+                ',' align
+        )? (',' metadataAttachment)*;
 cmpXchgInst:
-	'cmpxchg' weak = 'weak'? volatile = 'volatile'? typeValue ',' typeValue ',' typeValue syncScope?
-		atomicOrdering atomicOrdering (',' align)? (
-		',' metadataAttachment
-	)*;
+        KwCmpxchg weak = KwWeak? volatile = KwVolatile? typeValue ',' typeValue ',' typeValue syncScope?
+                atomicOrdering atomicOrdering (',' align)? (
+                ',' metadataAttachment
+        )*;
 atomicRMWInst:
-	'atomicrmw' volatile = 'volatile'? atomicOp typeValue ',' typeValue syncScope? atomicOrdering (
-		',' align
-	)? (',' metadataAttachment)*;
+        KwAtomicrmw volatile = KwVolatile? atomicOp typeValue ',' typeValue syncScope? atomicOrdering (
+                ',' align
+        )? (',' metadataAttachment)*;
 getElementPtrInst:
-	'getelementptr' inBounds? type ',' typeValue (',' typeValue)* (
-		',' metadataAttachment
-	)*;
+        KwGetelementptr inBounds? type ',' typeValue (',' typeValue)* (
+                ',' metadataAttachment
+        )*;
 truncInst:
-	'trunc' typeValue 'to' type (',' metadataAttachment)*;
-zExtInst: 'zext' typeValue 'to' type ( ',' metadataAttachment)*;
-sExtInst: 'sext' typeValue 'to' type ( ',' metadataAttachment)*;
+        KwTrunc typeValue KwTo type (',' metadataAttachment)*;
+zExtInst: KwZext typeValue KwTo type ( ',' metadataAttachment)*;
+sExtInst: KwSext typeValue KwTo type ( ',' metadataAttachment)*;
 fpTruncInst:
-	'fptrunc' typeValue 'to' type (',' metadataAttachment)*;
+        KwFptrunc typeValue KwTo type (',' metadataAttachment)*;
 fpExtInst:
-	'fpext' typeValue 'to' type (',' metadataAttachment)*;
+        KwFpext typeValue KwTo type (',' metadataAttachment)*;
 fpToUiInst:
-	'fptoui' typeValue 'to' type (',' metadataAttachment)*;
+        KwFptoui typeValue KwTo type (',' metadataAttachment)*;
 fpToSiInst:
-	'fptosi' typeValue 'to' type (',' metadataAttachment)*;
+        KwFptosi typeValue KwTo type (',' metadataAttachment)*;
 uiToFpInst:
-	'uitofp' typeValue 'to' type (',' metadataAttachment)*;
+        KwUitofp typeValue KwTo type (',' metadataAttachment)*;
 siToFpInst:
-	'sitofp' typeValue 'to' type (',' metadataAttachment)*;
+        KwSitofp typeValue KwTo type (',' metadataAttachment)*;
 ptrToIntInst:
-	'ptrtoint' typeValue 'to' type (',' metadataAttachment)*;
+        KwPtrtoint typeValue KwTo type (',' metadataAttachment)*;
 intToPtrInst:
-	'inttoptr' typeValue 'to' type (',' metadataAttachment)*;
+        KwInttoptr typeValue KwTo type (',' metadataAttachment)*;
 bitCastInst:
-	'bitcast' typeValue 'to' type (',' metadataAttachment)*;
+        KwBitcast typeValue KwTo type (',' metadataAttachment)*;
 addrSpaceCastInst:
-	'addrspacecast' typeValue 'to' type (',' metadataAttachment)*;
+        KwAddrspacecast typeValue KwTo type (',' metadataAttachment)*;
 iCmpInst:
-	'icmp' iPred typeValue ',' value (',' metadataAttachment)*;
+        KwIcmp iPred typeValue ',' value (',' metadataAttachment)*;
 fCmpInst:
-	'fcmp' fastMathFlag* fPred typeValue ',' value (
-		',' metadataAttachment
-	)*;
+        KwFcmp fastMathFlag* fPred typeValue ',' value (
+                ',' metadataAttachment
+        )*;
 phiInst:
-	'phi' fastMathFlag* type (inc (',' inc)*) (
-		',' metadataAttachment
-	)*;
+        KwPhi fastMathFlag* type (inc (',' inc)*) (
+                ',' metadataAttachment
+        )*;
 selectInst:
-	'select' fastMathFlag* typeValue ',' typeValue ',' typeValue (
-		',' metadataAttachment
-	)*;
-freezeInst: 'freeze' typeValue;
+        KwSelect fastMathFlag* typeValue ',' typeValue ',' typeValue (
+                ',' metadataAttachment
+        )*;
+freezeInst: KwFreeze typeValue;
 callInst:
-	tail = ('musttail' | 'notail' | 'tail')? 'call' fastMathFlag* callingConv? returnAttribute*
-		addrSpace? type value '(' args ')' funcAttribute* (
-		'[' operandBundle (',' operandBundle)* ']'
-	)? (',' metadataAttachment)*;
+        tail = (KwMusttail | KwNotail | KwTail)? KwCall fastMathFlag* callingConv? returnAttribute*
+                addrSpace? type value '(' args ')' funcAttribute* (
+                '[' operandBundle (',' operandBundle)* ']'
+        )? (',' metadataAttachment)*;
 vaargInst:
-	'va_arg' typeValue ',' type (',' metadataAttachment)*;
+        KwVaArg typeValue ',' type (',' metadataAttachment)*;
 landingPadInst:
-	'landingpad' type cleanUp = 'cleanup'? clause* (
-		',' metadataAttachment
-	)*;
+        KwLandingpad type cleanUp = KwCleanup? clause* (
+                ',' metadataAttachment
+        )*;
 catchPadInst:
-	'catchpad' 'within' LocalIdent '[' (
-		exceptionArg (',' exceptionArg)*
-	)? ']' (',' metadataAttachment)*;
+        KwCatchpad KwWithin LocalIdent '[' (
+                exceptionArg (',' exceptionArg)*
+        )? ']' (',' metadataAttachment)*;
 cleanupPadInst:
-	'cleanuppad' 'within' exceptionPad '[' (
-		exceptionArg (',' exceptionArg)*
-	)? ']' (',' metadataAttachment)*;
+        KwCleanuppad KwWithin exceptionPad '[' (
+                exceptionArg (',' exceptionArg)*
+        )? ']' (',' metadataAttachment)*;
 
 inc: '[' value ',' LocalIdent ']';
 
 operandBundle: StringLit '(' (typeValue (',' typeValue)*)? ')';
-clause: clauseType = ('catch' | 'filter') typeValue;
+clause: clauseType = (KwCatch | KwFilter) typeValue;
 
 args:
-	ellipsis = '...'?
-	| arg (',' arg)* (',' ellipsis = '...')?;
+        ellipsis = '...'?
+        | arg (',' arg)* (',' ellipsis = '...')?;
 arg: concreteType paramAttribute* value | metadataType metadata;
 
 exceptionArg: concreteType value | metadataType metadata;
 exceptionPad: noneConst | LocalIdent;
 
-externalLinkage: 'extern_weak' | 'external';
+externalLinkage: KwExternWeak | KwExternal;
 internalLinkage:
-	'appending'
-	| 'available_externally'
-	| 'common'
-	| 'internal'
-	| 'linkonce'
-	| 'linkonce_odr'
-	| 'private'
-	| 'weak'
-	| 'weak_odr';
+        KwAppending
+        | KwAvailableExternally
+        | KwCommon
+        | KwInternal
+        | KwLinkonce
+        | KwLinkonceOdr
+        | KwPrivate
+        | KwWeak
+        | KwWeakOdr;
 linkage: internalLinkage | externalLinkage;
-preemption: 'dso_local' | 'dso_preemptable';
-visibility: 'default' | 'hidden' | 'protected';
-dllStorageClass: 'dllexport' | 'dllimport';
-tlsModel: 'initialexec' | 'localdynamic' | 'localexec';
-unnamedAddr: 'local_unnamed_addr' | 'unnamed_addr';
-externallyInitialized: 'externally_initialized';
-immutable: 'constant' | 'global';
+preemption: KwDsoLocal | KwDsoPreemptable;
+visibility: Kwdefault | KwHidden | KwProtected;
+dllStorageClass: KwDllexport | KwDllimport;
+tlsModel: KwInitialexec | KwLocaldynamic | KwLocalexec;
+unnamedAddr: KwLocalUnnamedAddr | KwUnnamedAddr;
+externallyInitialized: KwExternallyInitialized;
+immutable: KwConstant | KwGlobal;
 funcAttr:
-	'alwaysinline'
-	| 'argmemonly'
-	| 'builtin'
-	| 'cold'
-	| 'convergent'
-	| 'disable_sanitizer_instrumentation'
-	| 'fn_ret_thunk_extern'
-	| 'hot'
-	| 'inaccessiblemem_or_argmemonly'
-	| 'inaccessiblememonly'
-	| 'inlinehint'
-	| 'jumptable'
-	| 'minsize'
-	| 'mustprogress'
-	| 'naked'
-	| 'nobuiltin'
-	| 'nocallback'
-	| 'nocf_check'
-	| 'noduplicate'
-	| 'nofree'
-	| 'noimplicitfloat'
-	| 'noinline'
-	| 'nomerge'
-	| 'nonlazybind'
-	| 'noprofile'
-	| 'norecurse'
-	| 'noredzone'
-	| 'noreturn'
-	| 'nosanitize_bounds'
-	| 'nosanitize_coverage'
-	| 'nosync'
-	| 'nounwind'
-	| 'null_pointer_is_valid'
-	| 'optforfuzzing'
-	| 'optnone'
-	| 'optsize'
-	| 'presplitcoroutine'
-	| 'readnone'
-	| 'readonly'
-	| 'returns_twice'
-	| 'safestack'
-	| 'sanitize_address'
-	| 'sanitize_hwaddress'
-	| 'sanitize_memory'
-	| 'sanitize_memtag'
-	| 'sanitize_thread'
-	| 'shadowcallstack'
-	| 'speculatable'
-	| 'speculative_load_hardening'
-	| 'ssp'
-	| 'sspreq'
-	| 'sspstrong'
-	| 'strictfp'
-	| 'willreturn'
-	| 'writeonly';
-distinct: 'distinct';
-inBounds: 'inbounds';
+        KwAlwaysinline
+        | KwArgmemonly
+        | KwBuiltin
+        | KwCold
+        | KwConvergent
+        | KwDisableSanitizerInstrumentation
+        | KwFnRetThunkExtern
+        | KwHot
+        | KwInaccessiblememOrArgmemonly
+        | KwInaccessiblememonly
+        | KwInlinehint
+        | KwJumptable
+        | KwMinsize
+        | KwMustprogress
+        | KwNaked
+        | KwNobuiltin
+        | KwNocallback
+        | KwNocfCheck
+        | KwNoduplicate
+        | KwNofree
+        | KwNoimplicitfloat
+        | KwNoinline
+        | KwNomerge
+        | KwNonlazybind
+        | KwNoprofile
+        | KwNorecurse
+        | KwNoredzone
+        | KwNoreturn
+        | KwNosanitizeBounds
+        | KwNosanitizeCoverage
+        | KwNosync
+        | KwNounwind
+        | KwNullPointerIsValid
+        | KwOptforfuzzing
+        | KwOptnone
+        | KwOptsize
+        | KwPresplitcoroutine
+        | KwReadnone
+        | KwReadonly
+        | KwReturnsTwice
+        | KwSafestack
+        | KwSanitizeAddress
+        | KwSanitizeHwaddress
+        | KwSanitizeMemory
+        | KwSanitizeMemtag
+        | KwSanitizeThread
+        | KwShadowcallstack
+        | KwSpeculatable
+        | KwSpeculativeLoadHardening
+        | KwSsp
+        | KwSspreq
+        | KwSspstrong
+        | KwStrictfp
+        | KwWillreturn
+        | KwWriteonly;
+distinct: KwDistinct;
+inBounds: KwInbounds;
 returnAttr:
-	'inreg'
-	| 'noalias'
-	| 'nonnull'
-	| 'noundef'
-	| 'signext'
-	| 'zeroext';
-overflowFlag: 'nsw' | 'nuw';
+        KwInreg
+        | KwNoalias
+        | KwNonnull
+        | KwNoundef
+        | KwSignext
+        | KwZeroext;
+overflowFlag: KwNsw | KwNuw;
 iPred:
-	'eq'
-	| 'ne'
-	| 'sge'
-	| 'sgt'
-	| 'sle'
-	| 'slt'
-	| 'uge'
-	| 'ugt'
-	| 'ule'
-	| 'ult';
+        KwEq
+        | KwNe
+        | KwSge
+        | KwSgt
+        | KwSle
+        | KwSlt
+        | KwUge
+        | KwUgt
+        | KwUle
+        | KwUlt;
 fPred:
-	'false'
-	| 'oeq'
-	| 'oge'
-	| 'ogt'
-	| 'ole'
-	| 'olt'
-	| 'one'
-	| 'ord'
-	| 'true'
-	| 'ueq'
-	| 'uge'
-	| 'ugt'
-	| 'ule'
-	| 'ult'
-	| 'une'
-	| 'uno';
+        KwFalse
+        | KwOeq
+        | KwOge
+        | KwOgt
+        | KwOle
+        | KwOlt
+        | KwOne
+        | KwOrd
+        | KwTrue
+        | KwUeq
+        | KwUge
+        | KwUgt
+        | KwUle
+        | KwUlt
+        | KwUne
+        | KwUno;
 atomicOrdering:
-	'acq_rel'
-	| 'acquire'
-	| 'monotonic'
-	| 'release'
-	| 'seq_cst'
-	| 'unordered';
+        KwAcqRel
+        | KwAcquire
+        | KwMonotonic
+        | KwRelease
+        | KwSeqCst
+        | KwUnordered;
 callingConvEnum:
-	'aarch64_sve_vector_pcs'
-	| 'aarch64_vector_pcs'
-	| 'amdgpu_cs'
-	| 'amdgpu_es'
-	| 'amdgpu_gfx'
-	| 'amdgpu_gs'
-	| 'amdgpu_hs'
-	| 'amdgpu_kernel'
-	| 'amdgpu_ls'
-	| 'amdgpu_ps'
-	| 'amdgpu_vs'
-	| 'anyregcc'
-	| 'arm_aapcs_vfpcc'
-	| 'arm_aapcscc'
-	| 'arm_apcscc'
-	| 'avr_intrcc'
-	| 'avr_signalcc'
-	| 'ccc'
-	| 'cfguard_checkcc'
-	| 'coldcc'
-	| 'cxx_fast_tlscc'
-	| 'fastcc'
-	| 'ghccc'
-	| 'hhvm_ccc'
-	| 'hhvmcc'
-	| 'intel_ocl_bicc'
-	| 'msp430_intrcc'
-	| 'preserve_allcc'
-	| 'preserve_mostcc'
-	| 'ptx_device'
-	| 'ptx_kernel'
-	| 'spir_func'
-	| 'spir_kernel'
-	| 'swiftcc'
-	| 'swifttailcc'
-	| 'tailcc'
-	| 'webkit_jscc'
-	| 'win64cc'
-	| 'x86_64_sysvcc'
-	| 'x86_fastcallcc'
-	| 'x86_intrcc'
-	| 'x86_regcallcc'
-	| 'x86_stdcallcc'
-	| 'x86_thiscallcc'
-	| 'x86_vectorcallcc';
+        KwAarch64SveVectorPcs
+        | KwAarch64VectorPcs
+        | KwAmdgpuCs
+        | KwAmdgpuEs
+        | KwAmdgpuGfx
+        | KwAmdgpuGs
+        | KwAmdgpuHs
+        | KwAmdgpuKernel
+        | KwAmdgpuLs
+        | KwAmdgpuPs
+        | KwAmdgpuVs
+        | KwAnyregcc
+        | KwArmAapcsVfpcc
+        | KwArmAapcscc
+        | KwArmApcscc
+        | KwAvrIntrcc
+        | KwAvrSignalcc
+        | KwCcc
+        | KwCfguardCheckcc
+        | KwColdcc
+        | KwCxxFastTlscc
+        | KwFastcc
+        | KwGhccc
+        | KwHhvmCcc
+        | KwHhvmcc
+        | KwIntelOclBicc
+        | KwMsp430Intrcc
+        | KwPreserveAllcc
+        | KwPreserveMostcc
+        | KwPtxDevice
+        | KwPtxKernel
+        | KwSpirFunc
+        | KwSpirKernel
+        | KwSwiftcc
+        | KwSwifttailcc
+        | KwTailcc
+        | KwWebkitJscc
+        | KwWin64cc
+        | KwX8664Sysvcc
+        | KwX86Fastcallcc
+        | KwX86Intrcc
+        | KwX86Regcallcc
+        | KwX86Stdcallcc
+        | KwX86Thiscallcc
+        | KwX86Vectorcallcc;
 
 fastMathFlag:
-	'afn'
-	| 'arcp'
-	| 'contract'
-	| 'fast'
-	| 'ninf'
-	| 'nnan'
-	| 'nsz'
-	| 'reassoc';
+        KwAfn
+        | KwArcp
+        | KwContract
+        | KwFast
+        | KwNinf
+        | KwNnan
+        | KwNsz
+        | KwReassoc;
 atomicOp:
-	'add'
-	| 'and'
-	| 'fadd'
-	| 'fmax'
-	| 'fmin'
-	| 'fsub'
-	| 'max'
-	| 'min'
-	| 'nand'
-	| 'or'
-	| 'sub'
-	| 'umax'
-	| 'umin'
-	| 'xchg'
-	| 'xor';
+        KwAdd
+        | KwAnd
+        | KwFadd
+        | KwFmax
+        | KwFmin
+        | KwFsub
+        | KwMax
+        | KwMin
+        | KwNand
+        | KwOr
+        | KwSub
+        | KwUmax
+        | KwUmin
+        | KwXchg
+        | KwXor;
 floatKind:
-	'half'
-	| 'bfloat'
-	| 'float'
-	| 'double'
-	| 'x86_fp80'
-	| 'fp128'
-	| 'ppc_fp128';
+        KwHalf
+        | KwBfloat
+        | KwFloat
+        | KwDouble
+        | KwX86Fp80
+        | KwFp128
+        | KwPpcFp128;
 /*看不懂，直接抄过来的 */
 specializedMDNode:
-	diBasicType
-	| diCommonBlock // not in spec as of 2019-12-05
-	| diCompileUnit
-	| diCompositeType
-	| diDerivedType
-	| diEnumerator
-	| diExpression
-	| diFile
-	| diGlobalVariable
-	| diGlobalVariableExpression
-	| diImportedEntity
-	| diLabel // not in spec as of 2018-10-14, still not in spec as of 2019-12-05
-	| diLexicalBlock
-	| diLexicalBlockFile
-	| diLocalVariable
-	| diLocation
-	| diMacro
-	| diMacroFile
-	| diModule // not in spec as of 2018-02-21, still not in spec as of 2019-12-05
-	| diNamespace
-	| diObjCProperty
-	| diStringType
-	| diSubprogram
-	| diSubrange
-	| diSubroutineType
-	| diTemplateTypeParameter
-	| diTemplateValueParameter
-	| genericDiNode; // not in spec as of 2018-02-21, still not in spec as of 2019-12-05
+        diBasicType
+        | diCommonBlock // not in spec as of 2019-12-05
+        | diCompileUnit
+        | diCompositeType
+        | diDerivedType
+        | diEnumerator
+        | diExpression
+        | diFile
+        | diGlobalVariable
+        | diGlobalVariableExpression
+        | diImportedEntity
+        | diLabel // not in spec as of 2018-10-14, still not in spec as of 2019-12-05
+        | diLexicalBlock
+        | diLexicalBlockFile
+        | diLocalVariable
+        | diLocation
+        | diMacro
+        | diMacroFile
+        | diModule // not in spec as of 2018-02-21, still not in spec as of 2019-12-05
+        | diNamespace
+        | diObjCProperty
+        | diStringType
+        | diSubprogram
+        | diSubrange
+        | diSubroutineType
+        | diTemplateTypeParameter
+        | diTemplateValueParameter
+        | genericDiNode; // not in spec as of 2018-02-21, still not in spec as of 2019-12-05
 
 diBasicType:
-	'!DIBasicType' '(' (diBasicTypeField (',' diBasicTypeField)*)? ')';
+        '!DIBasicType' '(' (diBasicTypeField (',' diBasicTypeField)*)? ')';
 diCommonBlock:
-	'!DICommonBlock' '(' (
-		diCommonBlockField (',' diCommonBlockField)*
-	)? ')';
+        '!DICommonBlock' '(' (
+                diCommonBlockField (',' diCommonBlockField)*
+        )? ')';
 diCompileUnit:
-	'!DICompileUnit' '(' (
-		diCompileUnitField (',' diCompileUnitField)*
-	)? ')';
+        '!DICompileUnit' '(' (
+                diCompileUnitField (',' diCompileUnitField)*
+        )? ')';
 diCompositeType:
-	'!DICompositeType' '(' (
-		diCompositeTypeField (',' diCompositeTypeField)*
-	)? ')';
+        '!DICompositeType' '(' (
+                diCompositeTypeField (',' diCompositeTypeField)*
+        )? ')';
 diCompositeTypeField:
-	tagField
-	| nameField
-	| scopeField
-	| fileField
-	| lineField
-	| baseTypeField
-	| sizeField
-	| alignField
-	| offsetField
-	| flagsField
-	| elementsField
-	| runtimeLangField
-	| vtableHolderField
-	| templateParamsField
-	| identifierField
-	| discriminatorField
-	| dataLocationField
-	| associatedField
-	| allocatedField
-	| rankField
-	| annotationsField;
+        tagField
+        | nameField
+        | scopeField
+        | fileField
+        | lineField
+        | baseTypeField
+        | sizeField
+        | alignField
+        | offsetField
+        | flagsField
+        | elementsField
+        | runtimeLangField
+        | vtableHolderField
+        | templateParamsField
+        | identifierField
+        | discriminatorField
+        | dataLocationField
+        | associatedField
+        | allocatedField
+        | rankField
+        | annotationsField;
 diDerivedType:
-	'!DIDerivedType' '(' (
-		diDerivedTypeField (',' diDerivedTypeField)*
-	)? ')';
+        '!DIDerivedType' '(' (
+                diDerivedTypeField (',' diDerivedTypeField)*
+        )? ')';
 diDerivedTypeField:
-	tagField
-	| nameField
-	| scopeField
-	| fileField
-	| lineField
-	| baseTypeField
-	| sizeField
-	| alignField
-	| offsetField
-	| flagsField
-	| extraDataField
-	| dwarfAddressSpaceField
-	| annotationsField;
+        tagField
+        | nameField
+        | scopeField
+        | fileField
+        | lineField
+        | baseTypeField
+        | sizeField
+        | alignField
+        | offsetField
+        | flagsField
+        | extraDataField
+        | dwarfAddressSpaceField
+        | annotationsField;
 diEnumerator:
-	'!DIEnumerator' '(' (
-		diEnumeratorField (',' diEnumeratorField)*
-	)? ')';
+        '!DIEnumerator' '(' (
+                diEnumeratorField (',' diEnumeratorField)*
+        )? ')';
 diEnumeratorField: nameField | valueIntField | isUnsignedField;
 diFile: '!DIFile' '(' (diFileField (',' diFileField)*)? ')';
 diFileField:
-	filenameField
-	| directoryField
-	| checksumkindField
-	| checksumField
-	| sourceField;
+        filenameField
+        | directoryField
+        | checksumkindField
+        | checksumField
+        | sourceField;
 diGlobalVariable:
-	'!DIGlobalVariable' '(' (
-		diGlobalVariableField (',' diGlobalVariableField)*
-	)? ')';
+        '!DIGlobalVariable' '(' (
+                diGlobalVariableField (',' diGlobalVariableField)*
+        )? ')';
 diGlobalVariableField:
-	nameField
-	| scopeField
-	| linkageNameField
-	| fileField
-	| lineField
-	| typeField
-	| isLocalField
-	| isDefinitionField
-	| templateParamsField
-	| declarationField
-	| alignField
-	| annotationsField;
+        nameField
+        | scopeField
+        | linkageNameField
+        | fileField
+        | lineField
+        | typeField
+        | isLocalField
+        | isDefinitionField
+        | templateParamsField
+        | declarationField
+        | alignField
+        | annotationsField;
 diGlobalVariableExpression:
-	'!DIGlobalVariableExpression' '(' (
-		diGlobalVariableExpressionField (
-			',' diGlobalVariableExpressionField
-		)*
-	)? ')';
+        '!DIGlobalVariableExpression' '(' (
+                diGlobalVariableExpressionField (
+                        ',' diGlobalVariableExpressionField
+                )*
+        )? ')';
 diGlobalVariableExpressionField: varField | exprField;
 diImportedEntity:
-	'!DIImportedEntity' '(' (
-		diImportedEntityField (',' diImportedEntityField)*
-	)? ')';
+        '!DIImportedEntity' '(' (
+                diImportedEntityField (',' diImportedEntityField)*
+        )? ')';
 diImportedEntityField:
-	tagField
-	| scopeField
-	| entityField
-	| fileField
-	| lineField
-	| nameField
-	| elementsField;
+        tagField
+        | scopeField
+        | entityField
+        | fileField
+        | lineField
+        | nameField
+        | elementsField;
 
 diLabel: '!DILabel' '(' (diLabelField (',' diLabelField)*)? ')';
 diLabelField: scopeField | nameField | fileField | lineField;
 diLexicalBlock:
-	'!DILexicalBlock' '(' (
-		diLexicalBlockField (',' diLexicalBlockField)*
-	)? ')';
+        '!DILexicalBlock' '(' (
+                diLexicalBlockField (',' diLexicalBlockField)*
+        )? ')';
 diLexicalBlockField:
-	scopeField
-	| fileField
-	| lineField
-	| columnField;
+        scopeField
+        | fileField
+        | lineField
+        | columnField;
 diLexicalBlockFile:
-	'!DILexicalBlockFile' '(' (
-		diLexicalBlockFileField (',' diLexicalBlockFileField)*
-	)? ')';
+        '!DILexicalBlockFile' '(' (
+                diLexicalBlockFileField (',' diLexicalBlockFileField)*
+        )? ')';
 diLexicalBlockFileField:
-	scopeField
-	| fileField
-	| discriminatorIntField;
+        scopeField
+        | fileField
+        | discriminatorIntField;
 diLocalVariable:
-	'!DILocalVariable' '(' (
-		diLocalVariableField (',' diLocalVariableField)*
-	)? ')';
+        '!DILocalVariable' '(' (
+                diLocalVariableField (',' diLocalVariableField)*
+        )? ')';
 diLocalVariableField:
-	scopeField
-	| nameField
-	| argField
-	| fileField
-	| lineField
-	| typeField
-	| flagsField
-	| alignField
-	| annotationsField;
+        scopeField
+        | nameField
+        | argField
+        | fileField
+        | lineField
+        | typeField
+        | flagsField
+        | alignField
+        | annotationsField;
 diLocation:
-	'!DILocation' '(' (diLocationField (',' diLocationField)*)? ')';
+        '!DILocation' '(' (diLocationField (',' diLocationField)*)? ')';
 diLocationField:
-	lineField
-	| columnField
-	| scopeField
-	| inlinedAtField
-	| isImplicitCodeField;
+        lineField
+        | columnField
+        | scopeField
+        | inlinedAtField
+        | isImplicitCodeField;
 diMacro: '!DIMacro' '(' (diMacroField (',' diMacroField)*)? ')';
 diMacroField:
-	typeMacinfoField
-	| lineField
-	| nameField
-	| valueStringField;
+        typeMacinfoField
+        | lineField
+        | nameField
+        | valueStringField;
 diMacroFile:
-	'!DIMacroFile' '(' (diMacroFileField (',' diMacroFileField)*)? ')';
+        '!DIMacroFile' '(' (diMacroFileField (',' diMacroFileField)*)? ')';
 diMacroFileField:
-	typeMacinfoField
-	| lineField
-	| fileField
-	| nodesField;
+        typeMacinfoField
+        | lineField
+        | fileField
+        | nodesField;
 diModule:
-	'!DIModule' '(' (diModuleField (',' diModuleField)*)? ')';
+        '!DIModule' '(' (diModuleField (',' diModuleField)*)? ')';
 diModuleField:
-	scopeField
-	| nameField
-	| configMacrosField
-	| includePathField
-	| apiNotesField
-	| fileField
-	| lineField
-	| isDeclField;
+        scopeField
+        | nameField
+        | configMacrosField
+        | includePathField
+        | apiNotesField
+        | fileField
+        | lineField
+        | isDeclField;
 diNamespace:
-	'!DINamespace' '(' (diNamespaceField (',' diNamespaceField)*)? ')';
+        '!DINamespace' '(' (diNamespaceField (',' diNamespaceField)*)? ')';
 diNamespaceField: scopeField | nameField | exportSymbolsField;
 diObjCProperty:
-	'!DIObjCProperty' '(' (
-		diObjCPropertyField (',' diObjCPropertyField)*
-	)? ')';
+        '!DIObjCProperty' '(' (
+                diObjCPropertyField (',' diObjCPropertyField)*
+        )? ')';
 diObjCPropertyField:
-	nameField
-	| fileField
-	| lineField
-	| setterField
-	| getterField
-	| attributesField
-	| typeField;
+        nameField
+        | fileField
+        | lineField
+        | setterField
+        | getterField
+        | attributesField
+        | typeField;
 diStringType:
-	'!DIStringType' '(' (
-		diStringTypeField (',' diStringTypeField)*
-	)? ')';
+        '!DIStringType' '(' (
+                diStringTypeField (',' diStringTypeField)*
+        )? ')';
 diStringTypeField:
-	tagField
-	| nameField
-	| stringLengthField
-	| stringLengthExpressionField
-	| stringLocationExpressionField
-	| sizeField
-	| alignField
-	| encodingField;
+        tagField
+        | nameField
+        | stringLengthField
+        | stringLengthExpressionField
+        | stringLocationExpressionField
+        | sizeField
+        | alignField
+        | encodingField;
 diSubprogram:
-	'!DISubprogram' '(' (
-		diSubprogramField (',' diSubprogramField)*
-	)? ')';
+        '!DISubprogram' '(' (
+                diSubprogramField (',' diSubprogramField)*
+        )? ')';
 diSubprogramField:
-	scopeField
-	| nameField
-	| linkageNameField
-	| fileField
-	| lineField
-	| typeField
-	| isLocalField
-	| isDefinitionField
-	| scopeLineField
-	| containingTypeField
-	| virtualityField
-	| virtualIndexField
-	| thisAdjustmentField
-	| flagsField
-	| spFlagsField
-	| isOptimizedField
-	| unitField
-	| templateParamsField
-	| declarationField
-	| retainedNodesField
-	| thrownTypesField
-	| annotationsField
-	| targetFuncNameField;
+        scopeField
+        | nameField
+        | linkageNameField
+        | fileField
+        | lineField
+        | typeField
+        | isLocalField
+        | isDefinitionField
+        | scopeLineField
+        | containingTypeField
+        | virtualityField
+        | virtualIndexField
+        | thisAdjustmentField
+        | flagsField
+        | spFlagsField
+        | isOptimizedField
+        | unitField
+        | templateParamsField
+        | declarationField
+        | retainedNodesField
+        | thrownTypesField
+        | annotationsField
+        | targetFuncNameField;
 diSubrange:
-	'!DICompileUnit' '(' (diSubrangeField (',' diSubrangeField)*)? ')';
+        '!DICompileUnit' '(' (diSubrangeField (',' diSubrangeField)*)? ')';
 diSubrangeField:
-	countField
-	| lowerBoundField
-	| upperBoundField
-	| strideField;
+        countField
+        | lowerBoundField
+        | upperBoundField
+        | strideField;
 diSubroutineType:
-	'!DISubroutineType' '(' (
-		diSubroutineTypeField (',' diSubroutineTypeField)*
-	)? ')';
+        '!DISubroutineType' '(' (
+                diSubroutineTypeField (',' diSubroutineTypeField)*
+        )? ')';
 diTemplateTypeParameter:
-	'!DITemplateTypeParameter' '(' (
-		diTemplateTypeParameterField (
-			',' diTemplateTypeParameterField
-		)*
-	)? ')';
+        '!DITemplateTypeParameter' '(' (
+                diTemplateTypeParameterField (
+                        ',' diTemplateTypeParameterField
+                )*
+        )? ')';
 diTemplateValueParameter:
-	'!DITemplateValueParameter' '(' (
-		diTemplateValueParameterField (
-			',' diTemplateValueParameterField
-		)
-	)? ')';
+        '!DITemplateValueParameter' '(' (
+                diTemplateValueParameterField (
+                        ',' diTemplateValueParameterField
+                )
+        )? ')';
 genericDiNode:
-	'!GenericDINode' '(' (
-		genericDINodeField (',' genericDINodeField)*
-	)? ')';
+        '!GenericDINode' '(' (
+                genericDINodeField (',' genericDINodeField)*
+        )? ')';
 
 diTemplateTypeParameterField:
-	nameField
-	| typeField
-	| defaultedField;
+        nameField
+        | typeField
+        | defaultedField;
 diCompileUnitField:
-	languageField
-	| fileField
-	| producerField
-	| isOptimizedField
-	| flagsStringField
-	| runtimeVersionField
-	| splitDebugFilenameField
-	| emissionKindField
-	| enumsField
-	| retainedTypesField
-	| globalsField
-	| importsField
-	| macrosField
-	| dwoIdField
-	| splitDebugInliningField
-	| debugInfoForProfilingField
-	| nameTableKindField
-	| rangesBaseAddressField
-	| sysrootField
-	| sdkField;
+        languageField
+        | fileField
+        | producerField
+        | isOptimizedField
+        | flagsStringField
+        | runtimeVersionField
+        | splitDebugFilenameField
+        | emissionKindField
+        | enumsField
+        | retainedTypesField
+        | globalsField
+        | importsField
+        | macrosField
+        | dwoIdField
+        | splitDebugInliningField
+        | debugInfoForProfilingField
+        | nameTableKindField
+        | rangesBaseAddressField
+        | sysrootField
+        | sdkField;
 diCommonBlockField:
-	scopeField
-	| declarationField
-	| nameField
-	| fileField
-	| lineField;
+        scopeField
+        | declarationField
+        | nameField
+        | fileField
+        | lineField;
 diBasicTypeField:
-	tagField
-	| nameField
-	| sizeField
-	| alignField
-	| encodingField
-	| flagsField;
+        tagField
+        | nameField
+        | sizeField
+        | alignField
+        | encodingField
+        | flagsField;
 genericDINodeField: tagField | headerField | operandsField;
-tagField: 'tag:' DwarfTag;
-headerField: 'header:' StringLit;
-operandsField: 'operands:' '{' (mdField (',' mdField)*)? '}';
+tagField: KwTagLabel DwarfTag;
+headerField: KwHeaderLabel StringLit;
+operandsField: KwOperandsLabel '{' (mdField (',' mdField)*)? '}';
 diTemplateValueParameterField:
-	tagField
-	| nameField
-	| typeField
-	| defaultedField
-	| valueField;
-nameField: 'name:' StringLit;
-typeField: 'type:' mdField;
-defaultedField: 'defaulted:' boolConst;
-valueField: 'value:' mdField;
+        tagField
+        | nameField
+        | typeField
+        | defaultedField
+        | valueField;
+nameField: KwNameLabel StringLit;
+typeField: KwTypeLabel mdField;
+defaultedField: KwDefaultedLabel boolConst;
+valueField: KwValueLabel mdField;
 mdField: nullConst | metadata;
 diSubroutineTypeField: flagsField | ccField | typesField;
-flagsField: 'flags:' diFlags;
+flagsField: KwFlagsLabel diFlags;
 diFlags: DiFlag ('|' DiFlag)*;
-ccField: 'cc:' DwarfCc | IntLit;
-alignField: 'align:' IntLit;
-allocatedField: 'allocated:' mdField;
-annotationsField: 'annotations:' mdField;
-argField: 'arg:' IntLit;
-associatedField: 'associated:' mdField;
-attributesField: 'attributes:' IntLit;
-baseTypeField: 'baseType:' mdField;
-checksumField: 'checksum:' StringLit;
-checksumkindField: 'checksumkind:' ChecksumKind;
-columnField: 'column:' IntLit;
-configMacrosField: 'configMacros:' StringLit;
-containingTypeField: 'containingType:' mdField;
-countField: 'count:' mdFieldOrInt;
-debugInfoForProfilingField: 'debugInfoForProfiling:' boolConst;
-declarationField: 'declaration:' mdField;
-directoryField: 'directory:' StringLit;
-discriminatorField: 'discriminator:' mdField;
-dataLocationField: 'dataLocation:' mdField;
-discriminatorIntField: 'discriminator:' IntLit;
-dwarfAddressSpaceField: 'dwarfAddressSpace:' IntLit;
-dwoIdField: 'dwoId:' IntLit;
-elementsField: 'elements:' mdField;
+ccField: KwCcLabel DwarfCc | IntLit;
+alignField: KwAlignLabel IntLit;
+allocatedField: KwAllocatedLabel mdField;
+annotationsField: KwAnnotationsLabel mdField;
+argField: KwArgLabel IntLit;
+associatedField: KwAssociatedLabel mdField;
+attributesField: KwAttributesLabel IntLit;
+baseTypeField: KwBaseTypeLabel mdField;
+checksumField: KwChecksumLabel StringLit;
+checksumkindField: KwChecksumkindLabel ChecksumKind;
+columnField: KwColumnLabel IntLit;
+configMacrosField: KwConfigMacrosLabel StringLit;
+containingTypeField: KwContainingTypeLabel mdField;
+countField: KwCountLabel mdFieldOrInt;
+debugInfoForProfilingField: KwDebugInfoForProfilingLabel boolConst;
+declarationField: KwDeclarationLabel mdField;
+directoryField: KwDirectoryLabel StringLit;
+discriminatorField: KwDiscriminatorLabel mdField;
+dataLocationField: KwDataLocationLabel mdField;
+discriminatorIntField: KwDiscriminatorLabel IntLit;
+dwarfAddressSpaceField: KwDwarfAddressSpaceLabel IntLit;
+dwoIdField: KwDwoIdLabel IntLit;
+elementsField: KwElementsLabel mdField;
 emissionKindField:
-	'emissionKind:' emissionKind = (
-		'DebugDirectivesOnly'
-		| 'FullDebug'
-		| 'LineTablesOnly'
-		| 'NoDebug'
-	);
-encodingField: 'encoding:' (IntLit | DwarfAttEncoding);
-entityField: 'entity:' mdField;
-enumsField: 'enums:' mdField;
-exportSymbolsField: 'exportSymbols:' boolConst;
-exprField: 'expr:' mdField;
-extraDataField: 'extraData:' mdField;
-fileField: 'file:' mdField;
-filenameField: 'filename:' StringLit;
-flagsStringField: 'flags:' StringLit;
-getterField: 'getter:' StringLit;
-globalsField: 'globals:' mdField;
-identifierField: 'identifier:' StringLit;
-importsField: 'imports:' mdField;
-includePathField: 'includePath:' StringLit;
-inlinedAtField: 'inlinedAt:' mdField;
-isDeclField: 'isDecl:' boolConst;
-isDefinitionField: 'isDefinition:' boolConst;
-isImplicitCodeField: 'isImplicitCode:' boolConst;
-isLocalField: 'isLocal:' boolConst;
-isOptimizedField: 'isOptimized:' boolConst;
-isUnsignedField: 'isUnsigned:' boolConst;
-apiNotesField: 'apinotes:' StringLit;
-languageField: 'language:' DwarfLang;
-lineField: 'line:' IntLit;
-linkageNameField: 'linkageName:' StringLit;
-lowerBoundField: 'lowerBound:' mdFieldOrInt;
-macrosField: 'macros:' mdField;
+        KwEmissionKindLabel emissionKind = (
+                KwDebugDirectivesOnly
+                | KwFullDebug
+                | KwLineTablesOnly
+                | KwNoDebug
+        );
+encodingField: KwEncodingLabel (IntLit | DwarfAttEncoding);
+entityField: KwEntityLabel mdField;
+enumsField: KwEnumsLabel mdField;
+exportSymbolsField: KwExportSymbolsLabel boolConst;
+exprField: KwExprLabel mdField;
+extraDataField: KwExtraDataLabel mdField;
+fileField: KwFileLabel mdField;
+filenameField: KwFilenameLabel StringLit;
+flagsStringField: KwFlagsLabel StringLit;
+getterField: KwGetterLabel StringLit;
+globalsField: KwGlobalsLabel mdField;
+identifierField: KwIdentifierLabel StringLit;
+importsField: KwImportsLabel mdField;
+includePathField: KwIncludePathLabel StringLit;
+inlinedAtField: KwInlinedAtLabel mdField;
+isDeclField: KwIsDeclLabel boolConst;
+isDefinitionField: KwIsDefinitionLabel boolConst;
+isImplicitCodeField: KwIsImplicitCodeLabel boolConst;
+isLocalField: KwIsLocalLabel boolConst;
+isOptimizedField: KwIsOptimizedLabel boolConst;
+isUnsignedField: KwIsUnsignedLabel boolConst;
+apiNotesField: KwApinotesLabel StringLit;
+languageField: KwLanguageLabel DwarfLang;
+lineField: KwLineLabel IntLit;
+linkageNameField: KwLinkageNameLabel StringLit;
+lowerBoundField: KwLowerBoundLabel mdFieldOrInt;
+macrosField: KwMacrosLabel mdField;
 nameTableKindField:
-	'nameTableKind:' nameTableKind = ('GNU' | 'None' | 'Default');
-nodesField: 'nodes:' mdField;
+        KwNameTableKindLabel nameTableKind = (KwGNU | KwNone | KwDefault);
+nodesField: KwNodesLabel mdField;
 offsetField:
-	// TODO: rename OffsetField= attribute to Offset= when inspirer/textmapper#13 is resolved
-	'offset:' IntLit;
-producerField: 'producer:' StringLit;
-rangesBaseAddressField: 'rangesBaseAddress:' boolConst;
-rankField: 'rank:' mdFieldOrInt;
-retainedNodesField: 'retainedNodes:' mdField;
-retainedTypesField: 'retainedTypes:' mdField;
-runtimeLangField: 'runtimeLang:' DwarfLang;
-runtimeVersionField: 'runtimeVersion:' IntLit;
-scopeField: 'scope:' mdField;
-scopeLineField: 'scopeLine:' IntLit;
-sdkField: 'sdk:' StringLit;
-setterField: 'setter:' StringLit;
-sizeField: 'size:' IntLit;
-sourceField: 'source:' StringLit;
-spFlagsField: 'spFlags:' (diSPFlag ('|' diSPFlag)*);
-splitDebugFilenameField: 'splitDebugFilename:' StringLit;
-splitDebugInliningField: 'splitDebugInlining:' boolConst;
-strideField: 'stride:' mdFieldOrInt;
-stringLengthField: 'stringLength:' mdField;
-stringLengthExpressionField: 'stringLengthExpression:' mdField;
+        // TODO: rename OffsetField= attribute to Offset= when inspirer/textmapper#13 is resolved
+        KwOffsetLabel IntLit;
+producerField: KwProducerLabel StringLit;
+rangesBaseAddressField: KwRangesBaseAddressLabel boolConst;
+rankField: KwRankLabel mdFieldOrInt;
+retainedNodesField: KwRetainedNodesLabel mdField;
+retainedTypesField: KwRetainedTypesLabel mdField;
+runtimeLangField: KwRuntimeLangLabel DwarfLang;
+runtimeVersionField: KwRuntimeVersionLabel IntLit;
+scopeField: KwScopeLabel mdField;
+scopeLineField: KwScopeLineLabel IntLit;
+sdkField: KwSdkLabel StringLit;
+setterField: KwSetterLabel StringLit;
+sizeField: KwSizeLabel IntLit;
+sourceField: KwSourceLabel StringLit;
+spFlagsField: KwSpFlagsLabel (diSPFlag ('|' diSPFlag)*);
+splitDebugFilenameField: KwSplitDebugFilenameLabel StringLit;
+splitDebugInliningField: KwSplitDebugInliningLabel boolConst;
+strideField: KwStrideLabel mdFieldOrInt;
+stringLengthField: KwStringLengthLabel mdField;
+stringLengthExpressionField: KwStringLengthExpressionLabel mdField;
 stringLocationExpressionField:
-	'stringLocationExpression:' mdField;
-sysrootField: 'sysroot:' StringLit;
-targetFuncNameField: 'targetFuncName:' StringLit;
-templateParamsField: 'templateParams:' mdField;
-thisAdjustmentField: 'thisAdjustment:' IntLit;
-thrownTypesField: 'thrownTypes:' mdField;
-typeMacinfoField: 'type:' DwarfMacinfo;
-typesField: 'types:' mdField;
-unitField: 'unit:' mdField;
-upperBoundField: 'upperBound:' mdFieldOrInt;
-valueIntField: 'value:' IntLit;
-valueStringField: 'value:' StringLit;
-varField: 'var:' mdField;
-virtualIndexField: 'virtualIndex:' IntLit;
-virtualityField: 'virtuality:' DwarfVirtuality;
-vtableHolderField: 'vtableHolder:' mdField;
+        KwStringLocationExpressionLabel mdField;
+sysrootField: KwSysrootLabel StringLit;
+targetFuncNameField: KwTargetFuncNameLabel StringLit;
+templateParamsField: KwTemplateParamsLabel mdField;
+thisAdjustmentField: KwThisAdjustmentLabel IntLit;
+thrownTypesField: KwThrownTypesLabel mdField;
+typeMacinfoField: KwTypeLabel DwarfMacinfo;
+typesField: KwTypesLabel mdField;
+unitField: KwUnitLabel mdField;
+upperBoundField: KwUpperBoundLabel mdFieldOrInt;
+valueIntField: KwValueLabel IntLit;
+valueStringField: KwValueLabel StringLit;
+varField: KwVarLabel mdField;
+virtualIndexField: KwVirtualIndexLabel IntLit;
+virtualityField: KwVirtualityLabel DwarfVirtuality;
+vtableHolderField: KwVtableHolderLabel mdField;
+
+
+// 这些要放到前面去
+DIExpression: '!DIExpression';
+DIArgList: '!DIArgList';
+DIBasicType: '!DIBasicType';
+DICommonBlock: '!DICommonBlock';
+DICompileUnit: '!DICompileUnit';
+DICompositeType: '!DICompositeType';
+DIDerivedType: '!DIDerivedType';
+DIEnumerator: '!DIEnumerator';
+DIFile: '!DIFile';
+DIGlobalVariable: '!DIGlobalVariable';
+DIGlobalVariableExpression: '!DIGlobalVariableExpression';
+DIImportedEntity: '!DIImportedEntity';
+DILabel: '!DILabel';
+DILexicalBlock: '!DILexicalBlock';
+DILexicalBlockFile: '!DILexicalBlockFile';
+DILocalVariable: '!DILocalVariable';
+DILocation: '!DILocation';
+DIMacro: '!DIMacro';
+DIMacroFile: '!DIMacroFile';
+DIModule: '!DIModule';
+DINamespace: '!DINamespace';
+DIObjCProperty: '!DIObjCProperty';
+DIStringType: '!DIStringType';
+DISubprogram: '!DISubprogram';
+DISubroutineType: '!DISubroutineType';
+DITemplateTypeParameter: '!DITemplateTypeParameter';
+DITemplateValueParameter: '!DITemplateValueParameter';
+GenericDINode: '!GenericDINode';
 
 fragment AsciiLetter: [A-Za-z];
 fragment Letter: AsciiLetter | [-$._];
@@ -1411,8 +1442,6 @@ DwarfVirtuality:
 	'DW_VIRTUALITY_' (AsciiLetter | DecimalDigit | '_')*;
 DwarfMacinfo: 'DW_MACINFO_' (AsciiLetter | DecimalDigit | '_')*;
 DwarfOp: 'DW_OP_' (AsciiLetter | DecimalDigit | '_')*;
-
-
 
 // 在最后再增添点词法分析 注意，KwNone 和 KwDefault 需要特判
 KwSourceFilename: 'source_filename';
@@ -1617,7 +1646,8 @@ KwArgmemonly: 'argmemonly';
 KwBuiltin: 'builtin';
 KwCold: 'cold';
 KwConvergent: 'convergent';
-KwDisableSanitizerInstrumentation: 'disable_sanitizer_instrumentation';
+KwDisableSanitizerInstrumentation:
+	'disable_sanitizer_instrumentation';
 KwFnRetThunkExtern: 'fn_ret_thunk_extern';
 KwHot: 'hot';
 KwInaccessiblememOrArgmemonly: 'inaccessiblemem_or_argmemonly';
@@ -1859,3 +1889,22 @@ KwVarLabel: 'var:';
 KwVirtualIndexLabel: 'virtualIndex:';
 KwVirtualityLabel: 'virtuality:';
 KwVtableHolderLabel: 'vtableHolder:';
+
+// 标点符号
+Comma: ',';
+SemiColon: ';';
+Equal: '=';
+LBraces: '{';
+RBraces: '}';
+Pipe: '|';
+Exclamation: '!';
+LParenthesis: '(';
+RParenthesis: ')';
+LBracket: '[';
+RBracket: ']';
+Ellipsis: '...';
+LAngleBrackets: '<';
+RAngleBrackets: '>';
+Asterisk: '*';
+
+
