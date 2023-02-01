@@ -3,6 +3,8 @@ source_filename = "main.c"
 target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128"
 target triple = "x86_64-pc-linux-gnu"
 
+@label = global i32 0, section "foo", align 1
+
 ; Function Attrs: noinline nounwind optnone uwtable
 define dso_local i32 @main(i32 noundef %0, i8** noundef %1) #0 {
 ; 这里这个 2 要占一个序号
@@ -28,9 +30,10 @@ define dso_local i32 @main(i32 noundef %0, i8** noundef %1) #0 {
   ; 可以引用 前面的 block 中的符号
   %tmp = load i32, i32* %7, align 4
   %foo = mul nsw i32 %tmp, %shit
+  %label = mul nsw i32 %tmp, %shit
   store i32 7, i32* %6, align 4
   br label %13
-
+  
 12:                                               ; preds = %2
   store i32 2, i32* %7, align 4
   ;%haha = mul nsw i32 %tmp, %foo
@@ -57,3 +60,5 @@ attributes #1 = { "frame-pointer"="all" "no-trapping-math"="true" "stack-protect
 !3 = !{i32 7, !"uwtable", i32 1}
 !4 = !{i32 7, !"frame-pointer", i32 2}
 !5 = !{!"Ubuntu clang version 14.0.6"}
+
+!label = !{}

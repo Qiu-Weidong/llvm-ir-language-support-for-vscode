@@ -21,6 +21,14 @@
 				},
         {
 					"name": "storage.type.function.llvm",
+					"match": "\\b(asm)\\b"
+				},
+        {
+					"name": "storage.type.function.llvm",
+					"match": "\\b(module)\\b"
+				},
+        {
+					"name": "storage.type.function.llvm",
 					"match": "\\b(declare)\\b"
 				},
         {

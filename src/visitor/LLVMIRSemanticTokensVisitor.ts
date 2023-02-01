@@ -48,7 +48,6 @@ export class LLVMIRSemanticTokensVisitor extends LLVMIRBaseVisitor {
   }
   // moduleAsm: KwModule KwAsm StringLit;
   visitModuleAsm(ctx: ModuleAsmContext): void {
-    this.highlightToken(ctx.KwAsm().symbol, 'property');
     this.highlightToken(ctx.StringLit().symbol, 'string');
   }
   // typeDef: LocalIdent '=' KwType type;

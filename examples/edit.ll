@@ -1,4 +1,7 @@
 ; 在这里编辑
+module asm "inline asm code goes here"
+module asm "more can go here"
+
 define void @main() {
   fence acquire                                        ; yields void
   fence syncscope("singlethread") seq_cst              ; yields void
@@ -23,7 +26,7 @@ declare !llvm.break !17 i64  @sub()
 ; 注意 不能这样使用，虽然语法不报错
 attributes #0 = { #1 #2 #14 }
 
-attributes #0 = { alwaysinline alignstack=4 }
+attributes #1 = { alwaysinline alignstack=4 }
 
 ; named metadata
 !name = !{!0, !1, !2}
