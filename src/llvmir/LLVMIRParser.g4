@@ -428,46 +428,46 @@ threadLocal: KwThreadLocal ('(' tlsModel ')')?;
 metadataType: KwMetadata;
 
 // expr
-bitCastExpr: KwBitcast '(' typeConst KwTo type ')';
+bitCastExpr: OpBitcast '(' typeConst KwTo type ')';
 getElementPtrExpr:
         KwGetelementptr inBounds? '(' type ',' typeConst (
                 ',' gepIndex
         )* ')';
 gepIndex: inRange = KwInrange? typeConst;
-addrSpaceCastExpr: KwAddrspacecast '(' typeConst KwTo type ')';
-intToPtrExpr: KwInttoptr '(' typeConst KwTo type ')';
-iCmpExpr: KwIcmp iPred '(' typeConst ',' typeConst ')';
-fCmpExpr: KwFcmp fPred '(' typeConst ',' typeConst ')';
+addrSpaceCastExpr: OpAddrspacecast '(' typeConst KwTo type ')';
+intToPtrExpr: OpInttoptr '(' typeConst KwTo type ')';
+iCmpExpr: OpIcmp iPred '(' typeConst ',' typeConst ')';
+fCmpExpr: OpFcmp fPred '(' typeConst ',' typeConst ')';
 selectExpr:
-        KwSelect '(' typeConst ',' typeConst ',' typeConst ')';
-truncExpr: KwTrunc '(' typeConst KwTo type ')';
-zExtExpr: KwZext '(' typeConst KwTo type ')';
-sExtExpr: KwSext '(' typeConst KwTo type ')';
-fpTruncExpr: KwFptrunc '(' typeConst KwTo type ')';
-fpExtExpr: KwFpext '(' typeConst KwTo type ')';
-fpToUiExpr: KwFptoui '(' typeConst KwTo type ')';
-fpToSiExpr: KwFptosi '(' typeConst KwTo type ')';
-uiToFpExpr: KwUitofp '(' typeConst KwTo type ')';
-siToFpExpr: KwSitofp '(' typeConst KwTo type ')';
-ptrToIntExpr: KwPtrtoint '(' typeConst KwTo type ')';
+        OpSelect '(' typeConst ',' typeConst ',' typeConst ')';
+truncExpr: OpTrunc '(' typeConst KwTo type ')';
+zExtExpr: OpZext '(' typeConst KwTo type ')';
+sExtExpr: OpSext '(' typeConst KwTo type ')';
+fpTruncExpr: OpFptrunc '(' typeConst KwTo type ')';
+fpExtExpr: OpFpext '(' typeConst KwTo type ')';
+fpToUiExpr: OpFptoui '(' typeConst KwTo type ')';
+fpToSiExpr: OpFptosi '(' typeConst KwTo type ')';
+uiToFpExpr: OpUitofp '(' typeConst KwTo type ')';
+siToFpExpr: OpSitofp '(' typeConst KwTo type ')';
+ptrToIntExpr: OpPtrtoint '(' typeConst KwTo type ')';
 extractElementExpr:
-        KwExtractelement '(' typeConst ',' typeConst ')';
+        OpExtractelement '(' typeConst ',' typeConst ')';
 insertElementExpr:
-        KwInsertelement '(' typeConst ',' typeConst ',' typeConst ')';
+        OpInsertelement '(' typeConst ',' typeConst ',' typeConst ')';
 shuffleVectorExpr:
-        KwShufflevector '(' typeConst ',' typeConst ',' typeConst ')';
-shlExpr: KwShl overflowFlag* '(' typeConst ',' typeConst ')';
+        OpShufflevector '(' typeConst ',' typeConst ',' typeConst ')';
+shlExpr: OpShl overflowFlag* '(' typeConst ',' typeConst ')';
 lShrExpr:
-        KwLshr exact = KwExact? '(' typeConst ',' typeConst ')';
+        OpLshr exact = KwExact? '(' typeConst ',' typeConst ')';
 aShrExpr:
-        KwAshr exact = KwExact? '(' typeConst ',' typeConst ')';
-andExpr: KwAnd '(' typeConst ',' typeConst ')';
-orExpr: KwOr '(' typeConst ',' typeConst ')';
-xorExpr: KwXor '(' typeConst ',' typeConst ')';
-addExpr: KwAdd overflowFlag* '(' typeConst ',' typeConst ')';
-subExpr: KwSub overflowFlag* '(' typeConst ',' typeConst ')';
-mulExpr: KwMul overflowFlag* '(' typeConst ',' typeConst ')';
-fNegExpr: KwFneg '(' typeConst ')';
+        OpAshr exact = KwExact? '(' typeConst ',' typeConst ')';
+andExpr: OpAnd '(' typeConst ',' typeConst ')';
+orExpr: OpOr '(' typeConst ',' typeConst ')';
+xorExpr: OpXor '(' typeConst ',' typeConst ')';
+addExpr: OpAdd overflowFlag* '(' typeConst ',' typeConst ')';
+subExpr: OpSub overflowFlag* '(' typeConst ',' typeConst ')';
+mulExpr: OpMul overflowFlag* '(' typeConst ',' typeConst ')';
+fNegExpr: OpFneg '(' typeConst ')';
 
 // instructions
 localDefInst: LocalIdent '=' valueInstruction;
@@ -534,116 +534,116 @@ valueInstruction:
         | cleanupPadInst;
 storeInst:
         // Store.
-        KwStore volatile = KwVolatile? typeValue ',' typeValue (
+        OpStore volatile = KwVolatile? typeValue ',' typeValue (
                 ',' align
         )? (',' metadataAttachment)*
         // atomic=KwAtomic store.
-        | KwStore atomic = KwAtomic volatile = KwVolatile? typeValue ',' typeValue syncScope?
+        | OpStore atomic = KwAtomic volatile = KwVolatile? typeValue ',' typeValue syncScope?
                 atomicOrdering (',' align)? (',' metadataAttachment)*;
 
 syncScope: KwSyncscope '(' StringLit ')';
 
 fenceInst:
-        KwFence syncScope? atomicOrdering (',' metadataAttachment)*;
+        OpFence syncScope? atomicOrdering (',' metadataAttachment)*;
 fNegInst:
-        KwFneg fastMathFlag* typeValue (',' metadataAttachment)*;
+        OpFneg fastMathFlag* typeValue (',' metadataAttachment)*;
 addInst:
-        KwAdd overflowFlag* typeValue ',' value (
+        OpAdd overflowFlag* typeValue ',' value (
                 ',' metadataAttachment
         )*;
 fAddInst:
-        KwFadd fastMathFlag* typeValue ',' value (
+        OpFadd fastMathFlag* typeValue ',' value (
                 ',' metadataAttachment
         )*;
 subInst:
-        KwSub overflowFlag* typeValue ',' value (
+        OpSub overflowFlag* typeValue ',' value (
                 ',' metadataAttachment
         )*;
 fSubInst:
-        KwFsub fastMathFlag* typeValue ',' value (
+        OpFsub fastMathFlag* typeValue ',' value (
                 ',' metadataAttachment
         )*;
 mulInst:
-        KwMul overflowFlag* typeValue ',' value (
+        OpMul overflowFlag* typeValue ',' value (
                 ',' metadataAttachment
         )*;
 fMulInst:
-        KwFmul fastMathFlag* typeValue ',' value (
+        OpFmul fastMathFlag* typeValue ',' value (
                 ',' metadataAttachment
         )*;
 uDivInst:
-        KwUdiv exact = KwExact? typeValue ',' value (
+        OpUdiv exact = KwExact? typeValue ',' value (
                 ',' metadataAttachment
         )*;
 sDivInst:
-        KwSdiv exact = KwExact? typeValue ',' value (
+        OpSdiv exact = KwExact? typeValue ',' value (
                 ',' metadataAttachment
         )*;
 fDivInst:
-        KwFdiv fastMathFlag* typeValue ',' value (
+        OpFdiv fastMathFlag* typeValue ',' value (
                 ',' metadataAttachment
         )*;
-uRemInst: KwUrem typeValue ',' value ( ',' metadataAttachment)*;
-sRemInst: KwSrem typeValue ',' value ( ',' metadataAttachment)*;
+uRemInst: OpUrem typeValue ',' value ( ',' metadataAttachment)*;
+sRemInst: OpSrem typeValue ',' value ( ',' metadataAttachment)*;
 fRemInst:
-        KwFrem fastMathFlag* typeValue ',' value (
+        OpFrem fastMathFlag* typeValue ',' value (
                 ',' metadataAttachment
         )*;
 shlInst:
-        KwShl overflowFlag* typeValue ',' value (
+        OpShl overflowFlag* typeValue ',' value (
                 ',' metadataAttachment
         )*;
 lShrInst:
-        KwLshr exact = KwExact? typeValue ',' value (
+        OpLshr exact = KwExact? typeValue ',' value (
                 ',' metadataAttachment
         )*;
 aShrInst:
-        KwAshr exact = KwExact? typeValue ',' value (
+        OpAshr exact = KwExact? typeValue ',' value (
                 ',' metadataAttachment
         )*;
-andInst: KwAnd typeValue ',' value ( ',' metadataAttachment)*;
-orInst: KwOr typeValue ',' value ( ',' metadataAttachment)*;
-xorInst: KwXor typeValue ',' value ( ',' metadataAttachment)*;
+andInst: OpAnd typeValue ',' value ( ',' metadataAttachment)*;
+orInst: OpOr typeValue ',' value ( ',' metadataAttachment)*;
+xorInst: OpXor typeValue ',' value ( ',' metadataAttachment)*;
 extractElementInst:
-        KwExtractelement typeValue ',' typeValue (
+        OpExtractelement typeValue ',' typeValue (
                 ',' metadataAttachment
         )*;
 insertElementInst:
-        KwInsertelement typeValue ',' typeValue ',' typeValue (
+        OpInsertelement typeValue ',' typeValue ',' typeValue (
                 ',' metadataAttachment
         )*;
 shuffleVectorInst:
-        KwShufflevector typeValue ',' typeValue ',' typeValue (
+        OpShufflevector typeValue ',' typeValue ',' typeValue (
                 ',' metadataAttachment
         )*;
 extractValueInst:
-        KwExtractvalue typeValue (',' IntLit)+ (
+        OpExtractvalue typeValue (',' IntLit)+ (
                 ',' metadataAttachment
         )*;
 insertValueInst:
-        KwInsertvalue typeValue ',' typeValue (',' IntLit)+ (
+        OpInsertvalue typeValue ',' typeValue (',' IntLit)+ (
                 ',' metadataAttachment
         )*;
 allocaInst:
-        KwAlloca inAllocaTok = KwInalloca? swiftError = KwSwifterror? type (
+        OpAlloca inAllocaTok = KwInalloca? swiftError = KwSwifterror? type (
                 ',' typeValue
         )? (',' align)? (',' addrSpace)? (',' metadataAttachment)*;
 loadInst:
         // Load.
-        KwLoad volatile = KwVolatile? type ',' typeValue (',' align)? (
+        OpLoad volatile = KwVolatile? type ',' typeValue (',' align)? (
                 ',' metadataAttachment
         )*
         // atomic=KwAtomic load.
-        | KwLoad atomic = KwAtomic volatile = KwVolatile? type ',' typeValue syncScope? atomicOrdering (
+        | OpLoad atomic = KwAtomic volatile = KwVolatile? type ',' typeValue syncScope? atomicOrdering (
                 ',' align
         )? (',' metadataAttachment)*;
 cmpXchgInst:
-        KwCmpxchg weak = KwWeak? volatile = KwVolatile? typeValue ',' typeValue ',' typeValue syncScope?
+        OpCmpxchg weak = KwWeak? volatile = KwVolatile? typeValue ',' typeValue ',' typeValue syncScope?
                 atomicOrdering atomicOrdering (',' align)? (
                 ',' metadataAttachment
         )*;
 atomicRMWInst:
-        KwAtomicrmw volatile = KwVolatile? atomicOp typeValue ',' typeValue syncScope? atomicOrdering (
+        OpAtomicrmw volatile = KwVolatile? atomicOp typeValue ',' typeValue syncScope? atomicOrdering (
                 ',' align
         )? (',' metadataAttachment)*;
 getElementPtrInst:
@@ -651,51 +651,51 @@ getElementPtrInst:
                 ',' metadataAttachment
         )*;
 truncInst:
-        KwTrunc typeValue KwTo type (',' metadataAttachment)*;
-zExtInst: KwZext typeValue KwTo type ( ',' metadataAttachment)*;
-sExtInst: KwSext typeValue KwTo type ( ',' metadataAttachment)*;
+        OpTrunc typeValue KwTo type (',' metadataAttachment)*;
+zExtInst: OpZext typeValue KwTo type ( ',' metadataAttachment)*;
+sExtInst: OpSext typeValue KwTo type ( ',' metadataAttachment)*;
 fpTruncInst:
-        KwFptrunc typeValue KwTo type (',' metadataAttachment)*;
+        OpFptrunc typeValue KwTo type (',' metadataAttachment)*;
 fpExtInst:
-        KwFpext typeValue KwTo type (',' metadataAttachment)*;
+        OpFpext typeValue KwTo type (',' metadataAttachment)*;
 fpToUiInst:
-        KwFptoui typeValue KwTo type (',' metadataAttachment)*;
+        OpFptoui typeValue KwTo type (',' metadataAttachment)*;
 fpToSiInst:
-        KwFptosi typeValue KwTo type (',' metadataAttachment)*;
+        OpFptosi typeValue KwTo type (',' metadataAttachment)*;
 uiToFpInst:
-        KwUitofp typeValue KwTo type (',' metadataAttachment)*;
+        OpUitofp typeValue KwTo type (',' metadataAttachment)*;
 siToFpInst:
-        KwSitofp typeValue KwTo type (',' metadataAttachment)*;
+        OpSitofp typeValue KwTo type (',' metadataAttachment)*;
 ptrToIntInst:
-        KwPtrtoint typeValue KwTo type (',' metadataAttachment)*;
+        OpPtrtoint typeValue KwTo type (',' metadataAttachment)*;
 intToPtrInst:
-        KwInttoptr typeValue KwTo type (',' metadataAttachment)*;
+        OpInttoptr typeValue KwTo type (',' metadataAttachment)*;
 bitCastInst:
-        KwBitcast typeValue KwTo type (',' metadataAttachment)*;
+        OpBitcast typeValue KwTo type (',' metadataAttachment)*;
 addrSpaceCastInst:
-        KwAddrspacecast typeValue KwTo type (',' metadataAttachment)*;
+        OpAddrspacecast typeValue KwTo type (',' metadataAttachment)*;
 iCmpInst:
-        KwIcmp iPred typeValue ',' value (',' metadataAttachment)*;
+        OpIcmp iPred typeValue ',' value (',' metadataAttachment)*;
 fCmpInst:
-        KwFcmp fastMathFlag* fPred typeValue ',' value (
+        OpFcmp fastMathFlag* fPred typeValue ',' value (
                 ',' metadataAttachment
         )*;
 phiInst:
-        KwPhi fastMathFlag* type (inc (',' inc)*) (
+        OpPhi fastMathFlag* type (inc (',' inc)*) (
                 ',' metadataAttachment
         )*;
 selectInst:
-        KwSelect fastMathFlag* typeValue ',' typeValue ',' typeValue (
+        OpSelect fastMathFlag* typeValue ',' typeValue ',' typeValue (
                 ',' metadataAttachment
         )*;
-freezeInst: KwFreeze typeValue;
+freezeInst: OpFreeze typeValue;
 callInst:
-        tail = (KwMusttail | KwNotail | KwTail)? KwCall fastMathFlag* callingConv? returnAttribute*
+        tail = (KwMusttail | KwNotail | KwTail)? OpCall fastMathFlag* callingConv? returnAttribute*
                 addrSpace? type value '(' args ')' funcAttribute* (
                 '[' operandBundle (',' operandBundle)* ']'
         )? (',' metadataAttachment)*;
 vaargInst:
-        KwVaArg typeValue ',' type (',' metadataAttachment)*;
+        OpVaArg typeValue ',' type (',' metadataAttachment)*;
 landingPadInst:
         KwLandingpad type cleanUp = KwCleanup? clause* (
                 ',' metadataAttachment
@@ -899,21 +899,21 @@ fastMathFlag:
         | KwNsz
         | KwReassoc;
 atomicOp:
-        KwAdd
-        | KwAnd
-        | KwFadd
-        | KwFmax
-        | KwFmin
-        | KwFsub
-        | KwMax
-        | KwMin
-        | KwNand
-        | KwOr
-        | KwSub
-        | KwUmax
-        | KwUmin
-        | KwXchg
-        | KwXor;
+        OpAdd
+        | OpAnd
+        | OpFadd
+        | OpFmax
+        | OpFmin
+        | OpFsub
+        | OpMax
+        | OpMin
+        | OpNand
+        | OpOr
+        | OpSub
+        | OpUmax
+        | OpUmin
+        | OpXchg
+        | OpXor;
 floatKind:
         KwHalf
         | KwBfloat
