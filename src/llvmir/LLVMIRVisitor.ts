@@ -23,16 +23,9 @@ import { MetadataDefContext } from "./LLVMIRParser";
 import { UseListOrderContext } from "./LLVMIRParser";
 import { UseListOrderBBContext } from "./LLVMIRParser";
 import { FuncHeaderContext } from "./LLVMIRParser";
-import { IndirectSymbolContext } from "./LLVMIRParser";
-import { CallingConvContext } from "./LLVMIRParser";
-import { CallingConvIntContext } from "./LLVMIRParser";
 import { FuncHdrFieldContext } from "./LLVMIRParser";
-import { GcContext } from "./LLVMIRParser";
-import { PrefixContext } from "./LLVMIRParser";
-import { PrologueContext } from "./LLVMIRParser";
-import { PersonalityContext } from "./LLVMIRParser";
-import { ReturnAttributeContext } from "./LLVMIRParser";
 import { FuncBodyContext } from "./LLVMIRParser";
+import { IndirectSymbolContext } from "./LLVMIRParser";
 import { BasicBlockContext } from "./LLVMIRParser";
 import { InstructionContext } from "./LLVMIRParser";
 import { TerminatorContext } from "./LLVMIRParser";
@@ -50,13 +43,18 @@ import { UnreachableTermContext } from "./LLVMIRParser";
 import { InvokeTermContext } from "./LLVMIRParser";
 import { CallBrTermContext } from "./LLVMIRParser";
 import { CatchSwitchTermContext } from "./LLVMIRParser";
+import { CallingConvContext } from "./LLVMIRParser";
+import { CallingConvIntContext } from "./LLVMIRParser";
+import { GcContext } from "./LLVMIRParser";
+import { PrefixContext } from "./LLVMIRParser";
+import { PrologueContext } from "./LLVMIRParser";
+import { PersonalityContext } from "./LLVMIRParser";
+import { ReturnAttributeContext } from "./LLVMIRParser";
 import { LabelContext } from "./LLVMIRParser";
 import { CaseContext } from "./LLVMIRParser";
 import { UnwindTargetContext } from "./LLVMIRParser";
 import { HandlersContext } from "./LLVMIRParser";
 import { MetadataNodeContext } from "./LLVMIRParser";
-import { DiExpressionContext } from "./LLVMIRParser";
-import { DiExpressionFieldContext } from "./LLVMIRParser";
 import { GlobalFieldContext } from "./LLVMIRParser";
 import { SectionContext } from "./LLVMIRParser";
 import { ComdatContext } from "./LLVMIRParser";
@@ -76,7 +74,6 @@ import { PoisonConstContext } from "./LLVMIRParser";
 import { BlockAddressConstContext } from "./LLVMIRParser";
 import { DsoLocalEquivalentConstContext } from "./LLVMIRParser";
 import { NoCFIConstContext } from "./LLVMIRParser";
-import { ConstantExprContext } from "./LLVMIRParser";
 import { TypeConstContext } from "./LLVMIRParser";
 import { MetadataAttachmentContext } from "./LLVMIRParser";
 import { MdNodeContext } from "./LLVMIRParser";
@@ -90,9 +87,6 @@ import { MdStringContext } from "./LLVMIRParser";
 import { MdFieldOrIntContext } from "./LLVMIRParser";
 import { DiSPFlagContext } from "./LLVMIRParser";
 import { FuncAttributeContext } from "./LLVMIRParser";
-import { TypeContext } from "./LLVMIRParser";
-import { VoidTypeContext } from "./LLVMIRParser";
-import { OpaqueTypeContext } from "./LLVMIRParser";
 import { ParamsContext } from "./LLVMIRParser";
 import { ParamContext } from "./LLVMIRParser";
 import { ParamAttributeContext } from "./LLVMIRParser";
@@ -109,11 +103,14 @@ import { VectorScaleRangeContext } from "./LLVMIRParser";
 import { ByRefAttrContext } from "./LLVMIRParser";
 import { ByvalContext } from "./LLVMIRParser";
 import { DereferenceableContext } from "./LLVMIRParser";
+import { ParamAttrContext } from "./LLVMIRParser";
+import { StructRetAttrContext } from "./LLVMIRParser";
+import { PreallocatedContext } from "./LLVMIRParser";
 import { ElementTypeContext } from "./LLVMIRParser";
 import { InAllocaContext } from "./LLVMIRParser";
-import { ParamAttrContext } from "./LLVMIRParser";
-import { PreallocatedContext } from "./LLVMIRParser";
-import { StructRetAttrContext } from "./LLVMIRParser";
+import { TypeContext } from "./LLVMIRParser";
+import { VoidTypeContext } from "./LLVMIRParser";
+import { OpaqueTypeContext } from "./LLVMIRParser";
 import { FirstClassTypeContext } from "./LLVMIRParser";
 import { ConcreteTypeContext } from "./LLVMIRParser";
 import { IntTypeContext } from "./LLVMIRParser";
@@ -127,8 +124,6 @@ import { NamedTypeContext } from "./LLVMIRParser";
 import { MmxTypeContext } from "./LLVMIRParser";
 import { TokenTypeContext } from "./LLVMIRParser";
 import { OpaquePointerTypeContext } from "./LLVMIRParser";
-import { AddrSpaceContext } from "./LLVMIRParser";
-import { ThreadLocalContext } from "./LLVMIRParser";
 import { MetadataTypeContext } from "./LLVMIRParser";
 import { BitCastExprContext } from "./LLVMIRParser";
 import { GetElementPtrExprContext } from "./LLVMIRParser";
@@ -161,10 +156,10 @@ import { AddExprContext } from "./LLVMIRParser";
 import { SubExprContext } from "./LLVMIRParser";
 import { MulExprContext } from "./LLVMIRParser";
 import { FNegExprContext } from "./LLVMIRParser";
+import { ConstantExprContext } from "./LLVMIRParser";
 import { LocalDefInstContext } from "./LLVMIRParser";
 import { ValueInstructionContext } from "./LLVMIRParser";
 import { StoreInstContext } from "./LLVMIRParser";
-import { SyncScopeContext } from "./LLVMIRParser";
 import { FenceInstContext } from "./LLVMIRParser";
 import { FNegInstContext } from "./LLVMIRParser";
 import { AddInstContext } from "./LLVMIRParser";
@@ -218,6 +213,7 @@ import { VaargInstContext } from "./LLVMIRParser";
 import { LandingPadInstContext } from "./LLVMIRParser";
 import { CatchPadInstContext } from "./LLVMIRParser";
 import { CleanupPadInstContext } from "./LLVMIRParser";
+import { SyncScopeContext } from "./LLVMIRParser";
 import { IncContext } from "./LLVMIRParser";
 import { OperandBundleContext } from "./LLVMIRParser";
 import { ClauseContext } from "./LLVMIRParser";
@@ -225,6 +221,8 @@ import { ArgsContext } from "./LLVMIRParser";
 import { ArgContext } from "./LLVMIRParser";
 import { ExceptionArgContext } from "./LLVMIRParser";
 import { ExceptionPadContext } from "./LLVMIRParser";
+import { AddrSpaceContext } from "./LLVMIRParser";
+import { ThreadLocalContext } from "./LLVMIRParser";
 import { ExternalLinkageContext } from "./LLVMIRParser";
 import { InternalLinkageContext } from "./LLVMIRParser";
 import { LinkageContext } from "./LLVMIRParser";
@@ -248,6 +246,8 @@ import { FastMathFlagContext } from "./LLVMIRParser";
 import { AtomicOpContext } from "./LLVMIRParser";
 import { FloatKindContext } from "./LLVMIRParser";
 import { SpecializedMDNodeContext } from "./LLVMIRParser";
+import { DiExpressionContext } from "./LLVMIRParser";
+import { DiExpressionFieldContext } from "./LLVMIRParser";
 import { DiBasicTypeContext } from "./LLVMIRParser";
 import { DiCommonBlockContext } from "./LLVMIRParser";
 import { DiCompileUnitContext } from "./LLVMIRParser";
@@ -552,27 +552,6 @@ export interface LLVMIRVisitor<Result> extends ParseTreeVisitor<Result> {
 	visitFuncHeader?: (ctx: FuncHeaderContext) => Result;
 
 	/**
-	 * Visit a parse tree produced by `LLVMIRParser.indirectSymbol`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitIndirectSymbol?: (ctx: IndirectSymbolContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by `LLVMIRParser.callingConv`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitCallingConv?: (ctx: CallingConvContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by `LLVMIRParser.callingConvInt`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitCallingConvInt?: (ctx: CallingConvIntContext) => Result;
-
-	/**
 	 * Visit a parse tree produced by `LLVMIRParser.funcHdrField`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -580,46 +559,18 @@ export interface LLVMIRVisitor<Result> extends ParseTreeVisitor<Result> {
 	visitFuncHdrField?: (ctx: FuncHdrFieldContext) => Result;
 
 	/**
-	 * Visit a parse tree produced by `LLVMIRParser.gc`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitGc?: (ctx: GcContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by `LLVMIRParser.prefix`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitPrefix?: (ctx: PrefixContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by `LLVMIRParser.prologue`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitPrologue?: (ctx: PrologueContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by `LLVMIRParser.personality`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitPersonality?: (ctx: PersonalityContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by `LLVMIRParser.returnAttribute`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitReturnAttribute?: (ctx: ReturnAttributeContext) => Result;
-
-	/**
 	 * Visit a parse tree produced by `LLVMIRParser.funcBody`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	visitFuncBody?: (ctx: FuncBodyContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by `LLVMIRParser.indirectSymbol`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitIndirectSymbol?: (ctx: IndirectSymbolContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by `LLVMIRParser.basicBlock`.
@@ -741,6 +692,55 @@ export interface LLVMIRVisitor<Result> extends ParseTreeVisitor<Result> {
 	visitCatchSwitchTerm?: (ctx: CatchSwitchTermContext) => Result;
 
 	/**
+	 * Visit a parse tree produced by `LLVMIRParser.callingConv`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitCallingConv?: (ctx: CallingConvContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by `LLVMIRParser.callingConvInt`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitCallingConvInt?: (ctx: CallingConvIntContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by `LLVMIRParser.gc`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitGc?: (ctx: GcContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by `LLVMIRParser.prefix`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitPrefix?: (ctx: PrefixContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by `LLVMIRParser.prologue`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitPrologue?: (ctx: PrologueContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by `LLVMIRParser.personality`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitPersonality?: (ctx: PersonalityContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by `LLVMIRParser.returnAttribute`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitReturnAttribute?: (ctx: ReturnAttributeContext) => Result;
+
+	/**
 	 * Visit a parse tree produced by `LLVMIRParser.label`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -774,20 +774,6 @@ export interface LLVMIRVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitMetadataNode?: (ctx: MetadataNodeContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by `LLVMIRParser.diExpression`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitDiExpression?: (ctx: DiExpressionContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by `LLVMIRParser.diExpressionField`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitDiExpressionField?: (ctx: DiExpressionFieldContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by `LLVMIRParser.globalField`.
@@ -923,13 +909,6 @@ export interface LLVMIRVisitor<Result> extends ParseTreeVisitor<Result> {
 	visitNoCFIConst?: (ctx: NoCFIConstContext) => Result;
 
 	/**
-	 * Visit a parse tree produced by `LLVMIRParser.constantExpr`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitConstantExpr?: (ctx: ConstantExprContext) => Result;
-
-	/**
 	 * Visit a parse tree produced by `LLVMIRParser.typeConst`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -1019,27 +998,6 @@ export interface LLVMIRVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitFuncAttribute?: (ctx: FuncAttributeContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by `LLVMIRParser.type`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitType?: (ctx: TypeContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by `LLVMIRParser.voidType`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitVoidType?: (ctx: VoidTypeContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by `LLVMIRParser.opaqueType`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitOpaqueType?: (ctx: OpaqueTypeContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by `LLVMIRParser.params`.
@@ -1154,6 +1112,27 @@ export interface LLVMIRVisitor<Result> extends ParseTreeVisitor<Result> {
 	visitDereferenceable?: (ctx: DereferenceableContext) => Result;
 
 	/**
+	 * Visit a parse tree produced by `LLVMIRParser.paramAttr`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitParamAttr?: (ctx: ParamAttrContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by `LLVMIRParser.structRetAttr`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitStructRetAttr?: (ctx: StructRetAttrContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by `LLVMIRParser.preallocated`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitPreallocated?: (ctx: PreallocatedContext) => Result;
+
+	/**
 	 * Visit a parse tree produced by `LLVMIRParser.elementType`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -1168,25 +1147,25 @@ export interface LLVMIRVisitor<Result> extends ParseTreeVisitor<Result> {
 	visitInAlloca?: (ctx: InAllocaContext) => Result;
 
 	/**
-	 * Visit a parse tree produced by `LLVMIRParser.paramAttr`.
+	 * Visit a parse tree produced by `LLVMIRParser.type`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	visitParamAttr?: (ctx: ParamAttrContext) => Result;
+	visitType?: (ctx: TypeContext) => Result;
 
 	/**
-	 * Visit a parse tree produced by `LLVMIRParser.preallocated`.
+	 * Visit a parse tree produced by `LLVMIRParser.voidType`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	visitPreallocated?: (ctx: PreallocatedContext) => Result;
+	visitVoidType?: (ctx: VoidTypeContext) => Result;
 
 	/**
-	 * Visit a parse tree produced by `LLVMIRParser.structRetAttr`.
+	 * Visit a parse tree produced by `LLVMIRParser.opaqueType`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	visitStructRetAttr?: (ctx: StructRetAttrContext) => Result;
+	visitOpaqueType?: (ctx: OpaqueTypeContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by `LLVMIRParser.firstClassType`.
@@ -1278,20 +1257,6 @@ export interface LLVMIRVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitOpaquePointerType?: (ctx: OpaquePointerTypeContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by `LLVMIRParser.addrSpace`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitAddrSpace?: (ctx: AddrSpaceContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by `LLVMIRParser.threadLocal`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitThreadLocal?: (ctx: ThreadLocalContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by `LLVMIRParser.metadataType`.
@@ -1518,6 +1483,13 @@ export interface LLVMIRVisitor<Result> extends ParseTreeVisitor<Result> {
 	visitFNegExpr?: (ctx: FNegExprContext) => Result;
 
 	/**
+	 * Visit a parse tree produced by `LLVMIRParser.constantExpr`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitConstantExpr?: (ctx: ConstantExprContext) => Result;
+
+	/**
 	 * Visit a parse tree produced by `LLVMIRParser.localDefInst`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -1537,13 +1509,6 @@ export interface LLVMIRVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitStoreInst?: (ctx: StoreInstContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by `LLVMIRParser.syncScope`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitSyncScope?: (ctx: SyncScopeContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by `LLVMIRParser.fenceInst`.
@@ -1917,6 +1882,13 @@ export interface LLVMIRVisitor<Result> extends ParseTreeVisitor<Result> {
 	visitCleanupPadInst?: (ctx: CleanupPadInstContext) => Result;
 
 	/**
+	 * Visit a parse tree produced by `LLVMIRParser.syncScope`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitSyncScope?: (ctx: SyncScopeContext) => Result;
+
+	/**
 	 * Visit a parse tree produced by `LLVMIRParser.inc`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -1964,6 +1936,20 @@ export interface LLVMIRVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitExceptionPad?: (ctx: ExceptionPadContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by `LLVMIRParser.addrSpace`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitAddrSpace?: (ctx: AddrSpaceContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by `LLVMIRParser.threadLocal`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitThreadLocal?: (ctx: ThreadLocalContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by `LLVMIRParser.externalLinkage`.
@@ -2125,6 +2111,20 @@ export interface LLVMIRVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitSpecializedMDNode?: (ctx: SpecializedMDNodeContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by `LLVMIRParser.diExpression`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitDiExpression?: (ctx: DiExpressionContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by `LLVMIRParser.diExpressionField`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitDiExpressionField?: (ctx: DiExpressionFieldContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by `LLVMIRParser.diBasicType`.
