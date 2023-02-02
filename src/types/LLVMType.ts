@@ -8,15 +8,26 @@ export abstract class LLVMType {
 
   // 检查两个类型是否完全相同
   abstract isSameType(other: LLVMType): boolean;
+  // 检查两个类型是否能够兼容
+  abstract isCompatibleTo(other: LLVMType): boolean;
 }
 
 export class VoidType extends LLVMType {
+  
   constructor() {
     super('void');
   }
 
   isSameType(other: LLVMType): boolean {
     return other instanceof VoidType;
+  }
+
+  isCompatibleTo(other: LLVMType): boolean {
+    // 首先要检查 NamedType
+    if(other instanceof NamedType) {
+      return this.isCompatibleTo(other.getRealType());
+    }
+    return this.isSameType(other);
   }
 }
 
@@ -26,6 +37,14 @@ export class OpaqueType extends LLVMType {
 
   isSameType(other: LLVMType): boolean {
     return other instanceof OpaqueType;
+  }
+
+  isCompatibleTo(other: LLVMType): boolean {
+    if(other instanceof NamedType) {
+      return this.isCompatibleTo(other.getRealType());
+    }
+    // 兼容 Opaque 和 任何结构体
+    return other instanceof(StructType) || other instanceof(OpaqueType);
   }
 }
 
@@ -38,6 +57,13 @@ export class IntType extends LLVMType {
     if (!(other instanceof IntType)) return false;
     return this.size === other.size;
   }
+
+  isCompatibleTo(other: LLVMType): boolean {
+    if(other instanceof NamedType) {
+      return this.isCompatibleTo(other.getRealType());
+    }
+    return this.isSameType(other);
+  }
 }
 
 export class FloatType extends LLVMType {
@@ -46,6 +72,13 @@ export class FloatType extends LLVMType {
   isSameType(other: LLVMType): boolean {
     if(! (other instanceof FloatType)) return false;
     return this.name === other.name;
+  }
+
+  isCompatibleTo(other: LLVMType): boolean {
+    if(other instanceof NamedType) {
+      return this.isCompatibleTo(other.getRealType());
+    }
+    return this.isSameType(other);
   }
 }
 
@@ -68,12 +101,28 @@ export class VectorType extends LLVMType {
     return this.length === other.length && this.scalable === other.scalable
       && this.baseType.isSameType(other.baseType);
   }
+
+  isCompatibleTo(other: LLVMType): boolean {
+    if(other instanceof NamedType) {
+      return this.isCompatibleTo(other.getRealType());
+    }
+    else if(! (other instanceof VectorType)) return false;
+    return this.length === other.length && this.scalable === other.scalable
+      && this.baseType.isCompatibleTo(other.baseType);
+  }
 }
 
 export class LabelType extends LLVMType {
   constructor() { super('label'); }
 
   isSameType(other: LLVMType): boolean {
+    return other instanceof LabelType;
+  }
+
+  isCompatibleTo(other: LLVMType): boolean {
+    if(other instanceof NamedType) {
+      return this.isCompatibleTo(other.getRealType());
+    }
     return other instanceof LabelType;
   }
 }
@@ -91,6 +140,12 @@ export class ArrayType extends LLVMType {
   isSameType(other: LLVMType): boolean {
     if(! (other instanceof ArrayType)) return false;
     return this.length === other.length && this.baseType.isSameType(other.baseType);
+  }
+
+  isCompatibleTo(other: LLVMType): boolean {
+    if(other instanceof NamedType) return this.isCompatibleTo(other.getRealType());
+    else if(! (other instanceof ArrayType)) return false;
+    return this.length === other.length && this.baseType.isCompatibleTo(other.baseType);
   }
 }
 
@@ -125,6 +180,18 @@ export class StructType extends LLVMType {
     }
     return true;
   }
+
+  isCompatibleTo(other: LLVMType): boolean {
+    // 兼容 opaque 类型
+    if(other instanceof OpaqueType) return true;
+    else if(other instanceof NamedType) return this.isCompatibleTo(other.getRealType());
+    else if(! (other instanceof StructType)) return false;
+    else if(other.packed !== this.packed || this.members.length !== other.members.length) return false;
+    for(let i=0; i<this.members.length; i++) {
+      if(! this.members[i].isCompatibleTo(other.members[i])) return false;
+    }
+    return true;
+  }
 }
 
 export class NamedType extends LLVMType {
@@ -138,12 +205,23 @@ export class NamedType extends LLVMType {
     if(! (other instanceof NamedType)) return false;
     return this.name === other.name;
   }
+
+  isCompatibleTo(other: LLVMType): boolean {
+    return this.realType.isCompatibleTo(other);
+  }
+
+  getRealType(): LLVMType { return this.realType; } 
 }
 
 export class MMXType extends LLVMType {
   constructor() { super('x86_mmx'); }
 
   isSameType(other: LLVMType): boolean {
+    return other instanceof MMXType;
+  }
+
+  isCompatibleTo(other: LLVMType): boolean {
+    if(other instanceof NamedType) return this.isCompatibleTo(other.getRealType());
     return other instanceof MMXType;
   }
 }
@@ -154,12 +232,22 @@ export class TokenType extends LLVMType {
   isSameType(other: LLVMType): boolean {
     return other instanceof TokenType;
   }
+
+  isCompatibleTo(other: LLVMType): boolean {
+    if(other instanceof NamedType) return this.isCompatibleTo(other.getRealType());
+    return other instanceof TokenType;
+  }
 }
 
 export class MetadataType extends LLVMType {
   constructor() { super('metadata'); }
 
   isSameType(other: LLVMType): boolean {
+    return other instanceof MetadataType;
+  }
+
+  isCompatibleTo(other: LLVMType): boolean {
+    if(other instanceof NamedType) return this.isCompatibleTo(other.getRealType());
     return other instanceof MetadataType;
   }
 }
@@ -193,6 +281,17 @@ export class FuncType extends LLVMType {
     }
     return true;
   }
+
+  isCompatibleTo(other: LLVMType): boolean {
+    if(other instanceof NamedType) return this.isCompatibleTo(other.getRealType());
+    else if(! (other instanceof FuncType)) return false;
+    else if(! this.retType.isCompatibleTo(other.retType)) return false;
+    else if(this.vaarg !== other.vaarg || this.params.length !== other.params.length) return false;
+    for(let i=0; i<this.params.length; i++) {
+      if(! this.params[i].isCompatibleTo(other.params[i])) return false;
+    }
+    return true;
+  }
 }
 
 export class OpaquePointerType extends LLVMType {
@@ -206,6 +305,12 @@ export class OpaquePointerType extends LLVMType {
 
   isSameType(other: LLVMType): boolean {
     return other instanceof OpaquePointerType && !(other instanceof PointerType) && this.addrSpace === other.addrSpace;
+  }
+
+  isCompatibleTo(other: LLVMType): boolean {
+    if(other instanceof NamedType) return this.isCompatibleTo(other.getRealType());
+    else if(other instanceof OpaquePointerType || other instanceof PointerType) return this.addrSpace === other.addrSpace;
+    return false;
   }
 }
 
@@ -229,6 +334,13 @@ export class PointerType extends OpaquePointerType {
   isSameType(other: LLVMType): boolean {
     if(! (other instanceof PointerType)) return false;
     return this.addrSpace === other.addrSpace && this.baseType.isSameType(other.baseType);
+  }
+
+  isCompatibleTo(other: LLVMType): boolean {
+    if(other instanceof NamedType) return this.isCompatibleTo(other.getRealType());
+    else if(other instanceof OpaquePointerType && !(other instanceof PointerType)) return other.isCompatibleTo(this);
+    else if(other instanceof PointerType) this.baseType.isCompatibleTo(other.baseType) && this.addrSpace === other.addrSpace;
+    return false;
   }
 }
 

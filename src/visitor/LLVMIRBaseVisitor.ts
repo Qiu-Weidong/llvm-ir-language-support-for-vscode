@@ -7,426 +7,427 @@ import { LLVMIRVisitor } from "../llvmir/LLVMIRVisitor";
 
 // 所有 visitor 的基类
 // 使用正则表达式 \?: \(\(ctx: ([a-zA-Z]+)\) => void\) \| undefined;
-// 替换为 (ctx: $1): void { this.visitChildren(ctx); }
-export class LLVMIRBaseVisitor implements LLVMIRVisitor<void> {
+// 替换为 (ctx: $1): any { return this.visitChildren(ctx); }
+export class LLVMIRBaseVisitor implements LLVMIRVisitor<any> {
   
-  visitCompilationUnit(ctx: CompilationUnitContext): void { this.visitChildren(ctx); }
-  visitTopLevelEntity(ctx: TopLevelEntityContext): void { this.visitChildren(ctx); }
-  visitTypeDef(ctx: TypeDefContext): void { this.visitChildren(ctx); }
-  visitGlobalDecl(ctx: GlobalDeclContext): void { this.visitChildren(ctx); }
-  visitGlobalDef(ctx: GlobalDefContext): void { this.visitChildren(ctx); }
-  visitIndirectSymbolDef(ctx: IndirectSymbolDefContext): void { this.visitChildren(ctx); }
-  visitFuncDecl(ctx: FuncDeclContext): void { this.visitChildren(ctx); }
-  visitFuncDef(ctx: FuncDefContext): void { this.visitChildren(ctx); }
-  visitFuncHeader(ctx: FuncHeaderContext): void { this.visitChildren(ctx); }
-  visitIndirectSymbol(ctx: IndirectSymbolContext): void { this.visitChildren(ctx); }
-  visitFuncBody(ctx: FuncBodyContext): void { this.visitChildren(ctx); }
-  visitBasicBlock(ctx: BasicBlockContext): void { this.visitChildren(ctx); }
-  visitInstruction(ctx: InstructionContext): void { this.visitChildren(ctx); }
-  visitTerminator(ctx: TerminatorContext): void { this.visitChildren(ctx); }
-  visitLocalDefTerm(ctx: LocalDefTermContext): void { this.visitChildren(ctx); }
-  visitValueTerminator(ctx: ValueTerminatorContext): void { this.visitChildren(ctx); }
-  visitRetTerm(ctx: RetTermContext): void { this.visitChildren(ctx); }
-  visitBrTerm(ctx: BrTermContext): void { this.visitChildren(ctx); }
-  visitCondBrTerm(ctx: CondBrTermContext): void { this.visitChildren(ctx); }
-  visitSwitchTerm(ctx: SwitchTermContext): void { this.visitChildren(ctx); }
-  visitIndirectBrTerm(ctx: IndirectBrTermContext): void { this.visitChildren(ctx); }
-  visitResumeTerm(ctx: ResumeTermContext): void { this.visitChildren(ctx); }
-  visitCatchRetTerm(ctx: CatchRetTermContext): void { this.visitChildren(ctx); }
-  visitCleanupRetTerm(ctx: CleanupRetTermContext): void { this.visitChildren(ctx); }
-  visitUnreachableTerm(ctx: UnreachableTermContext): void { this.visitChildren(ctx); }
-  visitInvokeTerm(ctx: InvokeTermContext): void { this.visitChildren(ctx); }
-  visitCallBrTerm(ctx: CallBrTermContext): void { this.visitChildren(ctx); }
-  visitCatchSwitchTerm(ctx: CatchSwitchTermContext): void { this.visitChildren(ctx); }
-  visitLabel(ctx: LabelContext): void { this.visitChildren(ctx); }
-  visitCase(ctx: CaseContext): void { this.visitChildren(ctx); }
-  visitType(ctx: TypeContext): void { this.visitChildren(ctx); }
-  visitParams(ctx: ParamsContext): void { this.visitChildren(ctx); }
-  visitParam(ctx: ParamContext): void { this.visitChildren(ctx); }
-  visitTypeValue(ctx: TypeValueContext): void { this.visitChildren(ctx); }
-  visitValue(ctx: ValueContext): void { this.visitChildren(ctx); }
+  visitCompilationUnit(ctx: CompilationUnitContext): any { return this.visitChildren(ctx); }
+  visitTopLevelEntity(ctx: TopLevelEntityContext): any { return this.visitChildren(ctx); }
+  visitTypeDef(ctx: TypeDefContext): any { return this.visitChildren(ctx); }
+  visitGlobalDecl(ctx: GlobalDeclContext): any { return this.visitChildren(ctx); }
+  visitGlobalDef(ctx: GlobalDefContext): any { return this.visitChildren(ctx); }
+  visitIndirectSymbolDef(ctx: IndirectSymbolDefContext): any { return this.visitChildren(ctx); }
+  visitFuncDecl(ctx: FuncDeclContext): any { return this.visitChildren(ctx); }
+  visitFuncDef(ctx: FuncDefContext): any { return this.visitChildren(ctx); }
+  visitFuncHeader(ctx: FuncHeaderContext): any { return this.visitChildren(ctx); }
+  visitIndirectSymbol(ctx: IndirectSymbolContext): any { return this.visitChildren(ctx); }
+  visitFuncBody(ctx: FuncBodyContext): any { return this.visitChildren(ctx); }
+  visitBasicBlock(ctx: BasicBlockContext): any { return this.visitChildren(ctx); }
+  visitInstruction(ctx: InstructionContext): any { return this.visitChildren(ctx); }
+  visitTerminator(ctx: TerminatorContext): any { return this.visitChildren(ctx); }
+  visitLocalDefTerm(ctx: LocalDefTermContext): any { return this.visitChildren(ctx); }
+  visitValueTerminator(ctx: ValueTerminatorContext): any { return this.visitChildren(ctx); }
+  visitRetTerm(ctx: RetTermContext): any { return this.visitChildren(ctx); }
+  visitBrTerm(ctx: BrTermContext): any { return this.visitChildren(ctx); }
+  visitCondBrTerm(ctx: CondBrTermContext): any { return this.visitChildren(ctx); }
+  visitSwitchTerm(ctx: SwitchTermContext): any { return this.visitChildren(ctx); }
+  visitIndirectBrTerm(ctx: IndirectBrTermContext): any { return this.visitChildren(ctx); }
+  visitResumeTerm(ctx: ResumeTermContext): any { return this.visitChildren(ctx); }
+  visitCatchRetTerm(ctx: CatchRetTermContext): any { return this.visitChildren(ctx); }
+  visitCleanupRetTerm(ctx: CleanupRetTermContext): any { return this.visitChildren(ctx); }
+  visitUnreachableTerm(ctx: UnreachableTermContext): any { return this.visitChildren(ctx); }
+  visitInvokeTerm(ctx: InvokeTermContext): any { return this.visitChildren(ctx); }
+  visitCallBrTerm(ctx: CallBrTermContext): any { return this.visitChildren(ctx); }
+  visitCatchSwitchTerm(ctx: CatchSwitchTermContext): any { return this.visitChildren(ctx); }
+  visitLabel(ctx: LabelContext): any { return this.visitChildren(ctx); }
+  visitCase(ctx: CaseContext): any { return this.visitChildren(ctx); }
+  visitType(ctx: TypeContext): any { return this.visitChildren(ctx); }
+  visitParams(ctx: ParamsContext): any { return this.visitChildren(ctx); }
+  visitParam(ctx: ParamContext): any { return this.visitChildren(ctx); }
+  visitTypeValue(ctx: TypeValueContext): any { return this.visitChildren(ctx); }
+  visitValue(ctx: ValueContext): any { return this.visitChildren(ctx); }
   // type
-  visitFirstClassType(ctx: FirstClassTypeContext): void { this.visitChildren(ctx); }
-  visitConcreteType(ctx: ConcreteTypeContext): void { this.visitChildren(ctx); }
-  visitIntType(ctx: IntTypeContext): void { this.visitChildren(ctx); }
-  visitFloatType(ctx: FloatTypeContext): void { this.visitChildren(ctx); }
-  visitPointerType(ctx: PointerTypeContext): void { this.visitChildren(ctx); }
-  visitVectorType(ctx: VectorTypeContext): void { this.visitChildren(ctx); }
-  visitLabelType(ctx: LabelTypeContext): void { this.visitChildren(ctx); }
-  visitArrayType(ctx: ArrayTypeContext): void { this.visitChildren(ctx); }
-  visitStructType(ctx: StructTypeContext): void { this.visitChildren(ctx); }
-  visitNamedType(ctx: NamedTypeContext): void { this.visitChildren(ctx); }
-  visitMmxType(ctx: MmxTypeContext): void { this.visitChildren(ctx); }
-  visitTokenType(ctx: TokenTypeContext): void { this.visitChildren(ctx); }
-  visitOpaquePointerType(ctx: OpaquePointerTypeContext): void { this.visitChildren(ctx); }
-  visitVoidType(ctx: VoidTypeContext): void { this.visitChildren(ctx); }
-  visitOpaqueType(ctx: OpaqueTypeContext): void { this.visitChildren(ctx); }
+  visitFirstClassType(ctx: FirstClassTypeContext): any { return this.visitChildren(ctx); }
+  visitConcreteType(ctx: ConcreteTypeContext): any { return this.visitChildren(ctx); }
+  visitIntType(ctx: IntTypeContext): any { return this.visitChildren(ctx); }
+  visitFloatType(ctx: FloatTypeContext): any { return this.visitChildren(ctx); }
+  visitPointerType(ctx: PointerTypeContext): any { return this.visitChildren(ctx); }
+  visitVectorType(ctx: VectorTypeContext): any { return this.visitChildren(ctx); }
+  visitLabelType(ctx: LabelTypeContext): any { return this.visitChildren(ctx); }
+  visitArrayType(ctx: ArrayTypeContext): any { return this.visitChildren(ctx); }
+  visitStructType(ctx: StructTypeContext): any { return this.visitChildren(ctx); }
+  visitNamedType(ctx: NamedTypeContext): any { return this.visitChildren(ctx); }
+  visitMmxType(ctx: MmxTypeContext): any { return this.visitChildren(ctx); }
+  visitTokenType(ctx: TokenTypeContext): any { return this.visitChildren(ctx); }
+  visitOpaquePointerType(ctx: OpaquePointerTypeContext): any { return this.visitChildren(ctx); }
+  visitVoidType(ctx: VoidTypeContext): any { return this.visitChildren(ctx); }
+  visitOpaqueType(ctx: OpaqueTypeContext): any { return this.visitChildren(ctx); }
   // constant
-  visitConstant(ctx: ConstantContext): void { this.visitChildren(ctx); }
-  visitBoolConst(ctx: BoolConstContext): void { this.visitChildren(ctx); }
-  visitIntConst(ctx: IntConstContext): void { this.visitChildren(ctx); }
-  visitFloatConst(ctx: FloatConstContext): void { this.visitChildren(ctx); }
-  visitNullConst(ctx: NullConstContext): void { this.visitChildren(ctx); }
-  visitNoneConst(ctx: NoneConstContext): void { this.visitChildren(ctx); }
-  visitStructConst(ctx: StructConstContext): void { this.visitChildren(ctx); }
-  visitArrayConst(ctx: ArrayConstContext): void { this.visitChildren(ctx); }
-  visitVectorConst(ctx: VectorConstContext): void { this.visitChildren(ctx); }
-  visitZeroInitializerConst(ctx: ZeroInitializerConstContext): void { this.visitChildren(ctx); }
-  visitUndefConst(ctx: UndefConstContext): void { this.visitChildren(ctx); }
-  visitPoisonConst(ctx: PoisonConstContext): void { this.visitChildren(ctx); }
-  visitBlockAddressConst(ctx: BlockAddressConstContext): void { this.visitChildren(ctx); }
-  visitDsoLocalEquivalentConst(ctx: DsoLocalEquivalentConstContext): void { this.visitChildren(ctx); }
-  visitNoCFIConst(ctx: NoCFIConstContext): void { this.visitChildren(ctx); }
-  visitTypeConst(ctx: TypeConstContext): void { this.visitChildren(ctx); }
+  visitConstant(ctx: ConstantContext): any { return this.visitChildren(ctx); }
+  visitBoolConst(ctx: BoolConstContext): any { return this.visitChildren(ctx); }
+  visitIntConst(ctx: IntConstContext): any { return this.visitChildren(ctx); }
+  visitFloatConst(ctx: FloatConstContext): any { return this.visitChildren(ctx); }
+  visitNullConst(ctx: NullConstContext): any { return this.visitChildren(ctx); }
+  visitNoneConst(ctx: NoneConstContext): any { return this.visitChildren(ctx); }
+  visitStructConst(ctx: StructConstContext): any { return this.visitChildren(ctx); }
+  visitArrayConst(ctx: ArrayConstContext): any { return this.visitChildren(ctx); }
+  visitVectorConst(ctx: VectorConstContext): any { return this.visitChildren(ctx); }
+  visitZeroInitializerConst(ctx: ZeroInitializerConstContext): any { return this.visitChildren(ctx); }
+  visitUndefConst(ctx: UndefConstContext): any { return this.visitChildren(ctx); }
+  visitPoisonConst(ctx: PoisonConstContext): any { return this.visitChildren(ctx); }
+  visitBlockAddressConst(ctx: BlockAddressConstContext): any { return this.visitChildren(ctx); }
+  visitDsoLocalEquivalentConst(ctx: DsoLocalEquivalentConstContext): any { return this.visitChildren(ctx); }
+  visitNoCFIConst(ctx: NoCFIConstContext): any { return this.visitChildren(ctx); }
+  visitTypeConst(ctx: TypeConstContext): any { return this.visitChildren(ctx); }
   
   // expr
-  visitConstantExpr(ctx: ConstantExprContext): void { this.visitChildren(ctx); }
-  visitBitCastExpr(ctx: BitCastExprContext): void { this.visitChildren(ctx); }
-  visitGetElementPtrExpr(ctx: GetElementPtrExprContext): void { this.visitChildren(ctx); }
-  visitGepIndex(ctx: GepIndexContext): void { this.visitChildren(ctx); }
-  visitAddrSpaceCastExpr(ctx: AddrSpaceCastExprContext): void { this.visitChildren(ctx); }
-  visitIntToPtrExpr(ctx: IntToPtrExprContext): void { this.visitChildren(ctx); }
-  visitICmpExpr(ctx: ICmpExprContext): void { this.visitChildren(ctx); }
-  visitFCmpExpr(ctx: FCmpExprContext): void { this.visitChildren(ctx); }
-  visitSelectExpr(ctx: SelectExprContext): void { this.visitChildren(ctx); }
-  visitTruncExpr(ctx: TruncExprContext): void { this.visitChildren(ctx); }
-  visitZExtExpr(ctx: ZExtExprContext): void { this.visitChildren(ctx); }
-  visitSExtExpr(ctx: SExtExprContext): void { this.visitChildren(ctx); }
-  visitFpTruncExpr(ctx: FpTruncExprContext): void { this.visitChildren(ctx); }
-  visitFpExtExpr(ctx: FpExtExprContext): void { this.visitChildren(ctx); }
-  visitFpToUiExpr(ctx: FpToUiExprContext): void { this.visitChildren(ctx); }
-  visitFpToSiExpr(ctx: FpToSiExprContext): void { this.visitChildren(ctx); }
-  visitUiToFpExpr(ctx: UiToFpExprContext): void { this.visitChildren(ctx); }
-  visitSiToFpExpr(ctx: SiToFpExprContext): void { this.visitChildren(ctx); }
-  visitPtrToIntExpr(ctx: PtrToIntExprContext): void { this.visitChildren(ctx); }
-  visitExtractElementExpr(ctx: ExtractElementExprContext): void { this.visitChildren(ctx); }
-  visitInsertElementExpr(ctx: InsertElementExprContext): void { this.visitChildren(ctx); }
-  visitShuffleVectorExpr(ctx: ShuffleVectorExprContext): void { this.visitChildren(ctx); }
-  visitShlExpr(ctx: ShlExprContext): void { this.visitChildren(ctx); }
-  visitLShrExpr(ctx: LShrExprContext): void { this.visitChildren(ctx); }
-  visitAShrExpr(ctx: AShrExprContext): void { this.visitChildren(ctx); }
-  visitAndExpr(ctx: AndExprContext): void { this.visitChildren(ctx); }
-  visitOrExpr(ctx: OrExprContext): void { this.visitChildren(ctx); }
-  visitXorExpr(ctx: XorExprContext): void { this.visitChildren(ctx); }
-  visitAddExpr(ctx: AddExprContext): void { this.visitChildren(ctx); }
-  visitSubExpr(ctx: SubExprContext): void { this.visitChildren(ctx); }
-  visitMulExpr(ctx: MulExprContext): void { this.visitChildren(ctx); }
-  visitFNegExpr(ctx: FNegExprContext): void { this.visitChildren(ctx); }
+  visitConstantExpr(ctx: ConstantExprContext): any { return this.visitChildren(ctx); }
+  visitBitCastExpr(ctx: BitCastExprContext): any { return this.visitChildren(ctx); }
+  visitGetElementPtrExpr(ctx: GetElementPtrExprContext): any { return this.visitChildren(ctx); }
+  visitGepIndex(ctx: GepIndexContext): any { return this.visitChildren(ctx); }
+  visitAddrSpaceCastExpr(ctx: AddrSpaceCastExprContext): any { return this.visitChildren(ctx); }
+  visitIntToPtrExpr(ctx: IntToPtrExprContext): any { return this.visitChildren(ctx); }
+  visitICmpExpr(ctx: ICmpExprContext): any { return this.visitChildren(ctx); }
+  visitFCmpExpr(ctx: FCmpExprContext): any { return this.visitChildren(ctx); }
+  visitSelectExpr(ctx: SelectExprContext): any { return this.visitChildren(ctx); }
+  visitTruncExpr(ctx: TruncExprContext): any { return this.visitChildren(ctx); }
+  visitZExtExpr(ctx: ZExtExprContext): any { return this.visitChildren(ctx); }
+  visitSExtExpr(ctx: SExtExprContext): any { return this.visitChildren(ctx); }
+  visitFpTruncExpr(ctx: FpTruncExprContext): any { return this.visitChildren(ctx); }
+  visitFpExtExpr(ctx: FpExtExprContext): any { return this.visitChildren(ctx); }
+  visitFpToUiExpr(ctx: FpToUiExprContext): any { return this.visitChildren(ctx); }
+  visitFpToSiExpr(ctx: FpToSiExprContext): any { return this.visitChildren(ctx); }
+  visitUiToFpExpr(ctx: UiToFpExprContext): any { return this.visitChildren(ctx); }
+  visitSiToFpExpr(ctx: SiToFpExprContext): any { return this.visitChildren(ctx); }
+  visitPtrToIntExpr(ctx: PtrToIntExprContext): any { return this.visitChildren(ctx); }
+  visitExtractElementExpr(ctx: ExtractElementExprContext): any { return this.visitChildren(ctx); }
+  visitInsertElementExpr(ctx: InsertElementExprContext): any { return this.visitChildren(ctx); }
+  visitShuffleVectorExpr(ctx: ShuffleVectorExprContext): any { return this.visitChildren(ctx); }
+  visitShlExpr(ctx: ShlExprContext): any { return this.visitChildren(ctx); }
+  visitLShrExpr(ctx: LShrExprContext): any { return this.visitChildren(ctx); }
+  visitAShrExpr(ctx: AShrExprContext): any { return this.visitChildren(ctx); }
+  visitAndExpr(ctx: AndExprContext): any { return this.visitChildren(ctx); }
+  visitOrExpr(ctx: OrExprContext): any { return this.visitChildren(ctx); }
+  visitXorExpr(ctx: XorExprContext): any { return this.visitChildren(ctx); }
+  visitAddExpr(ctx: AddExprContext): any { return this.visitChildren(ctx); }
+  visitSubExpr(ctx: SubExprContext): any { return this.visitChildren(ctx); }
+  visitMulExpr(ctx: MulExprContext): any { return this.visitChildren(ctx); }
+  visitFNegExpr(ctx: FNegExprContext): any { return this.visitChildren(ctx); }
   // inst
-  visitFenceInst(ctx: FenceInstContext): void { this.visitChildren(ctx); }
-  visitFNegInst(ctx: FNegInstContext): void { this.visitChildren(ctx); }
-  visitAddInst(ctx: AddInstContext): void { this.visitChildren(ctx); }
-  visitFAddInst(ctx: FAddInstContext): void { this.visitChildren(ctx); }
-  visitSubInst(ctx: SubInstContext): void { this.visitChildren(ctx); }
-  visitFSubInst(ctx: FSubInstContext): void { this.visitChildren(ctx); }
-  visitMulInst(ctx: MulInstContext): void { this.visitChildren(ctx); }
-  visitFMulInst(ctx: FMulInstContext): void { this.visitChildren(ctx); }
-  visitUDivInst(ctx: UDivInstContext): void { this.visitChildren(ctx); }
-  visitSDivInst(ctx: SDivInstContext): void { this.visitChildren(ctx); }
-  visitFDivInst(ctx: FDivInstContext): void { this.visitChildren(ctx); }
-  visitURemInst(ctx: URemInstContext): void { this.visitChildren(ctx); }
-  visitSRemInst(ctx: SRemInstContext): void { this.visitChildren(ctx); }
-  visitFRemInst(ctx: FRemInstContext): void { this.visitChildren(ctx); }
-  visitShlInst(ctx: ShlInstContext): void { this.visitChildren(ctx); }
-  visitLShrInst(ctx: LShrInstContext): void { this.visitChildren(ctx); }
-  visitAShrInst(ctx: AShrInstContext): void { this.visitChildren(ctx); }
-  visitAndInst(ctx: AndInstContext): void { this.visitChildren(ctx); }
-  visitOrInst(ctx: OrInstContext): void { this.visitChildren(ctx); }
-  visitXorInst(ctx: XorInstContext): void { this.visitChildren(ctx); }
-  visitExtractElementInst(ctx: ExtractElementInstContext): void { this.visitChildren(ctx); }
-  visitInsertElementInst(ctx: InsertElementInstContext): void { this.visitChildren(ctx); }
-  visitShuffleVectorInst(ctx: ShuffleVectorInstContext): void { this.visitChildren(ctx); }
-  visitExtractValueInst(ctx: ExtractValueInstContext): void { this.visitChildren(ctx); }
-  visitInsertValueInst(ctx: InsertValueInstContext): void { this.visitChildren(ctx); }
-  visitAllocaInst(ctx: AllocaInstContext): void { this.visitChildren(ctx); }
-  visitLoadInst(ctx: LoadInstContext): void { this.visitChildren(ctx); }
-  visitCmpXchgInst(ctx: CmpXchgInstContext): void { this.visitChildren(ctx); }
-  visitAtomicRMWInst(ctx: AtomicRMWInstContext): void { this.visitChildren(ctx); }
-  visitGetElementPtrInst(ctx: GetElementPtrInstContext): void { this.visitChildren(ctx); }
-  visitTruncInst(ctx: TruncInstContext): void { this.visitChildren(ctx); }
-  visitZExtInst(ctx: ZExtInstContext): void { this.visitChildren(ctx); }
-  visitSExtInst(ctx: SExtInstContext): void { this.visitChildren(ctx); }
-  visitFpTruncInst(ctx: FpTruncInstContext): void { this.visitChildren(ctx); }
-  visitFpExtInst(ctx: FpExtInstContext): void { this.visitChildren(ctx); }
-  visitFpToUiInst(ctx: FpToUiInstContext): void { this.visitChildren(ctx); }
-  visitFpToSiInst(ctx: FpToSiInstContext): void { this.visitChildren(ctx); }
-  visitUiToFpInst(ctx: UiToFpInstContext): void { this.visitChildren(ctx); }
-  visitSiToFpInst(ctx: SiToFpInstContext): void { this.visitChildren(ctx); }
-  visitPtrToIntInst(ctx: PtrToIntInstContext): void { this.visitChildren(ctx); }
-  visitIntToPtrInst(ctx: IntToPtrInstContext): void { this.visitChildren(ctx); }
-  visitBitCastInst(ctx: BitCastInstContext): void { this.visitChildren(ctx); }
-  visitAddrSpaceCastInst(ctx: AddrSpaceCastInstContext): void { this.visitChildren(ctx); }
-  visitICmpInst(ctx: ICmpInstContext): void { this.visitChildren(ctx); }
-  visitFCmpInst(ctx: FCmpInstContext): void { this.visitChildren(ctx); }
-  visitPhiInst(ctx: PhiInstContext): void { this.visitChildren(ctx); }
-  visitSelectInst(ctx: SelectInstContext): void { this.visitChildren(ctx); }
-  visitFreezeInst(ctx: FreezeInstContext): void { this.visitChildren(ctx); }
-  visitCallInst(ctx: CallInstContext): void { this.visitChildren(ctx); }
-  visitVaargInst(ctx: VaargInstContext): void { this.visitChildren(ctx); }
-  visitLandingPadInst(ctx: LandingPadInstContext): void { this.visitChildren(ctx); }
-  visitCatchPadInst(ctx: CatchPadInstContext): void { this.visitChildren(ctx); }
-  visitCleanupPadInst(ctx: CleanupPadInstContext): void { this.visitChildren(ctx); }
-  visitStoreInst(ctx: StoreInstContext): void { this.visitChildren(ctx); }
-  visitLocalDefInst(ctx: LocalDefInstContext): void { this.visitChildren(ctx); }
+  visitFenceInst(ctx: FenceInstContext): any { return this.visitChildren(ctx); }
+  visitFNegInst(ctx: FNegInstContext): any { return this.visitChildren(ctx); }
+  visitAddInst(ctx: AddInstContext): any { return this.visitChildren(ctx); }
+  visitFAddInst(ctx: FAddInstContext): any { return this.visitChildren(ctx); }
+  visitSubInst(ctx: SubInstContext): any { return this.visitChildren(ctx); }
+  visitFSubInst(ctx: FSubInstContext): any { return this.visitChildren(ctx); }
+  visitMulInst(ctx: MulInstContext): any { return this.visitChildren(ctx); }
+  visitFMulInst(ctx: FMulInstContext): any { return this.visitChildren(ctx); }
+  visitUDivInst(ctx: UDivInstContext): any { return this.visitChildren(ctx); }
+  visitSDivInst(ctx: SDivInstContext): any { return this.visitChildren(ctx); }
+  visitFDivInst(ctx: FDivInstContext): any { return this.visitChildren(ctx); }
+  visitURemInst(ctx: URemInstContext): any { return this.visitChildren(ctx); }
+  visitSRemInst(ctx: SRemInstContext): any { return this.visitChildren(ctx); }
+  visitFRemInst(ctx: FRemInstContext): any { return this.visitChildren(ctx); }
+  visitShlInst(ctx: ShlInstContext): any { return this.visitChildren(ctx); }
+  visitLShrInst(ctx: LShrInstContext): any { return this.visitChildren(ctx); }
+  visitAShrInst(ctx: AShrInstContext): any { return this.visitChildren(ctx); }
+  visitAndInst(ctx: AndInstContext): any { return this.visitChildren(ctx); }
+  visitOrInst(ctx: OrInstContext): any { return this.visitChildren(ctx); }
+  visitXorInst(ctx: XorInstContext): any { return this.visitChildren(ctx); }
+  visitExtractElementInst(ctx: ExtractElementInstContext): any { return this.visitChildren(ctx); }
+  visitInsertElementInst(ctx: InsertElementInstContext): any { return this.visitChildren(ctx); }
+  visitShuffleVectorInst(ctx: ShuffleVectorInstContext): any { return this.visitChildren(ctx); }
+  visitExtractValueInst(ctx: ExtractValueInstContext): any { return this.visitChildren(ctx); }
+  visitInsertValueInst(ctx: InsertValueInstContext): any { return this.visitChildren(ctx); }
+  visitAllocaInst(ctx: AllocaInstContext): any { return this.visitChildren(ctx); }
+  visitLoadInst(ctx: LoadInstContext): any { return this.visitChildren(ctx); }
+  visitCmpXchgInst(ctx: CmpXchgInstContext): any { return this.visitChildren(ctx); }
+  visitAtomicRMWInst(ctx: AtomicRMWInstContext): any { return this.visitChildren(ctx); }
+  visitGetElementPtrInst(ctx: GetElementPtrInstContext): any { return this.visitChildren(ctx); }
+  visitTruncInst(ctx: TruncInstContext): any { return this.visitChildren(ctx); }
+  visitZExtInst(ctx: ZExtInstContext): any { return this.visitChildren(ctx); }
+  visitSExtInst(ctx: SExtInstContext): any { return this.visitChildren(ctx); }
+  visitFpTruncInst(ctx: FpTruncInstContext): any { return this.visitChildren(ctx); }
+  visitFpExtInst(ctx: FpExtInstContext): any { return this.visitChildren(ctx); }
+  visitFpToUiInst(ctx: FpToUiInstContext): any { return this.visitChildren(ctx); }
+  visitFpToSiInst(ctx: FpToSiInstContext): any { return this.visitChildren(ctx); }
+  visitUiToFpInst(ctx: UiToFpInstContext): any { return this.visitChildren(ctx); }
+  visitSiToFpInst(ctx: SiToFpInstContext): any { return this.visitChildren(ctx); }
+  visitPtrToIntInst(ctx: PtrToIntInstContext): any { return this.visitChildren(ctx); }
+  visitIntToPtrInst(ctx: IntToPtrInstContext): any { return this.visitChildren(ctx); }
+  visitBitCastInst(ctx: BitCastInstContext): any { return this.visitChildren(ctx); }
+  visitAddrSpaceCastInst(ctx: AddrSpaceCastInstContext): any { return this.visitChildren(ctx); }
+  visitICmpInst(ctx: ICmpInstContext): any { return this.visitChildren(ctx); }
+  visitFCmpInst(ctx: FCmpInstContext): any { return this.visitChildren(ctx); }
+  visitPhiInst(ctx: PhiInstContext): any { return this.visitChildren(ctx); }
+  visitSelectInst(ctx: SelectInstContext): any { return this.visitChildren(ctx); }
+  visitFreezeInst(ctx: FreezeInstContext): any { return this.visitChildren(ctx); }
+  visitCallInst(ctx: CallInstContext): any { return this.visitChildren(ctx); }
+  visitVaargInst(ctx: VaargInstContext): any { return this.visitChildren(ctx); }
+  visitLandingPadInst(ctx: LandingPadInstContext): any { return this.visitChildren(ctx); }
+  visitCatchPadInst(ctx: CatchPadInstContext): any { return this.visitChildren(ctx); }
+  visitCleanupPadInst(ctx: CleanupPadInstContext): any { return this.visitChildren(ctx); }
+  visitStoreInst(ctx: StoreInstContext): any { return this.visitChildren(ctx); }
+  visitLocalDefInst(ctx: LocalDefInstContext): any { return this.visitChildren(ctx); }
 
-  visitTargetDef(ctx: TargetDefContext): void { this.visitChildren(ctx); }
-  visitSourceFilename(ctx: SourceFilenameContext): void { this.visitChildren(ctx); }
-  visitTargetDataLayout(ctx: TargetDataLayoutContext): void { this.visitChildren(ctx); }
-  visitTargetTriple(ctx: TargetTripleContext): void { this.visitChildren(ctx); }
-  visitComdatDef(ctx: ComdatDefContext): void { this.visitChildren(ctx); }
-  visitModuleAsm(ctx: ModuleAsmContext): void { this.visitChildren(ctx); }
-  visitAttrGroupDef(ctx: AttrGroupDefContext): void { this.visitChildren(ctx); }
-  visitNamedMetadataDef(ctx: NamedMetadataDefContext): void { this.visitChildren(ctx); }
-  visitMetadataDef(ctx: MetadataDefContext): void { this.visitChildren(ctx); }
-  visitUseListOrder(ctx: UseListOrderContext): void { this.visitChildren(ctx); }
-  visitUseListOrderBB(ctx: UseListOrderBBContext): void { this.visitChildren(ctx); }
-  visitCallingConv(ctx: CallingConvContext): void { this.visitChildren(ctx); }
-  visitCallingConvInt(ctx: CallingConvIntContext): void { this.visitChildren(ctx); }
-  visitFuncHdrField(ctx: FuncHdrFieldContext): void { this.visitChildren(ctx); }
-  visitGc(ctx: GcContext): void { this.visitChildren(ctx); }
-  visitPrefix(ctx: PrefixContext): void { this.visitChildren(ctx); }
-  visitPrologue(ctx: PrologueContext): void { this.visitChildren(ctx); }
-  visitPersonality(ctx: PersonalityContext): void { this.visitChildren(ctx); }
-  visitReturnAttribute(ctx: ReturnAttributeContext): void { this.visitChildren(ctx); }
-  visitUnwindTarget(ctx: UnwindTargetContext): void { this.visitChildren(ctx); }
-  visitHandlers(ctx: HandlersContext): void { this.visitChildren(ctx); }
-  visitMetadataNode(ctx: MetadataNodeContext): void { this.visitChildren(ctx); }
-  visitDiExpression(ctx: DiExpressionContext): void { this.visitChildren(ctx); }
-  visitDiExpressionField(ctx: DiExpressionFieldContext): void { this.visitChildren(ctx); }
-  visitGlobalField(ctx: GlobalFieldContext): void { this.visitChildren(ctx); }
-  visitSection(ctx: SectionContext): void { this.visitChildren(ctx); }
-  visitComdat(ctx: ComdatContext): void { this.visitChildren(ctx); }
-  visitPartition(ctx: PartitionContext): void { this.visitChildren(ctx); }
-  visitMetadataAttachment(ctx: MetadataAttachmentContext): void { this.visitChildren(ctx); }
-  visitMdNode(ctx: MdNodeContext): void { this.visitChildren(ctx); }
-  visitMdTuple(ctx: MdTupleContext): void { this.visitChildren(ctx); }
-  visitMetadata(ctx: MetadataContext): void { this.visitChildren(ctx); }
-  visitDiArgList(ctx: DiArgListContext): void { this.visitChildren(ctx); }
-  visitInlineAsm(ctx: InlineAsmContext): void { this.visitChildren(ctx); }
-  visitMdString(ctx: MdStringContext): void { this.visitChildren(ctx); }
-  visitMdFieldOrInt(ctx: MdFieldOrIntContext): void { this.visitChildren(ctx); }
-  visitDiSPFlag(ctx: DiSPFlagContext): void { this.visitChildren(ctx); }
-  visitFuncAttribute(ctx: FuncAttributeContext): void { this.visitChildren(ctx); }
-  visitParamAttribute(ctx: ParamAttributeContext): void { this.visitChildren(ctx); }
-  visitAttrString(ctx: AttrStringContext): void { this.visitChildren(ctx); }
-  visitAttrPair(ctx: AttrPairContext): void { this.visitChildren(ctx); }
-  visitAlign(ctx: AlignContext): void { this.visitChildren(ctx); }
-  visitAlignPair(ctx: AlignPairContext): void { this.visitChildren(ctx); }
-  visitAlignStack(ctx: AlignStackContext): void { this.visitChildren(ctx); }
-  visitAlignStackPair(ctx: AlignStackPairContext): void { this.visitChildren(ctx); }
-  visitAllocKind(ctx: AllocKindContext): void { this.visitChildren(ctx); }
-  visitAllocSize(ctx: AllocSizeContext): void { this.visitChildren(ctx); }
-  visitUnwindTable(ctx: UnwindTableContext): void { this.visitChildren(ctx); }
-  visitVectorScaleRange(ctx: VectorScaleRangeContext): void { this.visitChildren(ctx); }
-  visitByRefAttr(ctx: ByRefAttrContext): void { this.visitChildren(ctx); }
-  visitByval(ctx: ByvalContext): void { this.visitChildren(ctx); }
-  visitDereferenceable(ctx: DereferenceableContext): void { this.visitChildren(ctx); }
-  visitElementType(ctx: ElementTypeContext): void { this.visitChildren(ctx); }
-  visitInAlloca(ctx: InAllocaContext): void { this.visitChildren(ctx); }
-  visitParamAttr(ctx: ParamAttrContext): void { this.visitChildren(ctx); }
-  visitPreallocated(ctx: PreallocatedContext): void { this.visitChildren(ctx); }
-  visitStructRetAttr(ctx: StructRetAttrContext): void { this.visitChildren(ctx); }
-  visitAddrSpace(ctx: AddrSpaceContext): void { this.visitChildren(ctx); }
-  visitThreadLocal(ctx: ThreadLocalContext): void { this.visitChildren(ctx); }
-  visitMetadataType(ctx: MetadataTypeContext): void { this.visitChildren(ctx); }
-  visitValueInstruction(ctx: ValueInstructionContext): void { this.visitChildren(ctx); }
-  visitSyncScope(ctx: SyncScopeContext): void { this.visitChildren(ctx); }
-  visitInc(ctx: IncContext): void { this.visitChildren(ctx); }
-  visitOperandBundle(ctx: OperandBundleContext): void { this.visitChildren(ctx); }
-  visitClause(ctx: ClauseContext): void { this.visitChildren(ctx); }
-  visitArgs(ctx: ArgsContext): void { this.visitChildren(ctx); }
-  visitArg(ctx: ArgContext): void { this.visitChildren(ctx); }
-  visitExceptionArg(ctx: ExceptionArgContext): void { this.visitChildren(ctx); }
-  visitExceptionPad(ctx: ExceptionPadContext): void { this.visitChildren(ctx); }
-  visitExternalLinkage(ctx: ExternalLinkageContext): void { this.visitChildren(ctx); }
-  visitInternalLinkage(ctx: InternalLinkageContext): void { this.visitChildren(ctx); }
-  visitLinkage(ctx: LinkageContext): void { this.visitChildren(ctx); }
-  visitPreemption(ctx: PreemptionContext): void { this.visitChildren(ctx); }
-  visitVisibility(ctx: VisibilityContext): void { this.visitChildren(ctx); }
-  visitDllStorageClass(ctx: DllStorageClassContext): void { this.visitChildren(ctx); }
-  visitTlsModel(ctx: TlsModelContext): void { this.visitChildren(ctx); }
-  visitUnnamedAddr(ctx: UnnamedAddrContext): void { this.visitChildren(ctx); }
-  visitExternallyInitialized(ctx: ExternallyInitializedContext): void { this.visitChildren(ctx); }
-  visitImmutable(ctx: ImmutableContext): void { this.visitChildren(ctx); }
-  visitFuncAttr(ctx: FuncAttrContext): void { this.visitChildren(ctx); }
-  visitDistinct(ctx: DistinctContext): void { this.visitChildren(ctx); }
-  visitInBounds(ctx: InBoundsContext): void { this.visitChildren(ctx); }
-  visitReturnAttr(ctx: ReturnAttrContext): void { this.visitChildren(ctx); }
-  visitOverflowFlag(ctx: OverflowFlagContext): void { this.visitChildren(ctx); }
-  visitIPred(ctx: IPredContext): void { this.visitChildren(ctx); }
-  visitFPred(ctx: FPredContext): void { this.visitChildren(ctx); }
-  visitAtomicOrdering(ctx: AtomicOrderingContext): void { this.visitChildren(ctx); }
-  visitCallingConvEnum(ctx: CallingConvEnumContext): void { this.visitChildren(ctx); }
-  visitFastMathFlag(ctx: FastMathFlagContext): void { this.visitChildren(ctx); }
-  visitAtomicOp(ctx: AtomicOpContext): void { this.visitChildren(ctx); }
-  visitFloatKind(ctx: FloatKindContext): void { this.visitChildren(ctx); }
-  visitSpecializedMDNode(ctx: SpecializedMDNodeContext): void { this.visitChildren(ctx); }
-  visitDiBasicType(ctx: DiBasicTypeContext): void { this.visitChildren(ctx); }
-  visitDiCommonBlock(ctx: DiCommonBlockContext): void { this.visitChildren(ctx); }
-  visitDiCompileUnit(ctx: DiCompileUnitContext): void { this.visitChildren(ctx); }
-  visitDiCompositeType(ctx: DiCompositeTypeContext): void { this.visitChildren(ctx); }
-  visitDiCompositeTypeField(ctx: DiCompositeTypeFieldContext): void { this.visitChildren(ctx); }
-  visitDiDerivedType(ctx: DiDerivedTypeContext): void { this.visitChildren(ctx); }
-  visitDiDerivedTypeField(ctx: DiDerivedTypeFieldContext): void { this.visitChildren(ctx); }
-  visitDiEnumerator(ctx: DiEnumeratorContext): void { this.visitChildren(ctx); }
-  visitDiEnumeratorField(ctx: DiEnumeratorFieldContext): void { this.visitChildren(ctx); }
-  visitDiFile(ctx: DiFileContext): void { this.visitChildren(ctx); }
-  visitDiFileField(ctx: DiFileFieldContext): void { this.visitChildren(ctx); }
-  visitDiGlobalVariable(ctx: DiGlobalVariableContext): void { this.visitChildren(ctx); }
-  visitDiGlobalVariableField(ctx: DiGlobalVariableFieldContext): void { this.visitChildren(ctx); }
-  visitDiGlobalVariableExpression(ctx: DiGlobalVariableExpressionContext): void { this.visitChildren(ctx); }
-  visitDiGlobalVariableExpressionField(ctx: DiGlobalVariableExpressionFieldContext): void { this.visitChildren(ctx); }
-  visitDiImportedEntity(ctx: DiImportedEntityContext): void { this.visitChildren(ctx); }
-  visitDiImportedEntityField(ctx: DiImportedEntityFieldContext): void { this.visitChildren(ctx); }
-  visitDiLabel(ctx: DiLabelContext): void { this.visitChildren(ctx); }
-  visitDiLabelField(ctx: DiLabelFieldContext): void { this.visitChildren(ctx); }
-  visitDiLexicalBlock(ctx: DiLexicalBlockContext): void { this.visitChildren(ctx); }
-  visitDiLexicalBlockField(ctx: DiLexicalBlockFieldContext): void { this.visitChildren(ctx); }
-  visitDiLexicalBlockFile(ctx: DiLexicalBlockFileContext): void { this.visitChildren(ctx); }
-  visitDiLexicalBlockFileField(ctx: DiLexicalBlockFileFieldContext): void { this.visitChildren(ctx); }
-  visitDiLocalVariable(ctx: DiLocalVariableContext): void { this.visitChildren(ctx); }
-  visitDiLocalVariableField(ctx: DiLocalVariableFieldContext): void { this.visitChildren(ctx); }
-  visitDiLocation(ctx: DiLocationContext): void { this.visitChildren(ctx); }
-  visitDiLocationField(ctx: DiLocationFieldContext): void { this.visitChildren(ctx); }
-  visitDiMacro(ctx: DiMacroContext): void { this.visitChildren(ctx); }
-  visitDiMacroField(ctx: DiMacroFieldContext): void { this.visitChildren(ctx); }
-  visitDiMacroFile(ctx: DiMacroFileContext): void { this.visitChildren(ctx); }
-  visitDiMacroFileField(ctx: DiMacroFileFieldContext): void { this.visitChildren(ctx); }
-  visitDiModule(ctx: DiModuleContext): void { this.visitChildren(ctx); }
-  visitDiModuleField(ctx: DiModuleFieldContext): void { this.visitChildren(ctx); }
-  visitDiNamespace(ctx: DiNamespaceContext): void { this.visitChildren(ctx); }
-  visitDiNamespaceField(ctx: DiNamespaceFieldContext): void { this.visitChildren(ctx); }
-  visitDiObjCProperty(ctx: DiObjCPropertyContext): void { this.visitChildren(ctx); }
-  visitDiObjCPropertyField(ctx: DiObjCPropertyFieldContext): void { this.visitChildren(ctx); }
-  visitDiStringType(ctx: DiStringTypeContext): void { this.visitChildren(ctx); }
-  visitDiStringTypeField(ctx: DiStringTypeFieldContext): void { this.visitChildren(ctx); }
-  visitDiSubprogram(ctx: DiSubprogramContext): void { this.visitChildren(ctx); }
-  visitDiSubprogramField(ctx: DiSubprogramFieldContext): void { this.visitChildren(ctx); }
-  visitDiSubrange(ctx: DiSubrangeContext): void { this.visitChildren(ctx); }
-  visitDiSubrangeField(ctx: DiSubrangeFieldContext): void { this.visitChildren(ctx); }
-  visitDiSubroutineType(ctx: DiSubroutineTypeContext): void { this.visitChildren(ctx); }
-  visitDiTemplateTypeParameter(ctx: DiTemplateTypeParameterContext): void { this.visitChildren(ctx); }
-  visitDiTemplateValueParameter(ctx: DiTemplateValueParameterContext): void { this.visitChildren(ctx); }
-  visitGenericDiNode(ctx: GenericDiNodeContext): void { this.visitChildren(ctx); }
-  visitDiTemplateTypeParameterField(ctx: DiTemplateTypeParameterFieldContext): void { this.visitChildren(ctx); }
-  visitDiCompileUnitField(ctx: DiCompileUnitFieldContext): void { this.visitChildren(ctx); }
-  visitDiCommonBlockField(ctx: DiCommonBlockFieldContext): void { this.visitChildren(ctx); }
-  visitDiBasicTypeField(ctx: DiBasicTypeFieldContext): void { this.visitChildren(ctx); }
-  visitGenericDINodeField(ctx: GenericDINodeFieldContext): void { this.visitChildren(ctx); }
-  visitTagField(ctx: TagFieldContext): void { this.visitChildren(ctx); }
-  visitHeaderField(ctx: HeaderFieldContext): void { this.visitChildren(ctx); }
-  visitOperandsField(ctx: OperandsFieldContext): void { this.visitChildren(ctx); }
-  visitDiTemplateValueParameterField(ctx: DiTemplateValueParameterFieldContext): void { this.visitChildren(ctx); }
-  visitNameField(ctx: NameFieldContext): void { this.visitChildren(ctx); }
-  visitTypeField(ctx: TypeFieldContext): void { this.visitChildren(ctx); }
-  visitDefaultedField(ctx: DefaultedFieldContext): void { this.visitChildren(ctx); }
-  visitValueField(ctx: ValueFieldContext): void { this.visitChildren(ctx); }
-  visitMdField(ctx: MdFieldContext): void { this.visitChildren(ctx); }
-  visitDiSubroutineTypeField(ctx: DiSubroutineTypeFieldContext): void { this.visitChildren(ctx); }
-  visitFlagsField(ctx: FlagsFieldContext): void { this.visitChildren(ctx); }
-  visitDiFlags(ctx: DiFlagsContext): void { this.visitChildren(ctx); }
-  visitCcField(ctx: CcFieldContext): void { this.visitChildren(ctx); }
-  visitAlignField(ctx: AlignFieldContext): void { this.visitChildren(ctx); }
-  visitAllocatedField(ctx: AllocatedFieldContext): void { this.visitChildren(ctx); }
-  visitAnnotationsField(ctx: AnnotationsFieldContext): void { this.visitChildren(ctx); }
-  visitArgField(ctx: ArgFieldContext): void { this.visitChildren(ctx); }
-  visitAssociatedField(ctx: AssociatedFieldContext): void { this.visitChildren(ctx); }
-  visitAttributesField(ctx: AttributesFieldContext): void { this.visitChildren(ctx); }
-  visitBaseTypeField(ctx: BaseTypeFieldContext): void { this.visitChildren(ctx); }
-  visitChecksumField(ctx: ChecksumFieldContext): void { this.visitChildren(ctx); }
-  visitChecksumkindField(ctx: ChecksumkindFieldContext): void { this.visitChildren(ctx); }
-  visitColumnField(ctx: ColumnFieldContext): void { this.visitChildren(ctx); }
-  visitConfigMacrosField(ctx: ConfigMacrosFieldContext): void { this.visitChildren(ctx); }
-  visitContainingTypeField(ctx: ContainingTypeFieldContext): void { this.visitChildren(ctx); }
-  visitCountField(ctx: CountFieldContext): void { this.visitChildren(ctx); }
-  visitDebugInfoForProfilingField(ctx: DebugInfoForProfilingFieldContext): void { this.visitChildren(ctx); }
-  visitDeclarationField(ctx: DeclarationFieldContext): void { this.visitChildren(ctx); }
-  visitDirectoryField(ctx: DirectoryFieldContext): void { this.visitChildren(ctx); }
-  visitDiscriminatorField(ctx: DiscriminatorFieldContext): void { this.visitChildren(ctx); }
-  visitDataLocationField(ctx: DataLocationFieldContext): void { this.visitChildren(ctx); }
-  visitDiscriminatorIntField(ctx: DiscriminatorIntFieldContext): void { this.visitChildren(ctx); }
-  visitDwarfAddressSpaceField(ctx: DwarfAddressSpaceFieldContext): void { this.visitChildren(ctx); }
-  visitDwoIdField(ctx: DwoIdFieldContext): void { this.visitChildren(ctx); }
-  visitElementsField(ctx: ElementsFieldContext): void { this.visitChildren(ctx); }
-  visitEmissionKindField(ctx: EmissionKindFieldContext): void { this.visitChildren(ctx); }
-  visitEncodingField(ctx: EncodingFieldContext): void { this.visitChildren(ctx); }
-  visitEntityField(ctx: EntityFieldContext): void { this.visitChildren(ctx); }
-  visitEnumsField(ctx: EnumsFieldContext): void { this.visitChildren(ctx); }
-  visitExportSymbolsField(ctx: ExportSymbolsFieldContext): void { this.visitChildren(ctx); }
-  visitExprField(ctx: ExprFieldContext): void { this.visitChildren(ctx); }
-  visitExtraDataField(ctx: ExtraDataFieldContext): void { this.visitChildren(ctx); }
-  visitFileField(ctx: FileFieldContext): void { this.visitChildren(ctx); }
-  visitFilenameField(ctx: FilenameFieldContext): void { this.visitChildren(ctx); }
-  visitFlagsStringField(ctx: FlagsStringFieldContext): void { this.visitChildren(ctx); }
-  visitGetterField(ctx: GetterFieldContext): void { this.visitChildren(ctx); }
-  visitGlobalsField(ctx: GlobalsFieldContext): void { this.visitChildren(ctx); }
-  visitIdentifierField(ctx: IdentifierFieldContext): void { this.visitChildren(ctx); }
-  visitImportsField(ctx: ImportsFieldContext): void { this.visitChildren(ctx); }
-  visitIncludePathField(ctx: IncludePathFieldContext): void { this.visitChildren(ctx); }
-  visitInlinedAtField(ctx: InlinedAtFieldContext): void { this.visitChildren(ctx); }
-  visitIsDeclField(ctx: IsDeclFieldContext): void { this.visitChildren(ctx); }
-  visitIsDefinitionField(ctx: IsDefinitionFieldContext): void { this.visitChildren(ctx); }
-  visitIsImplicitCodeField(ctx: IsImplicitCodeFieldContext): void { this.visitChildren(ctx); }
-  visitIsLocalField(ctx: IsLocalFieldContext): void { this.visitChildren(ctx); }
-  visitIsOptimizedField(ctx: IsOptimizedFieldContext): void { this.visitChildren(ctx); }
-  visitIsUnsignedField(ctx: IsUnsignedFieldContext): void { this.visitChildren(ctx); }
-  visitApiNotesField(ctx: ApiNotesFieldContext): void { this.visitChildren(ctx); }
-  visitLanguageField(ctx: LanguageFieldContext): void { this.visitChildren(ctx); }
-  visitLineField(ctx: LineFieldContext): void { this.visitChildren(ctx); }
-  visitLinkageNameField(ctx: LinkageNameFieldContext): void { this.visitChildren(ctx); }
-  visitLowerBoundField(ctx: LowerBoundFieldContext): void { this.visitChildren(ctx); }
-  visitMacrosField(ctx: MacrosFieldContext): void { this.visitChildren(ctx); }
-  visitNameTableKindField(ctx: NameTableKindFieldContext): void { this.visitChildren(ctx); }
-  visitNodesField(ctx: NodesFieldContext): void { this.visitChildren(ctx); }
-  visitOffsetField(ctx: OffsetFieldContext): void { this.visitChildren(ctx); }
-  visitProducerField(ctx: ProducerFieldContext): void { this.visitChildren(ctx); }
-  visitRangesBaseAddressField(ctx: RangesBaseAddressFieldContext): void { this.visitChildren(ctx); }
-  visitRankField(ctx: RankFieldContext): void { this.visitChildren(ctx); }
-  visitRetainedNodesField(ctx: RetainedNodesFieldContext): void { this.visitChildren(ctx); }
-  visitRetainedTypesField(ctx: RetainedTypesFieldContext): void { this.visitChildren(ctx); }
-  visitRuntimeLangField(ctx: RuntimeLangFieldContext): void { this.visitChildren(ctx); }
-  visitRuntimeVersionField(ctx: RuntimeVersionFieldContext): void { this.visitChildren(ctx); }
-  visitScopeField(ctx: ScopeFieldContext): void { this.visitChildren(ctx); }
-  visitScopeLineField(ctx: ScopeLineFieldContext): void { this.visitChildren(ctx); }
-  visitSdkField(ctx: SdkFieldContext): void { this.visitChildren(ctx); }
-  visitSetterField(ctx: SetterFieldContext): void { this.visitChildren(ctx); }
-  visitSizeField(ctx: SizeFieldContext): void { this.visitChildren(ctx); }
-  visitSourceField(ctx: SourceFieldContext): void { this.visitChildren(ctx); }
-  visitSpFlagsField(ctx: SpFlagsFieldContext): void { this.visitChildren(ctx); }
-  visitSplitDebugFilenameField(ctx: SplitDebugFilenameFieldContext): void { this.visitChildren(ctx); }
-  visitSplitDebugInliningField(ctx: SplitDebugInliningFieldContext): void { this.visitChildren(ctx); }
-  visitStrideField(ctx: StrideFieldContext): void { this.visitChildren(ctx); }
-  visitStringLengthField(ctx: StringLengthFieldContext): void { this.visitChildren(ctx); }
-  visitStringLengthExpressionField(ctx: StringLengthExpressionFieldContext): void { this.visitChildren(ctx); }
-  visitStringLocationExpressionField(ctx: StringLocationExpressionFieldContext): void { this.visitChildren(ctx); }
-  visitSysrootField(ctx: SysrootFieldContext): void { this.visitChildren(ctx); }
-  visitTargetFuncNameField(ctx: TargetFuncNameFieldContext): void { this.visitChildren(ctx); }
-  visitTemplateParamsField(ctx: TemplateParamsFieldContext): void { this.visitChildren(ctx); }
-  visitThisAdjustmentField(ctx: ThisAdjustmentFieldContext): void { this.visitChildren(ctx); }
-  visitThrownTypesField(ctx: ThrownTypesFieldContext): void { this.visitChildren(ctx); }
-  visitTypeMacinfoField(ctx: TypeMacinfoFieldContext): void { this.visitChildren(ctx); }
-  visitTypesField(ctx: TypesFieldContext): void { this.visitChildren(ctx); }
-  visitUnitField(ctx: UnitFieldContext): void { this.visitChildren(ctx); }
-  visitUpperBoundField(ctx: UpperBoundFieldContext): void { this.visitChildren(ctx); }
-  visitValueIntField(ctx: ValueIntFieldContext): void { this.visitChildren(ctx); }
-  visitValueStringField(ctx: ValueStringFieldContext): void { this.visitChildren(ctx); }
-  visitVarField(ctx: VarFieldContext): void { this.visitChildren(ctx); }
-  visitVirtualIndexField(ctx: VirtualIndexFieldContext): void { this.visitChildren(ctx); }
-  visitVirtualityField(ctx: VirtualityFieldContext): void { this.visitChildren(ctx); }
-  visitVtableHolderField(ctx: VtableHolderFieldContext): void { this.visitChildren(ctx); }
+  visitTargetDef(ctx: TargetDefContext): any { return this.visitChildren(ctx); }
+  visitSourceFilename(ctx: SourceFilenameContext): any { return this.visitChildren(ctx); }
+  visitTargetDataLayout(ctx: TargetDataLayoutContext): any { return this.visitChildren(ctx); }
+  visitTargetTriple(ctx: TargetTripleContext): any { return this.visitChildren(ctx); }
+  visitComdatDef(ctx: ComdatDefContext): any { return this.visitChildren(ctx); }
+  visitModuleAsm(ctx: ModuleAsmContext): any { return this.visitChildren(ctx); }
+  visitAttrGroupDef(ctx: AttrGroupDefContext): any { return this.visitChildren(ctx); }
+  visitNamedMetadataDef(ctx: NamedMetadataDefContext): any { return this.visitChildren(ctx); }
+  visitMetadataDef(ctx: MetadataDefContext): any { return this.visitChildren(ctx); }
+  visitUseListOrder(ctx: UseListOrderContext): any { return this.visitChildren(ctx); }
+  visitUseListOrderBB(ctx: UseListOrderBBContext): any { return this.visitChildren(ctx); }
+  visitCallingConv(ctx: CallingConvContext): any { return this.visitChildren(ctx); }
+  visitCallingConvInt(ctx: CallingConvIntContext): any { return this.visitChildren(ctx); }
+  visitFuncHdrField(ctx: FuncHdrFieldContext): any { return this.visitChildren(ctx); }
+  visitGc(ctx: GcContext): any { return this.visitChildren(ctx); }
+  visitPrefix(ctx: PrefixContext): any { return this.visitChildren(ctx); }
+  visitPrologue(ctx: PrologueContext): any { return this.visitChildren(ctx); }
+  visitPersonality(ctx: PersonalityContext): any { return this.visitChildren(ctx); }
+  visitReturnAttribute(ctx: ReturnAttributeContext): any { return this.visitChildren(ctx); }
+  visitUnwindTarget(ctx: UnwindTargetContext): any { return this.visitChildren(ctx); }
+  visitHandlers(ctx: HandlersContext): any { return this.visitChildren(ctx); }
+  visitMetadataNode(ctx: MetadataNodeContext): any { return this.visitChildren(ctx); }
+  visitDiExpression(ctx: DiExpressionContext): any { return this.visitChildren(ctx); }
+  visitDiExpressionField(ctx: DiExpressionFieldContext): any { return this.visitChildren(ctx); }
+  visitGlobalField(ctx: GlobalFieldContext): any { return this.visitChildren(ctx); }
+  visitSection(ctx: SectionContext): any { return this.visitChildren(ctx); }
+  visitComdat(ctx: ComdatContext): any { return this.visitChildren(ctx); }
+  visitPartition(ctx: PartitionContext): any { return this.visitChildren(ctx); }
+  visitMetadataAttachment(ctx: MetadataAttachmentContext): any { return this.visitChildren(ctx); }
+  visitMdNode(ctx: MdNodeContext): any { return this.visitChildren(ctx); }
+  visitMdTuple(ctx: MdTupleContext): any { return this.visitChildren(ctx); }
+  visitMetadata(ctx: MetadataContext): any { return this.visitChildren(ctx); }
+  visitDiArgList(ctx: DiArgListContext): any { return this.visitChildren(ctx); }
+  visitInlineAsm(ctx: InlineAsmContext): any { return this.visitChildren(ctx); }
+  visitMdString(ctx: MdStringContext): any { return this.visitChildren(ctx); }
+  visitMdFieldOrInt(ctx: MdFieldOrIntContext): any { return this.visitChildren(ctx); }
+  visitDiSPFlag(ctx: DiSPFlagContext): any { return this.visitChildren(ctx); }
+  visitFuncAttribute(ctx: FuncAttributeContext): any { return this.visitChildren(ctx); }
+  visitParamAttribute(ctx: ParamAttributeContext): any { return this.visitChildren(ctx); }
+  visitAttrString(ctx: AttrStringContext): any { return this.visitChildren(ctx); }
+  visitAttrPair(ctx: AttrPairContext): any { return this.visitChildren(ctx); }
+  visitAlign(ctx: AlignContext): any { return this.visitChildren(ctx); }
+  visitAlignPair(ctx: AlignPairContext): any { return this.visitChildren(ctx); }
+  visitAlignStack(ctx: AlignStackContext): any { return this.visitChildren(ctx); }
+  visitAlignStackPair(ctx: AlignStackPairContext): any { return this.visitChildren(ctx); }
+  visitAllocKind(ctx: AllocKindContext): any { return this.visitChildren(ctx); }
+  visitAllocSize(ctx: AllocSizeContext): any { return this.visitChildren(ctx); }
+  visitUnwindTable(ctx: UnwindTableContext): any { return this.visitChildren(ctx); }
+  visitVectorScaleRange(ctx: VectorScaleRangeContext): any { return this.visitChildren(ctx); }
+  visitByRefAttr(ctx: ByRefAttrContext): any { return this.visitChildren(ctx); }
+  visitByval(ctx: ByvalContext): any { return this.visitChildren(ctx); }
+  visitDereferenceable(ctx: DereferenceableContext): any { return this.visitChildren(ctx); }
+  visitElementType(ctx: ElementTypeContext): any { return this.visitChildren(ctx); }
+  visitInAlloca(ctx: InAllocaContext): any { return this.visitChildren(ctx); }
+  visitParamAttr(ctx: ParamAttrContext): any { return this.visitChildren(ctx); }
+  visitPreallocated(ctx: PreallocatedContext): any { return this.visitChildren(ctx); }
+  visitStructRetAttr(ctx: StructRetAttrContext): any { return this.visitChildren(ctx); }
+  visitAddrSpace(ctx: AddrSpaceContext): any { return this.visitChildren(ctx); }
+  visitThreadLocal(ctx: ThreadLocalContext): any { return this.visitChildren(ctx); }
+  visitMetadataType(ctx: MetadataTypeContext): any { return this.visitChildren(ctx); }
+  visitValueInstruction(ctx: ValueInstructionContext): any { return this.visitChildren(ctx); }
+  visitSyncScope(ctx: SyncScopeContext): any { return this.visitChildren(ctx); }
+  visitInc(ctx: IncContext): any { return this.visitChildren(ctx); }
+  visitOperandBundle(ctx: OperandBundleContext): any { return this.visitChildren(ctx); }
+  visitClause(ctx: ClauseContext): any { return this.visitChildren(ctx); }
+  visitArgs(ctx: ArgsContext): any { return this.visitChildren(ctx); }
+  visitArg(ctx: ArgContext): any { return this.visitChildren(ctx); }
+  visitExceptionArg(ctx: ExceptionArgContext): any { return this.visitChildren(ctx); }
+  visitExceptionPad(ctx: ExceptionPadContext): any { return this.visitChildren(ctx); }
+  visitExternalLinkage(ctx: ExternalLinkageContext): any { return this.visitChildren(ctx); }
+  visitInternalLinkage(ctx: InternalLinkageContext): any { return this.visitChildren(ctx); }
+  visitLinkage(ctx: LinkageContext): any { return this.visitChildren(ctx); }
+  visitPreemption(ctx: PreemptionContext): any { return this.visitChildren(ctx); }
+  visitVisibility(ctx: VisibilityContext): any { return this.visitChildren(ctx); }
+  visitDllStorageClass(ctx: DllStorageClassContext): any { return this.visitChildren(ctx); }
+  visitTlsModel(ctx: TlsModelContext): any { return this.visitChildren(ctx); }
+  visitUnnamedAddr(ctx: UnnamedAddrContext): any { return this.visitChildren(ctx); }
+  visitExternallyInitialized(ctx: ExternallyInitializedContext): any { return this.visitChildren(ctx); }
+  visitImmutable(ctx: ImmutableContext): any { return this.visitChildren(ctx); }
+  visitFuncAttr(ctx: FuncAttrContext): any { return this.visitChildren(ctx); }
+  visitDistinct(ctx: DistinctContext): any { return this.visitChildren(ctx); }
+  visitInBounds(ctx: InBoundsContext): any { return this.visitChildren(ctx); }
+  visitReturnAttr(ctx: ReturnAttrContext): any { return this.visitChildren(ctx); }
+  visitOverflowFlag(ctx: OverflowFlagContext): any { return this.visitChildren(ctx); }
+  visitIPred(ctx: IPredContext): any { return this.visitChildren(ctx); }
+  visitFPred(ctx: FPredContext): any { return this.visitChildren(ctx); }
+  visitAtomicOrdering(ctx: AtomicOrderingContext): any { return this.visitChildren(ctx); }
+  visitCallingConvEnum(ctx: CallingConvEnumContext): any { return this.visitChildren(ctx); }
+  visitFastMathFlag(ctx: FastMathFlagContext): any { return this.visitChildren(ctx); }
+  visitAtomicOp(ctx: AtomicOpContext): any { return this.visitChildren(ctx); }
+  visitFloatKind(ctx: FloatKindContext): any { return this.visitChildren(ctx); }
+  visitSpecializedMDNode(ctx: SpecializedMDNodeContext): any { return this.visitChildren(ctx); }
+  visitDiBasicType(ctx: DiBasicTypeContext): any { return this.visitChildren(ctx); }
+  visitDiCommonBlock(ctx: DiCommonBlockContext): any { return this.visitChildren(ctx); }
+  visitDiCompileUnit(ctx: DiCompileUnitContext): any { return this.visitChildren(ctx); }
+  visitDiCompositeType(ctx: DiCompositeTypeContext): any { return this.visitChildren(ctx); }
+  visitDiCompositeTypeField(ctx: DiCompositeTypeFieldContext): any { return this.visitChildren(ctx); }
+  visitDiDerivedType(ctx: DiDerivedTypeContext): any { return this.visitChildren(ctx); }
+  visitDiDerivedTypeField(ctx: DiDerivedTypeFieldContext): any { return this.visitChildren(ctx); }
+  visitDiEnumerator(ctx: DiEnumeratorContext): any { return this.visitChildren(ctx); }
+  visitDiEnumeratorField(ctx: DiEnumeratorFieldContext): any { return this.visitChildren(ctx); }
+  visitDiFile(ctx: DiFileContext): any { return this.visitChildren(ctx); }
+  visitDiFileField(ctx: DiFileFieldContext): any { return this.visitChildren(ctx); }
+  visitDiGlobalVariable(ctx: DiGlobalVariableContext): any { return this.visitChildren(ctx); }
+  visitDiGlobalVariableField(ctx: DiGlobalVariableFieldContext): any { return this.visitChildren(ctx); }
+  visitDiGlobalVariableExpression(ctx: DiGlobalVariableExpressionContext): any { return this.visitChildren(ctx); }
+  visitDiGlobalVariableExpressionField(ctx: DiGlobalVariableExpressionFieldContext): any { return this.visitChildren(ctx); }
+  visitDiImportedEntity(ctx: DiImportedEntityContext): any { return this.visitChildren(ctx); }
+  visitDiImportedEntityField(ctx: DiImportedEntityFieldContext): any { return this.visitChildren(ctx); }
+  visitDiLabel(ctx: DiLabelContext): any { return this.visitChildren(ctx); }
+  visitDiLabelField(ctx: DiLabelFieldContext): any { return this.visitChildren(ctx); }
+  visitDiLexicalBlock(ctx: DiLexicalBlockContext): any { return this.visitChildren(ctx); }
+  visitDiLexicalBlockField(ctx: DiLexicalBlockFieldContext): any { return this.visitChildren(ctx); }
+  visitDiLexicalBlockFile(ctx: DiLexicalBlockFileContext): any { return this.visitChildren(ctx); }
+  visitDiLexicalBlockFileField(ctx: DiLexicalBlockFileFieldContext): any { return this.visitChildren(ctx); }
+  visitDiLocalVariable(ctx: DiLocalVariableContext): any { return this.visitChildren(ctx); }
+  visitDiLocalVariableField(ctx: DiLocalVariableFieldContext): any { return this.visitChildren(ctx); }
+  visitDiLocation(ctx: DiLocationContext): any { return this.visitChildren(ctx); }
+  visitDiLocationField(ctx: DiLocationFieldContext): any { return this.visitChildren(ctx); }
+  visitDiMacro(ctx: DiMacroContext): any { return this.visitChildren(ctx); }
+  visitDiMacroField(ctx: DiMacroFieldContext): any { return this.visitChildren(ctx); }
+  visitDiMacroFile(ctx: DiMacroFileContext): any { return this.visitChildren(ctx); }
+  visitDiMacroFileField(ctx: DiMacroFileFieldContext): any { return this.visitChildren(ctx); }
+  visitDiModule(ctx: DiModuleContext): any { return this.visitChildren(ctx); }
+  visitDiModuleField(ctx: DiModuleFieldContext): any { return this.visitChildren(ctx); }
+  visitDiNamespace(ctx: DiNamespaceContext): any { return this.visitChildren(ctx); }
+  visitDiNamespaceField(ctx: DiNamespaceFieldContext): any { return this.visitChildren(ctx); }
+  visitDiObjCProperty(ctx: DiObjCPropertyContext): any { return this.visitChildren(ctx); }
+  visitDiObjCPropertyField(ctx: DiObjCPropertyFieldContext): any { return this.visitChildren(ctx); }
+  visitDiStringType(ctx: DiStringTypeContext): any { return this.visitChildren(ctx); }
+  visitDiStringTypeField(ctx: DiStringTypeFieldContext): any { return this.visitChildren(ctx); }
+  visitDiSubprogram(ctx: DiSubprogramContext): any { return this.visitChildren(ctx); }
+  visitDiSubprogramField(ctx: DiSubprogramFieldContext): any { return this.visitChildren(ctx); }
+  visitDiSubrange(ctx: DiSubrangeContext): any { return this.visitChildren(ctx); }
+  visitDiSubrangeField(ctx: DiSubrangeFieldContext): any { return this.visitChildren(ctx); }
+  visitDiSubroutineType(ctx: DiSubroutineTypeContext): any { return this.visitChildren(ctx); }
+  visitDiTemplateTypeParameter(ctx: DiTemplateTypeParameterContext): any { return this.visitChildren(ctx); }
+  visitDiTemplateValueParameter(ctx: DiTemplateValueParameterContext): any { return this.visitChildren(ctx); }
+  visitGenericDiNode(ctx: GenericDiNodeContext): any { return this.visitChildren(ctx); }
+  visitDiTemplateTypeParameterField(ctx: DiTemplateTypeParameterFieldContext): any { return this.visitChildren(ctx); }
+  visitDiCompileUnitField(ctx: DiCompileUnitFieldContext): any { return this.visitChildren(ctx); }
+  visitDiCommonBlockField(ctx: DiCommonBlockFieldContext): any { return this.visitChildren(ctx); }
+  visitDiBasicTypeField(ctx: DiBasicTypeFieldContext): any { return this.visitChildren(ctx); }
+  visitGenericDINodeField(ctx: GenericDINodeFieldContext): any { return this.visitChildren(ctx); }
+  visitTagField(ctx: TagFieldContext): any { return this.visitChildren(ctx); }
+  visitHeaderField(ctx: HeaderFieldContext): any { return this.visitChildren(ctx); }
+  visitOperandsField(ctx: OperandsFieldContext): any { return this.visitChildren(ctx); }
+  visitDiTemplateValueParameterField(ctx: DiTemplateValueParameterFieldContext): any { return this.visitChildren(ctx); }
+  visitNameField(ctx: NameFieldContext): any { return this.visitChildren(ctx); }
+  visitTypeField(ctx: TypeFieldContext): any { return this.visitChildren(ctx); }
+  visitDefaultedField(ctx: DefaultedFieldContext): any { return this.visitChildren(ctx); }
+  visitValueField(ctx: ValueFieldContext): any { return this.visitChildren(ctx); }
+  visitMdField(ctx: MdFieldContext): any { return this.visitChildren(ctx); }
+  visitDiSubroutineTypeField(ctx: DiSubroutineTypeFieldContext): any { return this.visitChildren(ctx); }
+  visitFlagsField(ctx: FlagsFieldContext): any { return this.visitChildren(ctx); }
+  visitDiFlags(ctx: DiFlagsContext): any { return this.visitChildren(ctx); }
+  visitCcField(ctx: CcFieldContext): any { return this.visitChildren(ctx); }
+  visitAlignField(ctx: AlignFieldContext): any { return this.visitChildren(ctx); }
+  visitAllocatedField(ctx: AllocatedFieldContext): any { return this.visitChildren(ctx); }
+  visitAnnotationsField(ctx: AnnotationsFieldContext): any { return this.visitChildren(ctx); }
+  visitArgField(ctx: ArgFieldContext): any { return this.visitChildren(ctx); }
+  visitAssociatedField(ctx: AssociatedFieldContext): any { return this.visitChildren(ctx); }
+  visitAttributesField(ctx: AttributesFieldContext): any { return this.visitChildren(ctx); }
+  visitBaseTypeField(ctx: BaseTypeFieldContext): any { return this.visitChildren(ctx); }
+  visitChecksumField(ctx: ChecksumFieldContext): any { return this.visitChildren(ctx); }
+  visitChecksumkindField(ctx: ChecksumkindFieldContext): any { return this.visitChildren(ctx); }
+  visitColumnField(ctx: ColumnFieldContext): any { return this.visitChildren(ctx); }
+  visitConfigMacrosField(ctx: ConfigMacrosFieldContext): any { return this.visitChildren(ctx); }
+  visitContainingTypeField(ctx: ContainingTypeFieldContext): any { return this.visitChildren(ctx); }
+  visitCountField(ctx: CountFieldContext): any { return this.visitChildren(ctx); }
+  visitDebugInfoForProfilingField(ctx: DebugInfoForProfilingFieldContext): any { return this.visitChildren(ctx); }
+  visitDeclarationField(ctx: DeclarationFieldContext): any { return this.visitChildren(ctx); }
+  visitDirectoryField(ctx: DirectoryFieldContext): any { return this.visitChildren(ctx); }
+  visitDiscriminatorField(ctx: DiscriminatorFieldContext): any { return this.visitChildren(ctx); }
+  visitDataLocationField(ctx: DataLocationFieldContext): any { return this.visitChildren(ctx); }
+  visitDiscriminatorIntField(ctx: DiscriminatorIntFieldContext): any { return this.visitChildren(ctx); }
+  visitDwarfAddressSpaceField(ctx: DwarfAddressSpaceFieldContext): any { return this.visitChildren(ctx); }
+  visitDwoIdField(ctx: DwoIdFieldContext): any { return this.visitChildren(ctx); }
+  visitElementsField(ctx: ElementsFieldContext): any { return this.visitChildren(ctx); }
+  visitEmissionKindField(ctx: EmissionKindFieldContext): any { return this.visitChildren(ctx); }
+  visitEncodingField(ctx: EncodingFieldContext): any { return this.visitChildren(ctx); }
+  visitEntityField(ctx: EntityFieldContext): any { return this.visitChildren(ctx); }
+  visitEnumsField(ctx: EnumsFieldContext): any { return this.visitChildren(ctx); }
+  visitExportSymbolsField(ctx: ExportSymbolsFieldContext): any { return this.visitChildren(ctx); }
+  visitExprField(ctx: ExprFieldContext): any { return this.visitChildren(ctx); }
+  visitExtraDataField(ctx: ExtraDataFieldContext): any { return this.visitChildren(ctx); }
+  visitFileField(ctx: FileFieldContext): any { return this.visitChildren(ctx); }
+  visitFilenameField(ctx: FilenameFieldContext): any { return this.visitChildren(ctx); }
+  visitFlagsStringField(ctx: FlagsStringFieldContext): any { return this.visitChildren(ctx); }
+  visitGetterField(ctx: GetterFieldContext): any { return this.visitChildren(ctx); }
+  visitGlobalsField(ctx: GlobalsFieldContext): any { return this.visitChildren(ctx); }
+  visitIdentifierField(ctx: IdentifierFieldContext): any { return this.visitChildren(ctx); }
+  visitImportsField(ctx: ImportsFieldContext): any { return this.visitChildren(ctx); }
+  visitIncludePathField(ctx: IncludePathFieldContext): any { return this.visitChildren(ctx); }
+  visitInlinedAtField(ctx: InlinedAtFieldContext): any { return this.visitChildren(ctx); }
+  visitIsDeclField(ctx: IsDeclFieldContext): any { return this.visitChildren(ctx); }
+  visitIsDefinitionField(ctx: IsDefinitionFieldContext): any { return this.visitChildren(ctx); }
+  visitIsImplicitCodeField(ctx: IsImplicitCodeFieldContext): any { return this.visitChildren(ctx); }
+  visitIsLocalField(ctx: IsLocalFieldContext): any { return this.visitChildren(ctx); }
+  visitIsOptimizedField(ctx: IsOptimizedFieldContext): any { return this.visitChildren(ctx); }
+  visitIsUnsignedField(ctx: IsUnsignedFieldContext): any { return this.visitChildren(ctx); }
+  visitApiNotesField(ctx: ApiNotesFieldContext): any { return this.visitChildren(ctx); }
+  visitLanguageField(ctx: LanguageFieldContext): any { return this.visitChildren(ctx); }
+  visitLineField(ctx: LineFieldContext): any { return this.visitChildren(ctx); }
+  visitLinkageNameField(ctx: LinkageNameFieldContext): any { return this.visitChildren(ctx); }
+  visitLowerBoundField(ctx: LowerBoundFieldContext): any { return this.visitChildren(ctx); }
+  visitMacrosField(ctx: MacrosFieldContext): any { return this.visitChildren(ctx); }
+  visitNameTableKindField(ctx: NameTableKindFieldContext): any { return this.visitChildren(ctx); }
+  visitNodesField(ctx: NodesFieldContext): any { return this.visitChildren(ctx); }
+  visitOffsetField(ctx: OffsetFieldContext): any { return this.visitChildren(ctx); }
+  visitProducerField(ctx: ProducerFieldContext): any { return this.visitChildren(ctx); }
+  visitRangesBaseAddressField(ctx: RangesBaseAddressFieldContext): any { return this.visitChildren(ctx); }
+  visitRankField(ctx: RankFieldContext): any { return this.visitChildren(ctx); }
+  visitRetainedNodesField(ctx: RetainedNodesFieldContext): any { return this.visitChildren(ctx); }
+  visitRetainedTypesField(ctx: RetainedTypesFieldContext): any { return this.visitChildren(ctx); }
+  visitRuntimeLangField(ctx: RuntimeLangFieldContext): any { return this.visitChildren(ctx); }
+  visitRuntimeVersionField(ctx: RuntimeVersionFieldContext): any { return this.visitChildren(ctx); }
+  visitScopeField(ctx: ScopeFieldContext): any { return this.visitChildren(ctx); }
+  visitScopeLineField(ctx: ScopeLineFieldContext): any { return this.visitChildren(ctx); }
+  visitSdkField(ctx: SdkFieldContext): any { return this.visitChildren(ctx); }
+  visitSetterField(ctx: SetterFieldContext): any { return this.visitChildren(ctx); }
+  visitSizeField(ctx: SizeFieldContext): any { return this.visitChildren(ctx); }
+  visitSourceField(ctx: SourceFieldContext): any { return this.visitChildren(ctx); }
+  visitSpFlagsField(ctx: SpFlagsFieldContext): any { return this.visitChildren(ctx); }
+  visitSplitDebugFilenameField(ctx: SplitDebugFilenameFieldContext): any { return this.visitChildren(ctx); }
+  visitSplitDebugInliningField(ctx: SplitDebugInliningFieldContext): any { return this.visitChildren(ctx); }
+  visitStrideField(ctx: StrideFieldContext): any { return this.visitChildren(ctx); }
+  visitStringLengthField(ctx: StringLengthFieldContext): any { return this.visitChildren(ctx); }
+  visitStringLengthExpressionField(ctx: StringLengthExpressionFieldContext): any { return this.visitChildren(ctx); }
+  visitStringLocationExpressionField(ctx: StringLocationExpressionFieldContext): any { return this.visitChildren(ctx); }
+  visitSysrootField(ctx: SysrootFieldContext): any { return this.visitChildren(ctx); }
+  visitTargetFuncNameField(ctx: TargetFuncNameFieldContext): any { return this.visitChildren(ctx); }
+  visitTemplateParamsField(ctx: TemplateParamsFieldContext): any { return this.visitChildren(ctx); }
+  visitThisAdjustmentField(ctx: ThisAdjustmentFieldContext): any { return this.visitChildren(ctx); }
+  visitThrownTypesField(ctx: ThrownTypesFieldContext): any { return this.visitChildren(ctx); }
+  visitTypeMacinfoField(ctx: TypeMacinfoFieldContext): any { return this.visitChildren(ctx); }
+  visitTypesField(ctx: TypesFieldContext): any { return this.visitChildren(ctx); }
+  visitUnitField(ctx: UnitFieldContext): any { return this.visitChildren(ctx); }
+  visitUpperBoundField(ctx: UpperBoundFieldContext): any { return this.visitChildren(ctx); }
+  visitValueIntField(ctx: ValueIntFieldContext): any { return this.visitChildren(ctx); }
+  visitValueStringField(ctx: ValueStringFieldContext): any { return this.visitChildren(ctx); }
+  visitVarField(ctx: VarFieldContext): any { return this.visitChildren(ctx); }
+  visitVirtualIndexField(ctx: VirtualIndexFieldContext): any { return this.visitChildren(ctx); }
+  visitVirtualityField(ctx: VirtualityFieldContext): any { return this.visitChildren(ctx); }
+  visitVtableHolderField(ctx: VtableHolderFieldContext): any { return this.visitChildren(ctx); }
   
   
-  visit(tree: ParseTree): void {
-    tree.accept(this);
+  visit(tree: ParseTree): any {
+    return tree.accept(this);
   }
-  visitChildren(node: RuleNode): void {
+  visitChildren(node: RuleNode): any {
     for(let i=0; i<node.childCount; i++) node.getChild(i).accept(this);
+    return null;
   }
-  visitTerminal(node: TerminalNode): void {
+  visitTerminal(node: TerminalNode): any {
     throw new Error('method not implement');
   }
-  visitErrorNode(node: ErrorNode): void {
-    this.visitTerminal(node);
+  visitErrorNode(node: ErrorNode): any {
+    return this.visitTerminal(node);
   }
   
 }

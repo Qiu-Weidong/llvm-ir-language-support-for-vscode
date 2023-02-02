@@ -1,8 +1,9 @@
 ; 在这里编辑
 module asm "inline asm code goes here"
-module asm "more can go here"
+module asm "more can go here"  
 
-define void @main() {
+
+define void @main() { 
   fence acquire 
   fence syncscope("singlethread") seq_cst 
   fence syncscope("agent") seq_cst 
@@ -11,7 +12,7 @@ define void @main() {
 
 %mytype = type { %mytype*, i32 }
 
-define i32 @add() !llvm.loop !0 {
+define i32 @add() !llvm.loop !0 { 
   ret void 
   uselistorder i32 %arg1, { 1, 0, 2 } 
   uselistorder label %bb, { 1, 0 } 
