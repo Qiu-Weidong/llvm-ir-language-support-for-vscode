@@ -9,20 +9,24 @@ module asm "more can go here"
 @Y = global i32 42 
 @Z = global [2 x ptr] [ptr @X, ptr @Y]
 
-define void @main(i8* noundef %0, i8* noundef %1, ...) {
+define void @main(i8* noundef %0, i8* noundef %1, ...) { 
+  ; 注释
   fence acquire 
+  ; 再来一条注释
   fence syncscope("singlethread") seq_cst 
   fence syncscope("agent") seq_cst 
   ret void 
+  ; 注释
   uselistorder i32 %arg1, { 1, 0, 2 } 
   uselistorder label %bb, { 1, 0 } 
 }
 
 
 %mytype = type { %mytype*, i32 } 
-define i32 @add() !llvm.loop !0 {
+define i32 @add() !llvm.loop !0 { 
   ret void 
   uselistorder i32 %arg1, { 1, 0, 2 } 
+  ; 注释
   uselistorder label %bb, { 1, 0 } 
 }
 

@@ -11,10 +11,11 @@ export class LLVMIRFormattingEditProvider implements DocumentFormattingEditProvi
     documents.updateDocument(document);
     const data = documents.getAllData(document.uri);
 
-    const visitor = new LLVMIRFormattingEditVisitor();
     if (data) {
-      const { ast } = data;
-
+      const { ast, tokens } = data;
+      const comments = tokens.getTokens().filter(item => item.channel != 0);
+      const visitor = new LLVMIRFormattingEditVisitor(comments);
+      
       try {
         ast.accept(visitor);
       } catch (err) { console.log(err); }

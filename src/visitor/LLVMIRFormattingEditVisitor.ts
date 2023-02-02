@@ -2,6 +2,7 @@ import { LLVMIRBaseVisitor } from "./LLVMIRBaseVisitor";
 import { Position, Range, TextEdit } from "vscode";
 import { BasicBlockContext, CompilationUnitContext, FuncBodyContext, FuncHeaderContext, UseListOrderContext } from "../llvmir/LLVMIRParser";
 import { TerminalNode } from "antlr4ts/tree/TerminalNode";
+import { Token } from "antlr4ts";
 // import { Token } from "antlr4ts";
 
 
@@ -10,13 +11,17 @@ export class LLVMIRFormattingEditVisitor extends LLVMIRBaseVisitor {
   private content: string;
   private indentSize: number;
   private indent: number;
+  private allComments: Token[];
+  private funcComments: Token[];
 
-  constructor() {
+  constructor(comments: Token[]) {
     super();
     this.edits = [];
     this.content = '';
     this.indentSize = 2;
     this.indent = 0;
+    this.allComments = comments;
+    this.funcComments = [];
   }
 
   private writeNewLine() {
@@ -24,10 +29,24 @@ export class LLVMIRFormattingEditVisitor extends LLVMIRBaseVisitor {
     for (let i = 0; i < this.indent; i++) this.content += ' ';
   }
 
+  private writeLeftComments(token: Token) {
+    // 输出 token 前面的 注释
+    while (this.funcComments.length > 0 && this.funcComments[0].tokenIndex < token.tokenIndex) {
+      const comment = this.funcComments[0];
+      this.funcComments = this.funcComments.slice(1, this.funcComments.length);
+      const text = comment.text?.trim() || '';
+      this.content += text;
+      this.writeNewLine();
+    }
+  }
+
   getResult(): TextEdit[] { return this.edits; }
 
   // 默认情况下，所有 terminal 后面都有一个 空格 ',' 除外
   visitTerminal(node: TerminalNode): void {
+    // 输出注释
+    this.writeLeftComments(node.symbol);
+    
     const text = node.symbol.text?.trim();
     if (text) {
       if (text === ',' || text === '*' || text === ')' || text == ']' || text === '>') {
@@ -52,11 +71,6 @@ export class LLVMIRFormattingEditVisitor extends LLVMIRBaseVisitor {
     let last_line = -1;
 
     for (const entity of ctx.topLevelEntity()) {
-      // if(entity.funcDef()) {
-
-      // }
-
-
       // 首先将输出清空
       this.content = '';
       entity.accept(this);
@@ -90,7 +104,11 @@ export class LLVMIRFormattingEditVisitor extends LLVMIRBaseVisitor {
 
   // 只保留函数体内部的注释
   visitFuncBody(ctx: FuncBodyContext): void {
-    this.content += '{';
+    const st = ctx.start.tokenIndex;
+    const ed = ctx.stop?.tokenIndex || st;
+    this.funcComments = this.allComments.filter(item => item.tokenIndex >= st && item.tokenIndex <= ed);
+
+    ctx.LBraces().accept(this);
     // 注意这里不能设置缩进
     this.writeNewLine();
 
@@ -106,7 +124,7 @@ export class LLVMIRFormattingEditVisitor extends LLVMIRBaseVisitor {
     this.indent -= this.indentSize;
 
     this.writeNewLine();
-    this.content += '}';
+    ctx.RBraces().accept(this);
   }
 
   visitBasicBlock(ctx: BasicBlockContext): void {
