@@ -3,7 +3,6 @@ import { Position, Range, TextEdit } from "vscode";
 import { BasicBlockContext, CompilationUnitContext, FuncBodyContext, FuncHeaderContext, UseListOrderContext } from "../llvmir/LLVMIRParser";
 import { TerminalNode } from "antlr4ts/tree/TerminalNode";
 import { Token } from "antlr4ts";
-// import { Token } from "antlr4ts";
 
 
 export class LLVMIRFormattingEditVisitor extends LLVMIRBaseVisitor {
@@ -46,7 +45,7 @@ export class LLVMIRFormattingEditVisitor extends LLVMIRBaseVisitor {
   visitTerminal(node: TerminalNode): void {
     // 输出注释
     this.writeLeftComments(node.symbol);
-    
+
     const text = node.symbol.text?.trim();
     if (text) {
       if (text === ',' || text === '*' || text === ')' || text == ']' || text === '>') {
