@@ -1,7 +1,7 @@
 import { Token } from "antlr4ts";
 import { TerminalNode } from "antlr4ts/tree/TerminalNode";
 import { Position, Range, SemanticTokensBuilder } from "vscode";
-import { AddInstContext, AddrSpaceCastInstContext, AllocaInstContext, AndInstContext, ArrayConstContext, AShrInstContext, AtomicRMWInstContext, BasicBlockContext, BitCastInstContext, BoolConstContext, BrTermContext, CallInstContext, CatchPadInstContext, CleanupPadInstContext, CmpXchgInstContext, ComdatDefContext, ExtractElementInstContext, ExtractValueInstContext, FAddInstContext, FastMathFlagContext, FCmpInstContext, FDivInstContext, FenceInstContext, FloatKindContext, FloatTypeContext, FMulInstContext, FNegInstContext, FpExtInstContext, FPredContext, FpToSiInstContext, FpToUiInstContext, FpTruncInstContext, FreezeInstContext, FRemInstContext, FSubInstContext, FuncDeclContext, FuncDefContext, FuncHeaderContext, GetElementPtrInstContext, GlobalDefContext, ICmpInstContext, IndirectBrTermContext, InsertElementInstContext, InsertValueInstContext, IntToPtrInstContext, IPredContext, LabelContext, LabelTypeContext, LandingPadInstContext, LoadInstContext, LocalDefInstContext, LShrInstContext, MetadataTypeContext, MmxTypeContext, ModuleAsmContext, MulInstContext, NamedTypeContext, NoneConstContext, NullConstContext, OpaquePointerTypeContext, OpaqueTypeContext, OrInstContext, OverflowFlagContext, ParamContext, ParamsContext, PhiInstContext, PtrToIntInstContext, RetTermContext, SDivInstContext, SelectInstContext, SExtInstContext, ShlInstContext, ShuffleVectorInstContext, SiToFpInstContext, SourceFilenameContext, SRemInstContext, StoreInstContext, StructConstContext, SubInstContext, TargetDataLayoutContext, TargetTripleContext, TerminatorContext, TokenTypeContext, TruncInstContext, TypeDefContext, UDivInstContext, UiToFpInstContext, URemInstContext, VaargInstContext, ValueInstructionContext, ValueTerminatorContext, VoidTypeContext, XorInstContext, ZExtInstContext } from "../llvmir/LLVMIRParser";
+import { AddInstContext, AddrSpaceCastInstContext, AddrSpaceContext, AllocaInstContext, AndInstContext, ArrayConstContext, AShrInstContext, AtomicRMWInstContext, BasicBlockContext, BitCastInstContext, BoolConstContext, BrTermContext, CallingConvContext, CallInstContext, CatchPadInstContext, CleanupPadInstContext, CmpXchgInstContext, ComdatDefContext, DllStorageClassContext, ExternalLinkageContext, ExternallyInitializedContext, ExtractElementInstContext, ExtractValueInstContext, FAddInstContext, FastMathFlagContext, FCmpInstContext, FDivInstContext, FenceInstContext, FloatKindContext, FloatTypeContext, FMulInstContext, FNegInstContext, FpExtInstContext, FPredContext, FpToSiInstContext, FpToUiInstContext, FpTruncInstContext, FreezeInstContext, FRemInstContext, FSubInstContext, FuncDeclContext, FuncDefContext, FuncHeaderContext, GetElementPtrInstContext, GlobalDefContext, ICmpInstContext, IndirectBrTermContext, InsertElementInstContext, InsertValueInstContext, InternalLinkageContext, IntToPtrInstContext, IPredContext, LabelContext, LabelTypeContext, LandingPadInstContext, LoadInstContext, LocalDefInstContext, LShrInstContext, MetadataTypeContext, MmxTypeContext, ModuleAsmContext, MulInstContext, NamedTypeContext, NoneConstContext, NullConstContext, OpaquePointerTypeContext, OpaqueTypeContext, OrInstContext, OverflowFlagContext, ParamContext, ParamsContext, PhiInstContext, PreemptionContext, PtrToIntInstContext, RetTermContext, SDivInstContext, SelectInstContext, SExtInstContext, ShlInstContext, ShuffleVectorInstContext, SiToFpInstContext, SourceFilenameContext, SRemInstContext, StoreInstContext, StructConstContext, SubInstContext, SyncScopeContext, TargetDataLayoutContext, TargetTripleContext, TerminatorContext, ThreadLocalContext, TlsModelContext, TokenTypeContext, TruncInstContext, TypeDefContext, UDivInstContext, UiToFpInstContext, UnnamedAddrContext, URemInstContext, VaargInstContext, ValueInstructionContext, ValueTerminatorContext, VisibilityContext, VoidTypeContext, XorInstContext, ZExtInstContext } from "../llvmir/LLVMIRParser";
 import { LLVMIRBaseVisitor } from "./LLVMIRBaseVisitor";
 
 
@@ -169,6 +169,47 @@ export class LLVMIRSemanticTokensVisitor extends LLVMIRBaseVisitor {
       || ctx.KwNsz()?.symbol || ctx.KwReassoc()?.symbol;
     this.highlightToken(symbol, 'decorator');
   }
+
+  visitExternalLinkage(ctx: ExternalLinkageContext): void {
+    this.highlightToken(ctx.start, 'property');
+  }
+  visitPreemption(ctx: PreemptionContext): void {
+    this.highlightToken(ctx.start, 'property');
+  }
+  visitVisibility(ctx: VisibilityContext): void {
+    this.highlightToken(ctx.start, 'property');
+  }
+  visitDllStorageClass(ctx: DllStorageClassContext): void {
+    this.highlightToken(ctx.start, 'property');
+  }
+  visitUnnamedAddr(ctx: UnnamedAddrContext): void {
+    this.highlightToken(ctx.start, 'property');
+  }
+  visitAddrSpace(ctx: AddrSpaceContext): void {
+    this.highlightToken(ctx.start, 'property');
+    ctx.IntLit().accept(this);
+  }
+  visitThreadLocal(ctx: ThreadLocalContext): void {
+    this.highlightToken(ctx.start, 'property');
+    ctx.tlsModel()?.accept(this);
+  }
+  visitTlsModel(ctx: TlsModelContext): void {
+    this.highlightToken(ctx.start, 'property');
+  }
+  visitExternallyInitialized(ctx: ExternallyInitializedContext): void {
+    this.highlightToken(ctx.start, 'property');
+  }
+  visitInternalLinkage(ctx: InternalLinkageContext): void {
+    this.highlightToken(ctx.start, 'property');
+  }
+  visitSyncScope(ctx: SyncScopeContext): void {
+    this.highlightToken(ctx.start, 'property');
+    ctx.StringLit().accept(this);
+  }
+  visitCallingConv(ctx: CallingConvContext): void {
+    this.highlightToken(ctx.start, 'property');
+  }
+  
 
   // 最后面留一张 token map
   private static tokenMap: Map<number, string> = new Map([

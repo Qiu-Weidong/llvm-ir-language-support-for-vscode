@@ -52,6 +52,12 @@
         }, {
           "name": "storage.type.function.llvm",
           "match": "\\b(label)\\b"
+        },{
+          "name": "storage.type.function.llvm",
+          "match": "\\b(constant)\\b"
+        },{
+          "name": "storage.type.function.llvm",
+          "match": "\\b(global)\\b"
         }
 			]
 		},
