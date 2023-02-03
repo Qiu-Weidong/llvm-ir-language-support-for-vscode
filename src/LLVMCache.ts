@@ -6,6 +6,7 @@ import { CharStreams, CommonTokenStream } from "antlr4ts";
 import { LLVMIRDiagnosticListener } from "./listener/LLVMIRDiagnosticListener";
 import { LLVMIRLexer } from "./llvmir/LLVMIRLexer";
 import { LLVMIRParser } from "./llvmir/LLVMIRParser";
+import { LLVMIRTypeDefResolver } from "./visitor/LLVMIRTypeDefResolver";
 
 
 export class LLVMCache {
@@ -40,6 +41,11 @@ export class LLVMCache {
     parser.addErrorListener(diagnosticListener);
 
     const ast = parser.compilationUnit();
+    // 使用 LLVMIRTypeDefResolver 解析类型表
+    const typeDefResolver = new LLVMIRTypeDefResolver(diagnostics);
+    try { ast.accept(typeDefResolver); } catch(err) { console.log(err); }
+
+
     this.documents.set(document.uri.toString(), { content, ast, tokens });
     this.diangostics.set(document.uri, diagnostics);
   }

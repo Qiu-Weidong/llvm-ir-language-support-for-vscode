@@ -1,8 +1,8 @@
 import { Token } from "antlr4ts";
 import { Diagnostic, DiagnosticSeverity, Position, Range } from "vscode";
 import { AttrGroupDefContext, ComdatDefContext, MetadataDefContext, NamedMetadataDefContext, TypeDefContext } from "../llvmir/LLVMIRParser";
-import { GlobalScope, Scope } from "../types/LLVMScope";
-import { LLVMType } from "../types/LLVMType";
+import { GlobalScope, Scope } from "./LLVMIRScope";
+import { LLVMIRType } from "./LLVMIRType";
 import { LLVMIRBaseVisitor } from "./LLVMIRBaseVisitor";
 
 
@@ -31,7 +31,7 @@ export class LLVMIRScopeVisitor extends LLVMIRBaseVisitor {
   }
 
   visitTypeDef(ctx: TypeDefContext): any {
-    const ty = ctx.type().accept(this) as LLVMType;
+    const ty = ctx.type().accept(this) as LLVMIRType;
     const name = ctx.LocalIdent().symbol.text;
     if (!name) {
       const symbol = ctx.LocalIdent().symbol;

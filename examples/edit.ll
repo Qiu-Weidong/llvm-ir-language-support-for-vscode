@@ -4,6 +4,7 @@ module asm "more can go here"
 
 %hello = type {  i32, i64, %world }
 %world = type { %hello, i32 }
+; %hello = type {}
 
 define void @main() { 
   fence acquire 

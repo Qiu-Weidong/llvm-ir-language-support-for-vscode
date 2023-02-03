@@ -1,9 +1,9 @@
-import { LLVMType, NamedType } from "./LLVMType";
-import { LLVMEitity } from "./LLVMEntity";
+import { LLVMIRType } from "./LLVMIRType";
+import { LLVMEitity } from "./LLVMIREntity";
 
 // 符号表查询接口
 export interface Scope {
-  getNamedType(name: string): LLVMType | undefined;
+  getNamedType(name: string): LLVMIRType | undefined;
   getComdat(name: string): string | undefined;
   getAttrGroup(name: string): string | undefined;
   getMetadata(name: string): string | undefined;
@@ -14,7 +14,7 @@ export interface Scope {
 
 
   addLabel(name: string): void ;
-  addNamedType(name: string, namedType: LLVMType): void;
+  addNamedType(name: string, namedType: LLVMIRType): void;
   addComdat(name: string, content: string): void;
   addAttrGroup(name: string, content: string): void;
   addMetadata(name: string, content: string): void;
@@ -25,7 +25,7 @@ export interface Scope {
 export class GlobalScope implements Scope {
   // 需要保存类型定义、comdat、全局变量、indirectSymbol、函数、attrgroup、metadata
   protected children: Map<string, Scope>;
-  protected namedTypes: Map<string, LLVMType>;
+  protected namedTypes: Map<string, LLVMIRType>;
   protected comdats: Map<string, string>;
   protected attrGroups: Map<string, string>;
   protected metadatas: Map<string, string>;
@@ -44,7 +44,7 @@ export class GlobalScope implements Scope {
   addLabel(name: string): void {
     throw new Error("can't add label in global scope");
   }
-  addNamedType(name: string, namedType: LLVMType): void {
+  addNamedType(name: string, namedType: LLVMIRType): void {
     this.namedTypes.set(name, namedType);
   }
   addComdat(name: string, content: string): void {
@@ -62,7 +62,7 @@ export class GlobalScope implements Scope {
   containsLabel(name: string): boolean {
     return false;
   }
-  getNamedType(name: string): LLVMType | undefined {
+  getNamedType(name: string): LLVMIRType | undefined {
     return this.namedTypes.get(name);
   }
   getComdat(name: string): string | undefined {
@@ -110,7 +110,7 @@ export class LocalScope implements Scope {
   containsLabel(name: string): boolean {
     return this.labels.has(name);
   }
-  getNamedType(name: string): LLVMType | undefined {
+  getNamedType(name: string): LLVMIRType | undefined {
     return this.parent.getNamedType(name);
   }
   getComdat(name: string): string | undefined {
@@ -130,7 +130,7 @@ export class LocalScope implements Scope {
   addLabel(name: string): void {
     this.labels.add(name);
   }
-  addNamedType(name: string, namedType: NamedType): void {
+  addNamedType(name: string, namedType: LLVMIRType): void {
     this.parent.addNamedType(name, namedType);
   }
   addComdat(name: string, content: string): void {
