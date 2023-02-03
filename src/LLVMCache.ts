@@ -7,6 +7,8 @@ import { LLVMIRDiagnosticListener } from "./listener/LLVMIRDiagnosticListener";
 import { LLVMIRLexer } from "./llvmir/LLVMIRLexer";
 import { LLVMIRParser } from "./llvmir/LLVMIRParser";
 import { LLVMIRTypeDefResolver } from "./visitor/LLVMIRTypeDefResolver";
+import { GlobalScope, Scope } from "./visitor/LLVMIRScope";
+import { LLVMIRScopeVisitor } from "./visitor/LLVMIRScopeVisitor";
 
 
 export class LLVMCache {
@@ -17,6 +19,7 @@ export class LLVMCache {
     content: string, // 文档内容
     ast: ParseTree, // 语法树
     tokens: CommonTokenStream, // token 流
+    scope: Scope, // 符号表
   }>;
   public static getInstance(): LLVMCache {
     if (!LLVMCache.instance) {
@@ -44,9 +47,14 @@ export class LLVMCache {
     // 使用 LLVMIRTypeDefResolver 解析类型表
     const typeDefResolver = new LLVMIRTypeDefResolver(diagnostics);
     try { ast.accept(typeDefResolver); } catch(err) { console.log(err); }
+    const types = typeDefResolver.getTypeTable();
+    const scope: Scope = new GlobalScope();
+    scope.setTypeTable(types);
 
+    const scopeVisitor = new LLVMIRScopeVisitor(diagnostics, scope);
+    try { ast.accept(scopeVisitor); } catch(err) { console.log(err); }
 
-    this.documents.set(document.uri.toString(), { content, ast, tokens });
+    this.documents.set(document.uri.toString(), { content, ast, tokens, scope });
     this.diangostics.set(document.uri, diagnostics);
   }
 

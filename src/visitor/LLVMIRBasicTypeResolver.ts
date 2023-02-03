@@ -7,7 +7,7 @@ import {
   StructType,
   OpaquePointerType, OpaqueType, PointerType, VoidType
 } from "./LLVMIRType";
-import { ArrayTypeContext, FloatTypeContext, IntTypeContext, LabelTypeContext, MetadataTypeContext, MmxTypeContext, NamedTypeContext, OpaquePointerTypeContext, OpaqueTypeContext, StructTypeContext, TokenTypeContext, TypeContext, TypeDefContext, VectorTypeContext, VoidTypeContext } from "../llvmir/LLVMIRParser";
+import { ArrayTypeContext, FloatTypeContext, IntTypeContext, LabelTypeContext, MetadataTypeContext, MmxTypeContext, OpaquePointerTypeContext, OpaqueTypeContext, StructTypeContext, TokenTypeContext, TypeContext, VectorTypeContext, VoidTypeContext } from "../llvmir/LLVMIRParser";
 
 
 // 主要对 type 这个非终结符进行解析

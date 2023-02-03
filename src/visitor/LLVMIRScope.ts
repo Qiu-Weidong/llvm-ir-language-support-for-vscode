@@ -20,6 +20,9 @@ export interface Scope {
   addMetadata(name: string, content: string): void;
 
   addEntity(name: string, entity: LLVMEitity): void;
+
+
+  setTypeTable(types: Map<string, LLVMIRType>): void ;
 }
 
 export class GlobalScope implements Scope {
@@ -93,6 +96,10 @@ export class GlobalScope implements Scope {
   getScope(name: string): Scope | undefined {
     return this.children.get(name);
   }
+
+  setTypeTable(types: Map<string, LLVMIRType>): void {
+    this.namedTypes = types;
+  }
 }
 
 export class LocalScope implements Scope {
@@ -105,7 +112,9 @@ export class LocalScope implements Scope {
     this.entities = new Map();
     this.labels = new Set();
   }
-
+  setTypeTable(types: Map<string, LLVMIRType>): void {
+    this.parent.setTypeTable(types);
+  }
 
   containsLabel(name: string): boolean {
     return this.labels.has(name);

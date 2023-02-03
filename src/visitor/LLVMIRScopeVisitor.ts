@@ -1,9 +1,9 @@
 import { Token } from "antlr4ts";
 import { Diagnostic, DiagnosticSeverity, Position, Range } from "vscode";
 import { AttrGroupDefContext, ComdatDefContext, MetadataDefContext, NamedMetadataDefContext, TypeDefContext } from "../llvmir/LLVMIRParser";
-import { GlobalScope, Scope } from "./LLVMIRScope";
-import { LLVMIRType } from "./LLVMIRType";
+import { Scope } from "./LLVMIRScope";
 import { LLVMIRBaseVisitor } from "./LLVMIRBaseVisitor";
+import { LLVMIRTypeResolver } from "./LLVMIRTypeResolver";
 
 
 
@@ -11,11 +11,14 @@ export class LLVMIRScopeVisitor extends LLVMIRBaseVisitor {
   // 在遍历过程中将错误信息添加进去
   private diagnostics: Diagnostic[];
   private scope: Scope;
+  private typeResolver: LLVMIRTypeResolver;
 
-  constructor(diagnostics: Diagnostic[]) {
+  constructor(diagnostics: Diagnostic[], scope: Scope) {
     super();
     this.diagnostics = diagnostics;
-    this.scope = new GlobalScope();
+    this.scope = scope;
+    this.typeResolver = new LLVMIRTypeResolver(this.scope);
+    
   }
 
   addError(symbol: Token, msg: string) {
@@ -30,21 +33,6 @@ export class LLVMIRScopeVisitor extends LLVMIRBaseVisitor {
     this.diagnostics.push(diagnostic);
   }
 
-  visitTypeDef(ctx: TypeDefContext): any {
-    const ty = ctx.type().accept(this) as LLVMIRType;
-    const name = ctx.LocalIdent().symbol.text;
-    if (!name) {
-      const symbol = ctx.LocalIdent().symbol;
-      // 报一个符号名称为空的错误
-      this.addError(symbol, 'no type name provide');
-    }
-    else if (this.scope.getNamedType(name)) {
-      // 报一个重复定义类型的错误
-      this.addError(ctx.LocalIdent().symbol, 'duplicated type');
-    }
-    else
-      this.scope.addNamedType(name, ty);
-  }
   visitComdatDef(ctx: ComdatDefContext) {
     const name = ctx.ComdatName().symbol.text;
     const kind = ctx._selectionKind.text;
@@ -106,7 +94,7 @@ export class LLVMIRScopeVisitor extends LLVMIRBaseVisitor {
     }
   }
 
-
+  // 使用 LLVMIRTypeResolver 来解析类型
 
 }
 
