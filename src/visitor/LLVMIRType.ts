@@ -61,6 +61,8 @@ export class IntType extends LLVMIRType {
   isCompatibleTo(other: LLVMIRType): boolean {
     return this.isSameType(other);
   }
+
+  getSize() { return this.size; }
 }
 
 export class FloatType extends LLVMIRType {
@@ -144,6 +146,8 @@ export class OpaquePointerType extends LLVMIRType {
     if (other instanceof OpaquePointerType || other instanceof PointerType) return this.addrSpace === other.addrSpace;
     return false;
   }
+
+  getAddrSpace() { return this.addrSpace; }
 }
 
 export class VectorType extends LLVMIRType {
@@ -158,6 +162,9 @@ export class VectorType extends LLVMIRType {
   setBaseType(type: LLVMIRType) {
     this.baseType = type;
   }
+
+  isScalable() { return this.scalable; }
+  getLength() { return this.length; }
 
   containsUndefined(): boolean {
     return ! this.baseType.isDefined();
@@ -187,6 +194,8 @@ export class VectorType extends LLVMIRType {
 export class ArrayType extends LLVMIRType {
   protected length: number;
   protected baseType: LLVMIRType;
+
+  getLength() { return this.length; }
 
   constructor(length: number, baseType: LLVMIRType) {
     super(`[${length} x ${baseType.getName()}]`);
@@ -219,6 +228,7 @@ export class StructType extends LLVMIRType {
   protected packed: boolean;
   protected members: LLVMIRType[];
 
+  isPacked() { return this.packed; }
   getMembers() { return this.members; }
   containsUndefined(): boolean {
     for(const member of this.members) {
@@ -274,6 +284,7 @@ export class FuncType extends LLVMIRType {
   getRetType() { return this.retType; }
   getParams() { return this.params; }
   setRetType(type: LLVMIRType) { this.retType = type; }
+  isVaarg() { return this.vaarg; }
 
   containsUndefined(): boolean {
     if( ! this.retType.isDefined()) return true;

@@ -1,7 +1,7 @@
 import { Token } from "antlr4ts";
 import { Diagnostic, DiagnosticSeverity, Position, Range } from "vscode";
 import { AttrGroupDefContext, ComdatDefContext, MetadataDefContext, NamedMetadataDefContext, TypeDefContext } from "../llvmir/LLVMIRParser";
-import { Scope } from "./LLVMIRScope";
+import { LocalScope, Scope } from "./LLVMIRScope";
 import { LLVMIRBaseVisitor } from "./LLVMIRBaseVisitor";
 import { LLVMIRTypeResolver } from "./LLVMIRTypeResolver";
 
@@ -11,13 +11,14 @@ export class LLVMIRScopeVisitor extends LLVMIRBaseVisitor {
   // 在遍历过程中将错误信息添加进去
   private diagnostics: Diagnostic[];
   private scope: Scope;
+  private localScope: LocalScope | undefined;
   private typeResolver: LLVMIRTypeResolver;
 
   constructor(diagnostics: Diagnostic[], scope: Scope) {
     super();
     this.diagnostics = diagnostics;
     this.scope = scope;
-    this.typeResolver = new LLVMIRTypeResolver(this.scope);
+    this.typeResolver = new LLVMIRTypeResolver(this.scope, diagnostics);
     
   }
 
