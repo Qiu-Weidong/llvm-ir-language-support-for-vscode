@@ -2,6 +2,8 @@
 module asm "inline asm code goes here"
 module asm "more can go here"  
 
+%hello = type {  i32, i64, %world }
+%world = type { %hello, i32 }
 
 define void @main() { 
   fence acquire 
