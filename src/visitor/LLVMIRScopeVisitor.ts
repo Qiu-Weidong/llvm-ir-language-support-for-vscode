@@ -1,9 +1,11 @@
 import { Token } from "antlr4ts";
 import { Diagnostic, DiagnosticSeverity, Position, Range } from "vscode";
-import { AttrGroupDefContext, ComdatDefContext, MetadataDefContext, NamedMetadataDefContext, TypeDefContext } from "../llvmir/LLVMIRParser";
+import { AttrGroupDefContext, BasicBlockContext, ComdatDefContext, CompilationUnitContext, FuncBodyContext, FuncDeclContext, FuncDefContext, GlobalDeclContext, GlobalDefContext, IndirectSymbolDefContext, LocalDefInstContext, MetadataDefContext, NamedMetadataDefContext, TypeDefContext } from "../llvmir/LLVMIRParser";
 import { LocalScope, Scope } from "./LLVMIRScope";
 import { LLVMIRBaseVisitor } from "./LLVMIRBaseVisitor";
 import { LLVMIRTypeResolver } from "./LLVMIRTypeResolver";
+import { LLVMIRType } from "./LLVMIRType";
+import { LLVMIREitity } from "./LLVMIREntity";
 
 
 
@@ -11,7 +13,7 @@ export class LLVMIRScopeVisitor extends LLVMIRBaseVisitor {
   // 在遍历过程中将错误信息添加进去
   private diagnostics: Diagnostic[];
   private scope: Scope;
-  private localScope: LocalScope | undefined;
+  // private localScope: LocalScope | undefined;
   private typeResolver: LLVMIRTypeResolver;
 
   constructor(diagnostics: Diagnostic[], scope: Scope) {
@@ -96,7 +98,83 @@ export class LLVMIRScopeVisitor extends LLVMIRBaseVisitor {
   }
 
   // 使用 LLVMIRTypeResolver 来解析类型
+  visitCompilationUnit(ctx: CompilationUnitContext) {
+    ctx.topLevelEntity().forEach(entity => {
+      entity.comdatDef()?.accept(this);
+      entity.globalDecl()?.accept(this);
+      entity.globalDef()?.accept(this);
+      entity.indirectSymbolDef()?.accept(this);
+      entity.funcDecl()?.accept(this);
+      entity.funcDef()?.accept(this);
+      entity.attrGroupDef()?.accept(this);
+      entity.namedMetadataDef()?.accept(this);
+      entity.metadataDef()?.accept(this);
+    });
+  }
 
+  visitGlobalDecl(ctx: GlobalDeclContext) {
+    const name = ctx.GlobalIdent().text;
+    // this.typeResolver.setScope(this.scope);
+    const ty: LLVMIRType = ctx.type().accept(this.typeResolver);
+    const entity = new LLVMIREitity(name, ty);
+    this.scope.addEntity(name, entity);
+  }
+  visitGlobalDef(ctx: GlobalDefContext) {
+    const name = ctx.GlobalIdent().text;
+    // this.typeResolver.setScope(this.scope);
+    const ty: LLVMIRType = ctx.type().accept(this.typeResolver);
+    const entity = new LLVMIREitity(name, ty);
+    this.scope.addEntity(name, entity);
+  }
+
+  visitIndirectSymbolDef(ctx: IndirectSymbolDefContext) {
+    const name = ctx.GlobalIdent().text;
+    // this.typeResolver.setScope(this.scope);
+    const ty: LLVMIRType = ctx.type().accept(this.typeResolver);
+    const entity = new LLVMIREitity(name, ty);
+    this.scope.addEntity(name, entity);
+  }
+
+  visitFuncDecl(ctx: FuncDeclContext) {
+    const ty: LLVMIRType = ctx.funcHeader().accept(this.typeResolver);
+    const name = ctx.funcHeader().GlobalIdent().text;
+    this.scope.addEntity(name, new LLVMIREitity(name, ty));
+  }
+
+  visitFuncDef(ctx: FuncDefContext) {
+    const ty: LLVMIRType = ctx.funcHeader().accept(this.typeResolver);
+    const name = ctx.funcHeader().GlobalIdent().text;
+    this.scope.addEntity(name, new LLVMIREitity(name, ty));
+    const localscope = new LocalScope(this.scope);
+    this.scope.addChild(name, localscope);
+
+    // 切换符号表
+    this.scope = localscope;
+    this.typeResolver.setScope(this.scope);
+    ctx.funcBody().accept(this);
+    // 切换符号表
+    this.scope = this.scope.getParent();
+    this.typeResolver.setScope(this.scope);
+  }
+
+
+  visitFuncBody(ctx: FuncBodyContext) {
+    ctx.basicBlock().forEach(block => block.accept(this));
+  }
+  visitBasicBlock(ctx: BasicBlockContext) {
+    const label = ctx.LabelIdent()?.text;
+    if(label) {
+      this.scope.addLabel(label);
+    }
+    ctx.instruction().forEach(inst => inst.accept(this));
+    // ctx.terminator().accept(this);
+  }
+
+  visitLocalDefInst(ctx: LocalDefInstContext) {
+    const ty: LLVMIRType = ctx.valueInstruction().accept(this.typeResolver);
+    const name = ctx.LocalIdent().text;
+    this.scope.addEntity(name, new LLVMIREitity(name, ty));
+  }
 }
 
 

@@ -1,15 +1,18 @@
 import { LLVMIRType } from "./LLVMIRType";
-import { LLVMEitity } from "./LLVMIREntity";
+import { LLVMIREitity } from "./LLVMIREntity";
 
 // 符号表查询接口
 export interface Scope {
+  addChild(name: string, scope: Scope): void;
+  getParent(): Scope;
+
   getNamedType(name: string): LLVMIRType | undefined;
   getComdat(name: string): string | undefined;
   getAttrGroup(name: string): string | undefined;
   getMetadata(name: string): string | undefined;
 
 
-  getEntity(name: string): LLVMEitity | undefined;
+  getEntity(name: string): LLVMIREitity | undefined;
   containsLabel(name: string): boolean;
 
 
@@ -19,7 +22,7 @@ export interface Scope {
   addAttrGroup(name: string, content: string): void;
   addMetadata(name: string, content: string): void;
 
-  addEntity(name: string, entity: LLVMEitity): void;
+  addEntity(name: string, entity: LLVMIREitity): void;
 
 
   setTypeTable(types: Map<string, LLVMIRType>): void ;
@@ -34,7 +37,7 @@ export class GlobalScope implements Scope {
   protected metadatas: Map<string, string>;
   
   // 变量和函数表
-  protected entities: Map<string, LLVMEitity>;
+  protected entities: Map<string, LLVMIREitity>;
 
   constructor() { 
     this.children = new Map(); 
@@ -43,6 +46,12 @@ export class GlobalScope implements Scope {
     this.attrGroups = new Map();
     this.metadatas = new Map();
     this.entities = new Map();
+  }
+  getParent(): Scope {
+    throw new Error("Method not implemented.");
+  }
+  addChild(name: string, scope: Scope): void {
+    this.children.set(name, scope);
   }
   addLabel(name: string): void {
     throw new Error("can't add label in global scope");
@@ -59,7 +68,7 @@ export class GlobalScope implements Scope {
   addMetadata(name: string, content: string): void {
     this.metadatas.set(name, content);
   }
-  addEntity(name: string, entity: LLVMEitity): void {
+  addEntity(name: string, entity: LLVMIREitity): void {
     this.entities.set(name, entity);
   }
   containsLabel(name: string): boolean {
@@ -77,7 +86,7 @@ export class GlobalScope implements Scope {
   getMetadata(name: string): string | undefined {
     return this.metadatas.get(name);
   }
-  getEntity(name: string): LLVMEitity | undefined {
+  getEntity(name: string): LLVMIREitity | undefined {
     return this.entities.get(name);
   }
 
@@ -104,13 +113,19 @@ export class GlobalScope implements Scope {
 
 export class LocalScope implements Scope {
   protected parent: Scope;
-  protected entities: Map<string, LLVMEitity>;
+  protected entities: Map<string, LLVMIREitity>;
   protected labels: Set<string>;
 
   constructor(parent: Scope) { 
     this.parent = parent; 
     this.entities = new Map();
     this.labels = new Set();
+  }
+  getParent(): Scope {
+    return this.parent;
+  }
+  addChild(name: string, scope: Scope): void {
+    this.parent.addChild(name, scope);
   }
   setTypeTable(types: Map<string, LLVMIRType>): void {
     this.parent.setTypeTable(types);
@@ -131,7 +146,7 @@ export class LocalScope implements Scope {
   getMetadata(name: string): string | undefined {
     return this.parent.getMetadata(name);
   }
-  getEntity(name: string): LLVMEitity | undefined {
+  getEntity(name: string): LLVMIREitity | undefined {
     return this.entities.get(name) || this.parent.getEntity(name);
   }
 
@@ -151,7 +166,7 @@ export class LocalScope implements Scope {
   addMetadata(name: string, content: string): void {
     this.parent.addMetadata(name, content);
   }
-  addEntity(name: string, entity: LLVMEitity): void {
+  addEntity(name: string, entity: LLVMIREitity): void {
     this.entities.set(name, entity);
   }
 }

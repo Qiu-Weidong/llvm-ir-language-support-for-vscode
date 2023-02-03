@@ -1,9 +1,10 @@
 import { Token } from "antlr4ts";
+import { TerminalNode } from "antlr4ts/tree/TerminalNode";
 import { Diagnostic, DiagnosticSeverity, Position, Range } from "vscode";
-import { AddExprContext, AddrSpaceCastExprContext, AddrSpaceContext, AndExprContext, ArrayConstContext, AShrExprContext, BitCastExprContext, BlockAddressConstContext, BoolConstContext, ConcreteTypeContext, ConstantContext, ConstantExprContext, DsoLocalEquivalentConstContext, ExtractElementExprContext, FCmpExprContext, FirstClassTypeContext, FloatConstContext, FNegExprContext, FpExtExprContext, FpToSiExprContext, FpToUiExprContext, FpTruncExprContext, FuncHeaderContext, GetElementPtrExprContext, ICmpExprContext, InsertElementExprContext, IntConstContext, IntToPtrExprContext, LShrExprContext, MulExprContext, NoCFIConstContext, NoneConstContext, NullConstContext, OrExprContext, PoisonConstContext, PtrToIntExprContext, SelectExprContext, SExtExprContext, ShlExprContext, ShuffleVectorExprContext, SiToFpExprContext, StructConstContext, SubExprContext, TruncExprContext, TypeConstContext, UiToFpExprContext, UndefConstContext, VectorConstContext, XorExprContext, ZeroInitializerConstContext, ZExtExprContext } from "../llvmir/LLVMIRParser";
+import { AddExprContext, AddInstContext, AddrSpaceCastExprContext, AddrSpaceContext, AllocaInstContext, AndExprContext, AndInstContext, ArrayConstContext, AShrExprContext, AShrInstContext, BitCastExprContext, BlockAddressConstContext, BoolConstContext, ConcreteTypeContext, ConstantContext, ConstantExprContext, DsoLocalEquivalentConstContext, ExtractElementExprContext, ExtractElementInstContext, FAddInstContext, FCmpExprContext, FDivInstContext, FirstClassTypeContext, FloatConstContext, FMulInstContext, FNegExprContext, FNegInstContext, FpExtExprContext, FpToSiExprContext, FpToUiExprContext, FpTruncExprContext, FRemInstContext, FSubInstContext, FuncHeaderContext, GetElementPtrExprContext, ICmpExprContext, InsertElementExprContext, InsertElementInstContext, IntConstContext, IntToPtrExprContext, LoadInstContext, LShrExprContext, LShrInstContext, MulExprContext, MulInstContext, NoCFIConstContext, NoneConstContext, NullConstContext, OrExprContext, OrInstContext, ParamContext, PoisonConstContext, PtrToIntExprContext, SDivInstContext, SelectExprContext, SExtExprContext, ShlExprContext, ShlInstContext, ShuffleVectorExprContext, ShuffleVectorInstContext, SiToFpExprContext, SRemInstContext, StructConstContext, SubExprContext, SubInstContext, TruncExprContext, TypeConstContext, TypeValueContext, UDivInstContext, UiToFpExprContext, UndefConstContext, URemInstContext, ValueContext, ValueInstructionContext, VectorConstContext, XorExprContext, XorInstContext, ZeroInitializerConstContext, ZExtExprContext } from "../llvmir/LLVMIRParser";
 import { LLVMIRBasicTypeResolver } from "./LLVMIRBasicTypeResolver";
 import { Scope } from "./LLVMIRScope";
-import { ArrayType, FloatType, FuncType, IntType, LLVMIRType, StructType, VectorType, VoidType } from "./LLVMIRType";
+import { ArrayType, FloatType, FuncType, IntType, LLVMIRType, PointerType, StructType, VectorType, VoidType } from "./LLVMIRType";
 
 
 export class LLVMIRTypeResolver extends LLVMIRBasicTypeResolver {
@@ -14,6 +15,9 @@ export class LLVMIRTypeResolver extends LLVMIRBasicTypeResolver {
     super();
     this.scope = scope;
     this.diagnostics = diagnostics;
+  }
+  setScope(scope: Scope) {
+    this.scope = scope;
   }
 
   addError(symbol: Token, msg: string) {
@@ -28,12 +32,15 @@ export class LLVMIRTypeResolver extends LLVMIRBasicTypeResolver {
     this.diagnostics.push(diagnostic);
   }
 
-
   visitFuncHeader(ctx: FuncHeaderContext) {
     const retType: LLVMIRType = ctx.type().accept(this);
     const vaarg = ctx.params().Ellipsis() ? true : false;
     const params: LLVMIRType[] = ctx.params().param().map(param => param.accept(this));
     return new FuncType(retType, params, vaarg);
+  }
+  visitParam(ctx: ParamContext) {
+    const ty: LLVMIRType = ctx.type().accept(this);
+    return ty;
   }
 
   visitConstantExpr(ctx: ConstantExprContext) {
@@ -357,10 +364,12 @@ export class LLVMIRTypeResolver extends LLVMIRBasicTypeResolver {
     // const ty2: LLVMIRType = ctx.typeConst()[1].accept(this);
     return ty1;
   }
-
-
   visitTypeConst(ctx: TypeConstContext) {
     const ret: LLVMIRType = ctx.firstClassType().accept(this);
+    const ty: LLVMIRType = ctx.constant().accept(this);
+    if(! ret.isCompatibleTo(ty) && ! ty.isCompatibleTo(ret)) {
+      this.addError(ctx.firstClassType().start, `类型不匹配`);
+    }
     return ret;
   }
   visitFirstClassType(ctx: FirstClassTypeContext) {
@@ -373,6 +382,240 @@ export class LLVMIRTypeResolver extends LLVMIRBasicTypeResolver {
     return ret;
   }
   
+  visitTypeValue(ctx: TypeValueContext) {
+    const ty1: LLVMIRType = ctx.firstClassType().accept(this);
+    const ty2: LLVMIRType = ctx.value().accept(this);
+    if(! ty1.isCompatibleTo(ty2) && ! ty2.isCompatibleTo(ty1)) {
+      this.addError(ctx.value().start, '类型不匹配');
+    }
+    return ty1;
+  }
+  visitValue(ctx: ValueContext) {
+    if(ctx.constant()) {
+      const ret: LLVMIRType = ctx.constant()?.accept(this);
+      return ret;
+    }
+    else if(ctx.LocalIdent()) {
+      const name = ctx.LocalIdent()?.text;
+      if(name) {
+        return this.scope.getEntity(name)?.getType();
+      }
+    }
+  }
+  
+  // inst
+  visitValueInstruction(ctx: ValueInstructionContext) {
+    const ret: LLVMIRType = ctx.getChild(0).accept(this);
+    return ret;
+  }
+  visitFNegInst(ctx: FNegInstContext) {
+    const ret: LLVMIRType = ctx.typeValue().accept(this);
+    return ret;
+  }
+  visitAddInst(ctx: AddInstContext) {
+    const ty1:LLVMIRType = ctx.typeValue().accept(this);
+    const ty2: LLVMIRType = ctx.value().accept(this);
+    if(! ty1.isCompatibleTo(ty2) && ! ty2.isCompatibleTo(ty1)) {
+      this.addError(ctx.value().start, '类型不匹配');
+    }
+    return ty1;
+  }
+  visitFAddInst(ctx: FAddInstContext) {
+    const ty1:LLVMIRType = ctx.typeValue().accept(this);
+    const ty2: LLVMIRType = ctx.value().accept(this);
+    if(! ty1.isCompatibleTo(ty2) && ! ty2.isCompatibleTo(ty1)) {
+      this.addError(ctx.value().start, '类型不匹配');
+    }
+    return ty1;
+  }
+  visitSubInst(ctx: SubInstContext) {
+    const ty1:LLVMIRType = ctx.typeValue().accept(this);
+    const ty2: LLVMIRType = ctx.value().accept(this);
+    if(! ty1.isCompatibleTo(ty2) && ! ty2.isCompatibleTo(ty1)) {
+      this.addError(ctx.value().start, '类型不匹配');
+    }
+    return ty1;
+  }
+  visitFSubInst(ctx: FSubInstContext) {
+    const ty1:LLVMIRType = ctx.typeValue().accept(this);
+    const ty2: LLVMIRType = ctx.value().accept(this);
+    if(! ty1.isCompatibleTo(ty2) && ! ty2.isCompatibleTo(ty1)) {
+      this.addError(ctx.value().start, '类型不匹配');
+    }
+    return ty1;
+  }
+  visitMulInst(ctx: MulInstContext) {
+    const ty1:LLVMIRType = ctx.typeValue().accept(this);
+    const ty2: LLVMIRType = ctx.value().accept(this);
+    if(! ty1.isCompatibleTo(ty2) && ! ty2.isCompatibleTo(ty1)) {
+      this.addError(ctx.value().start, '类型不匹配');
+    }
+    return ty1;
+  }
+  visitFMulInst(ctx: FMulInstContext) {
+    const ty1:LLVMIRType = ctx.typeValue().accept(this);
+    const ty2: LLVMIRType = ctx.value().accept(this);
+    if(! ty1.isCompatibleTo(ty2) && ! ty2.isCompatibleTo(ty1)) {
+      this.addError(ctx.value().start, '类型不匹配');
+    }
+    return ty1;
+  }
+  visitUDivInst(ctx: UDivInstContext) {
+    const ty1:LLVMIRType = ctx.typeValue().accept(this);
+    const ty2: LLVMIRType = ctx.value().accept(this);
+    if(! ty1.isCompatibleTo(ty2) && ! ty2.isCompatibleTo(ty1)) {
+      this.addError(ctx.value().start, '类型不匹配');
+    }
+    return ty1;
+  }
+  visitSDivInst(ctx: SDivInstContext) {
+    const ty1:LLVMIRType = ctx.typeValue().accept(this);
+    const ty2: LLVMIRType = ctx.value().accept(this);
+    if(! ty1.isCompatibleTo(ty2) && ! ty2.isCompatibleTo(ty1)) {
+      this.addError(ctx.value().start, '类型不匹配');
+    }
+    return ty1;
+  }
+  visitFDivInst(ctx: FDivInstContext) {
+    const ty1:LLVMIRType = ctx.typeValue().accept(this);
+    const ty2: LLVMIRType = ctx.value().accept(this);
+    if(! ty1.isCompatibleTo(ty2) && ! ty2.isCompatibleTo(ty1)) {
+      this.addError(ctx.value().start, '类型不匹配');
+    }
+    return ty1;
+  }
+
+  visitURemInst(ctx: URemInstContext) {
+    const ty1:LLVMIRType = ctx.typeValue().accept(this);
+    const ty2: LLVMIRType = ctx.value().accept(this);
+    if(! ty1.isCompatibleTo(ty2) && ! ty2.isCompatibleTo(ty1)) {
+      this.addError(ctx.value().start, '类型不匹配');
+    }
+    return ty1;
+  }
+
+  visitSRemInst(ctx: SRemInstContext) {
+    const ty1:LLVMIRType = ctx.typeValue().accept(this);
+    const ty2: LLVMIRType = ctx.value().accept(this);
+    if(! ty1.isCompatibleTo(ty2) && ! ty2.isCompatibleTo(ty1)) {
+      this.addError(ctx.value().start, '类型不匹配');
+    }
+    return ty1;
+  }
+  visitFRemInst(ctx: FRemInstContext) {
+    const ty1:LLVMIRType = ctx.typeValue().accept(this);
+    const ty2: LLVMIRType = ctx.value().accept(this);
+    if(! ty1.isCompatibleTo(ty2) && ! ty2.isCompatibleTo(ty1)) {
+      this.addError(ctx.value().start, '类型不匹配');
+    }
+    return ty1;
+  }
+
+  visitShlInst(ctx: ShlInstContext) {
+    const ret: LLVMIRType = ctx.typeValue().accept(this);
+    return ret;
+  }
+  visitLShrInst(ctx: LShrInstContext) {
+    const ret: LLVMIRType = ctx.typeValue().accept(this);
+    return ret;
+  }
+  visitAShrInst(ctx: AShrInstContext) {
+    const ret: LLVMIRType = ctx.typeValue().accept(this);
+    return ret;
+  }
+
+  visitAndInst(ctx: AndInstContext) {
+    const ty1:LLVMIRType = ctx.typeValue().accept(this);
+    const ty2: LLVMIRType = ctx.value().accept(this);
+    if(! ty1.isCompatibleTo(ty2) && ! ty2.isCompatibleTo(ty1)) {
+      this.addError(ctx.value().start, '类型不匹配');
+    }
+    return ty1;
+  }
+  visitOrInst(ctx: OrInstContext) {
+    const ty1:LLVMIRType = ctx.typeValue().accept(this);
+    const ty2: LLVMIRType = ctx.value().accept(this);
+    if(! ty1.isCompatibleTo(ty2) && ! ty2.isCompatibleTo(ty1)) {
+      this.addError(ctx.value().start, '类型不匹配');
+    }
+    return ty1;
+  }
+  visitXorInst(ctx: XorInstContext) {
+    const ty1:LLVMIRType = ctx.typeValue().accept(this);
+    const ty2: LLVMIRType = ctx.value().accept(this);
+    if(! ty1.isCompatibleTo(ty2) && ! ty2.isCompatibleTo(ty1)) {
+      this.addError(ctx.value().start, '类型不匹配');
+    }
+    return ty1;
+  }
+
+  visitExtractElementInst(ctx: ExtractElementInstContext) {
+    const ty: LLVMIRType = ctx.typeValue()[0].accept(this);
+    if (ty instanceof VectorType) {
+      return ty.getBaseType();
+    }
+    else {
+      this.addError(ctx.typeValue()[0].start, `extractelement指令的第一个参数必须是 vector`);
+      return ty;
+    }
+  }
+
+  visitInsertElementInst(ctx: InsertElementInstContext) {
+    const ty: LLVMIRType = ctx.typeValue()[0].accept(this);
+    const itemty: LLVMIRType = ctx.typeValue()[1].accept(this);
+    if (ty instanceof VectorType) {
+      const baseType = ty.getBaseType();
+      if (!baseType.isCompatibleTo(itemty) && !itemty.isCompatibleTo(baseType)) {
+        this.addError(ctx.typeValue()[1].start, `两个参数的类型不匹配`);
+      }
+      return ty;
+    }
+    else {
+      this.addError(ctx.typeValue()[0].start, `insertelement的第一个参数必须是 vector`);
+      return ty;
+    }
+  }
+
+  visitShuffleVectorInst(ctx: ShuffleVectorInstContext) {
+    const ty1: LLVMIRType = ctx.typeValue()[0].accept(this);
+    const ty2: LLVMIRType = ctx.typeValue()[1].accept(this);
+    const ty3: LLVMIRType = ctx.typeValue()[2].accept(this);
+
+    if (!(ty1 instanceof VectorType)) {
+      this.addError(ctx.typeValue()[0].start, `第一个参数必须是 vector`);
+    }
+    else if (!(ty2 instanceof VectorType)) {
+      this.addError(ctx.typeValue()[1].start, `第二个参数必须是 vector`);
+    } else if (!(ty3 instanceof VectorType) || !(ty3.getBaseType() instanceof IntType)) {
+      this.addError(ctx.typeValue()[2].start, `第三个参数必须是 vector<i32>`);
+    }
+    else {
+      // 检查 ty1 和 ty2 的 baseType 是否兼容
+      const base1 = ty1.getBaseType();
+      const base2 = ty2.getBaseType();
+      if (ty1.getLength() != ty2.getLength()
+        || ty1.isScalable() != ty2.isScalable()
+        || (
+          !base1.isCompatibleTo(base2) && !base2.isCompatibleTo(base1)
+        )) {
+        this.addError(ctx.typeValue()[0].start, `两个参数的类型不兼容`);
+      }
+      const m = ty3.getLength();
+      return new VectorType(m, ty1.isScalable(), base1);
+    }
+    return ty1;
+  }
+
+  visitAllocaInst(ctx: AllocaInstContext) {
+    const baseType: LLVMIRType = ctx.type().accept(this);
+    const addrspace = ctx.addrSpace()?.IntLit().text;
+    const i = addrspace ? LLVMIRBasicTypeResolver.parseIntLit(addrspace):undefined;
+    return new PointerType(baseType, i);
+  }
+  visitLoadInst(ctx: LoadInstContext) {
+    const ty: LLVMIRType = ctx.type().accept(this);
+    return ty;
+  }
   
 }
 
