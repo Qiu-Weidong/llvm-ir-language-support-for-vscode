@@ -2,7 +2,7 @@ import { ParserRuleContext, Token } from "antlr4ts";
 import { RuleNode } from "antlr4ts/tree/RuleNode";
 import { TerminalNode } from "antlr4ts/tree/TerminalNode";
 import { Hover, MarkdownString, Position } from "vscode";
-import { CompilationUnitContext, FuncAttrContext, FuncAttributeContext } from "../llvmir/LLVMIRParser";
+import { ComdatContext, CompilationUnitContext, FuncAttrContext, FuncAttributeContext, MetadataAttachmentContext } from "../llvmir/LLVMIRParser";
 import { LLVMIRBaseVisitor } from "./LLVMIRBaseVisitor";
 import { Scope } from "./LLVMIRScope";
 
@@ -81,10 +81,32 @@ export class LLVMIRHoverVisitor extends LLVMIRBaseVisitor {
     if (attr && this.positionInTerminal(attr)) {
       // 悬浮提示
       const info = this.scope.getAttrGroup(attr.text);
-      if (info) this.result = new Hover(
-        new MarkdownString(info)
-      );
+      if (info) this.result = new Hover([
+        { language: "llvm-ir", value: info },
+      ]);
     }
+  }
+  visitComdat(ctx: ComdatContext) {
+    const name = ctx.ComdatName();
+    if (name && this.positionInTerminal(name)) {
+      const info = this.scope.getComdat(name.text);
+      if (info) // this.result = new Hover(new MarkdownString(info));
+        this.result = new Hover([
+          { language: "llvm-ir", value: info },
+        ]);
+    }
+  }
+  visitMetadataAttachment(ctx: MetadataAttachmentContext) {
+    if (this.positionInTerminal(ctx.MetadataName())) {
+      const name = ctx.MetadataName().text;
+      const info = this.scope.getMetadata(name);
+      if (info) {
+        this.result = new Hover([
+          { language: "llvm-ir", value: info }
+        ]);
+      }
+    }
+
   }
 
 }

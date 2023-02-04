@@ -377,3 +377,14 @@ export class UndefinedType extends LLVMIRType {
   
 }
 
+// 如果类型解析失败，则返回一个未知类型
+export class UnknownType extends LLVMIRType {
+  isSameType(other: LLVMIRType): boolean {
+    return other instanceof UnknownType;
+  }
+  isCompatibleTo(other: LLVMIRType): boolean {
+    return other instanceof UnknownType;
+  }
+  constructor() { super('unknown'); }
+}
+

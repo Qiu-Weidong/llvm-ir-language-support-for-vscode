@@ -1,6 +1,6 @@
 import { Token } from "antlr4ts";
 import { Diagnostic, DiagnosticSeverity, Position, Range } from "vscode";
-import { AttrGroupDefContext, BasicBlockContext, ComdatDefContext, CompilationUnitContext, FuncBodyContext, FuncDeclContext, FuncDefContext, GlobalDeclContext, GlobalDefContext, IndirectSymbolDefContext, LocalDefInstContext, MetadataDefContext, NamedMetadataDefContext, TypeDefContext } from "../llvmir/LLVMIRParser";
+import { AttrGroupDefContext, BasicBlockContext, ComdatDefContext, CompilationUnitContext, FuncAttributeContext, FuncBodyContext, FuncDeclContext, FuncDefContext, GlobalDeclContext, GlobalDefContext, IndirectSymbolDefContext, LocalDefInstContext, MetadataDefContext, NamedMetadataDefContext, TypeDefContext } from "../llvmir/LLVMIRParser";
 import { LocalScope, Scope } from "./LLVMIRScope";
 import { LLVMIRBaseVisitor } from "./LLVMIRBaseVisitor";
 import { LLVMIRTypeResolver } from "./LLVMIRTypeResolver";
@@ -21,7 +21,7 @@ export class LLVMIRScopeVisitor extends LLVMIRBaseVisitor {
     this.diagnostics = diagnostics;
     this.scope = scope;
     this.typeResolver = new LLVMIRTypeResolver(this.scope, diagnostics);
-    
+
   }
 
   addError(symbol: Token, msg: string) {
@@ -62,37 +62,41 @@ export class LLVMIRScopeVisitor extends LLVMIRBaseVisitor {
       this.addError(ctx.AttrGroupId().symbol, 'duplicate attrgroup');
     }
     else {
-      // let funcattr = '';
-      // ctx.funcAttribute().forEach(attr => {
-      //   funcattr += attr.accept(this) as string;
-      // });
-      // const content = `attributes ${name} = { ${funcattr} }`;
-      this.scope.addAttrGroup(name, ctx.toString());
+      let funcattr = '';
+      ctx.funcAttribute().forEach(attr => {
+        funcattr += attr.text + ', ';
+      });
+      if(funcattr.endsWith(', ')) funcattr = funcattr.slice(0, funcattr.length-2);
+      const content = `attributes ${name} = { ${funcattr} }`;
+      this.scope.addAttrGroup(name, content);
     }
   }
   visitNamedMetadataDef(ctx: NamedMetadataDefContext) {
     const symbol = ctx.MetadataName().symbol;
-    if(! symbol.text) {
+    if (!symbol.text) {
       this.addError(symbol, 'no metadata name or id provide');
     }
-    else if(this.scope.getMetadata(symbol.text)) {
+    else if (this.scope.getMetadata(symbol.text)) {
       this.addError(symbol, 'duplicate metadata');
     }
     else {
-
-      this.scope.addMetadata(symbol.text, ctx.toString());
+      let info = '';
+      ctx.metadataNode().forEach(node => {
+        info += node.text + ', ';
+      });
+      if(info.endsWith(', ')) info = info.slice(0, info.length-2);
+      this.scope.addMetadata(symbol.text, `${symbol.text} = ! { ${info} }`);
     }
   }
   visitMetadataDef(ctx: MetadataDefContext) {
     const symbol = ctx.MetadataId().symbol;
-    if(! symbol.text) {
+    if (!symbol.text) {
       this.addError(symbol, 'no metadata name or id provide');
     }
-    else if(this.scope.getMetadata(symbol.text)) {
+    else if (this.scope.getMetadata(symbol.text)) {
       this.addError(symbol, 'duplicate metadata');
     }
     else {
-
       this.scope.addMetadata(symbol.text, ctx.toString());
     }
   }
@@ -151,6 +155,14 @@ export class LLVMIRScopeVisitor extends LLVMIRBaseVisitor {
     // 切换符号表
     this.scope = localscope;
     this.typeResolver.setScope(this.scope);
+    // 首先要讲参数添加到符号表
+    ctx.funcHeader().params().param().forEach(param => {
+      const name = param.LocalIdent()?.text;
+      if (name) {
+        const ty: LLVMIRType = param.type().accept(this.typeResolver);
+        this.scope.addEntity(name, new LLVMIREitity(name, ty));
+      }
+    });
     ctx.funcBody().accept(this);
     // 切换符号表
     this.scope = this.scope.getParent();
@@ -163,7 +175,7 @@ export class LLVMIRScopeVisitor extends LLVMIRBaseVisitor {
   }
   visitBasicBlock(ctx: BasicBlockContext) {
     const label = ctx.LabelIdent()?.text;
-    if(label) {
+    if (label) {
       this.scope.addLabel(label);
     }
     ctx.instruction().forEach(inst => inst.accept(this));

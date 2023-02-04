@@ -9,7 +9,7 @@ module asm "more can go here"
 @Y = global i32 42 
 @Z = global [2 x ptr] [ptr @X, ptr @Y]
 
-define void @main(i8* noundef %0, i8* noundef %1, ...) #0 { 
+define void @main(i8* noundef %0, i8* noundef %1, ...) #0 #1 { 
   ; 注释
   ; fence acquire 
   ; 再来一条注释
@@ -22,10 +22,13 @@ define void @main(i8* noundef %0, i8* noundef %1, ...) #0 {
   uselistorder label %bb, { 1, 0 } 
 }
 
+$foo = comdat largest
+@foo = global i32 2, comdat($foo)
 
 %mytype = type { %mytype*, i32 } 
-define i32 @add(i32 %p1, i32 %p2) !llvm.loop !0 {
-  ; %3 = add i32 %p1, %p2 
+; 只能有一个 metadataname
+define i32 @add(i32 %p1, i32 %p2) !name !0  {
+  %3 = add i32 %p1, %p2 
 
   ret void 
   uselistorder i32 %arg1, { 1, 0, 2 } 
