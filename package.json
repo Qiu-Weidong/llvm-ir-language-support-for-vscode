@@ -6,6 +6,7 @@
   "engines": {
     "vscode": "^1.74.0"
   },
+  "publisher": "qiu",
   "categories": [
     "Programming Languages"
   ],
