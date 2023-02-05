@@ -1,6 +1,18 @@
-# llvm-ir-language-support
+#llvm-ir-language-support
+This plugin provides functions such as syntax highlighting, code formatting, and hover prompts for the `llvm ir` language.
 
-局部变量只能赋值一次，且带引号和不带引号视为相同。
+## features
+  - [x] syntax highlighting
+  - [x] Code formatting
+  - [x] Hover tooltip
+  - [x] Error diagnosis
+  - [ ] jump definition
+  - [ ] View references
 
-对于序号，一直递增就可以了，注意 label 要占用序号
-
+## Code formatting
+![](asset/format.gif)
+## Hover prompt
+![](asset/hover.gif)
+When the mouse hovers over the variable, the type will be prompted, and when the mouse hovers over `comdat`, `attrgroup` and `type`, their definitions will be displayed.
+## Error Diagnosis
+![](asset/diagnosed.gif)

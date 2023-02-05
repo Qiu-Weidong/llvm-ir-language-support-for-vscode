@@ -1,7 +1,7 @@
 {
   "name": "llvm-ir-language-support",
   "displayName": "LLVM IR Language Support",
-  "description": "",
+  "description": "This plugin provides functions such as syntax highlighting, code formatting, and hover prompts for the `llvm ir` language.",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.74.0"
@@ -9,9 +9,23 @@
   "categories": [
     "Programming Languages"
   ],
+  "license": "MIT",
+  "keywords": [
+		"llvm",
+    "LLVM",
+    "LLVM IR",
+		"llvm ir",
+    "llvm-ir",
+    "LLVM_IR"
+	],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Qiu-Weidong/llvm-ir-language-support-for-vscode.git"
+  },
   "activationEvents": [
     "onLanguage:llvm-ir"
   ],
+  "icon": "asset/icon.jpg",
   "main": "./dist/extension.js",
   "contributes": {
     "languages": [

@@ -6,7 +6,7 @@ module asm "more can go here"
 %world = type { %hello, i32 }
 ; %hello = type {}
 
-define void @main() { 
+define dso_local void @main() { 
   fence acquire 
   fence syncscope("singlethread") seq_cst 
   fence syncscope("agent") seq_cst 

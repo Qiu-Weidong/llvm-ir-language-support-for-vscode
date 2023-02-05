@@ -7,7 +7,6 @@ target triple = "x86_64-pc-linux-gnu"
 
 ; Function Attrs: noinline nounwind optnone uwtable
 define dso_local i32 @main(i32 noundef %0, i8** noundef %1) #0 {
-; 这里这个 2 要占一个序号
 2:
   %3 = alloca i32, align 4
   %4 = alloca i32, align 4
@@ -23,14 +22,14 @@ define dso_local i32 @main(i32 noundef %0, i8** noundef %1) #0 {
   %8 = load i32, i32* %6, align 4
   %9 = load i32, i32* %7, align 4
   %10 = icmp sgt i32 %8, true
-  %shit = add nsw i32 %8, %9
+  %hello = add nsw i32 %8, %9
   br i1 %10, label %11, label %12
 
 11:                                               ; preds = %2
   ; 可以引用 前面的 block 中的符号
   %tmp = load i32, i32* %7, align 4
-  %foo = mul nsw i32 %tmp, %shit
-  %label = mul nsw i32 %tmp, %shit
+  %foo = mul nsw i32 %tmp, %hello
+  %label = mul nsw i32 %tmp, %hello
   store i32 7, i32* %6, align 4
   br label %13
   
@@ -43,7 +42,7 @@ define dso_local i32 @main(i32 noundef %0, i8** noundef %1) #0 {
   %14 = load i32, i32* %6, align 4
   %15 = load i32, i32* %7, align 4
   %16 = add nsw i32 %14, %15
-  %haha = mul nsw i32 %shit, %9
+  %haha = mul nsw i32 %hello, %9
   ret i32 %16
 }
 
