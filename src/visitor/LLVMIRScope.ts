@@ -26,6 +26,7 @@ export interface Scope {
 
 
   setTypeTable(types: Map<string, LLVMIRType>): void ;
+  getChild(name: string): Scope | undefined;
 }
 
 export class GlobalScope implements Scope {
@@ -46,6 +47,9 @@ export class GlobalScope implements Scope {
     this.attrGroups = new Map();
     this.metadatas = new Map();
     this.entities = new Map();
+  }
+  getChild(name: string): Scope| undefined {
+    return this.children.get(name)
   }
   getParent(): Scope {
     throw new Error("Method not implemented.");
@@ -120,6 +124,9 @@ export class LocalScope implements Scope {
     this.parent = parent; 
     this.entities = new Map();
     this.labels = new Set();
+  }
+  getChild(name: string): Scope | undefined {
+    return this.parent.getChild(name);
   }
   getParent(): Scope {
     return this.parent;

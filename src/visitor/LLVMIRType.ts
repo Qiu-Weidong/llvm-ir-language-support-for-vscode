@@ -343,9 +343,9 @@ export class PointerType extends OpaquePointerType {
 
   private resetName() {
     if (this.addrSpace)
-      this.name = `${this.baseType.getName()} addrspace(${this.addrSpace}) *`;
+      this.name = `${this.baseType.getName()} addrspace(${this.addrSpace})*`;
     else {
-      this.name = `${this.baseType.getName()} *`;
+      this.name = `${this.baseType.getName()}*`;
     }
   }
 

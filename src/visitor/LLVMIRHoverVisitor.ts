@@ -2,7 +2,7 @@ import { ParserRuleContext, Token } from "antlr4ts";
 import { RuleNode } from "antlr4ts/tree/RuleNode";
 import { TerminalNode } from "antlr4ts/tree/TerminalNode";
 import { Hover, MarkdownString, Position } from "vscode";
-import { ComdatContext, CompilationUnitContext, FuncAttrContext, FuncAttributeContext, MdNodeContext, MetadataAttachmentContext, MetadataContext, MetadataNodeContext, NamedTypeContext, TypeContext } from "../llvmir/LLVMIRParser";
+import { ComdatContext, CompilationUnitContext, FuncAttrContext, FuncAttributeContext, FuncDefContext, FuncHeaderContext, LocalDefInstContext, MdNodeContext, MetadataAttachmentContext, MetadataContext, MetadataNodeContext, NamedTypeContext, ParamContext, ParamsContext, TypeContext, ValueContext } from "../llvmir/LLVMIRParser";
 import { LLVMIRBaseVisitor } from "./LLVMIRBaseVisitor";
 import { Scope } from "./LLVMIRScope";
 
@@ -19,13 +19,6 @@ export class LLVMIRHoverVisitor extends LLVMIRBaseVisitor {
   }
 
   visitTerminal(node: TerminalNode) {
-    // const token = node.symbol;
-    // const line = token.line - 1;
-    // const character = token.charPositionInLine;
-    // const end = token.charPositionInLine + (token.text?.length || 0);
-    // if(this.position.line === line && this.position.character >= character && this.position.character <= end) {
-    //   // hover 在这里
-    // }
   }
   visitChildren(node: RuleNode) {
     for (let i = 0; i < node.childCount; i++) {
@@ -106,17 +99,17 @@ export class LLVMIRHoverVisitor extends LLVMIRBaseVisitor {
         ]);
       }
     }
-    
-    if(this.positionInContext(ctx.mdNode())) {
+
+    if (this.positionInContext(ctx.mdNode())) {
       ctx.mdNode().accept(this);
     }
   }
   visitMetadataNode(ctx: MetadataNodeContext) {
     const id = ctx.MetadataId();
-    if(id && this.positionInTerminal(id)) {
+    if (id && this.positionInTerminal(id)) {
       const name = id.text;
       const info = this.scope.getMetadata(name);
-      if(info) {
+      if (info) {
         this.result = new Hover([
           { language: "llvm-ir", value: info }
         ]);
@@ -125,10 +118,10 @@ export class LLVMIRHoverVisitor extends LLVMIRBaseVisitor {
   }
   visitMdNode(ctx: MdNodeContext) {
     const id = ctx.MetadataId();
-    if(id && this.positionInTerminal(id)) {
+    if (id && this.positionInTerminal(id)) {
       const name = id.text;
       const info = this.scope.getMetadata(name);
-      if(info) {
+      if (info) {
         this.result = new Hover([
           { language: "llvm-ir", value: info }
         ]);
@@ -137,10 +130,10 @@ export class LLVMIRHoverVisitor extends LLVMIRBaseVisitor {
   }
   visitMetadata(ctx: MetadataContext) {
     const id = ctx.MetadataId();
-    if(id && this.positionInTerminal(id)) {
+    if (id && this.positionInTerminal(id)) {
       const name = id.text;
       const info = this.scope.getMetadata(name);
-      if(info) {
+      if (info) {
         this.result = new Hover([
           { language: "llvm-ir", value: info }
         ]);
@@ -149,16 +142,76 @@ export class LLVMIRHoverVisitor extends LLVMIRBaseVisitor {
   }
 
   visitNamedType(ctx: NamedTypeContext) {
-    if(this.positionInTerminal(ctx.LocalIdent())) {
+    if (this.positionInTerminal(ctx.LocalIdent())) {
       const name = ctx.LocalIdent().text;
       const ty = this.scope.getNamedType(name);
-      if(ty ) {
+      if (ty) {
         this.result = new Hover([
           { language: 'llvm-ir', value: ty.getName() }
         ]);
       }
     }
   }
+
+
+  // 切换符号表
+  visitFuncDef(ctx: FuncDefContext) {
+    const header = ctx.funcHeader();
+    const name = header.GlobalIdent().text;
+    const localScope = this.scope.getChild(name);
+    if(localScope) {
+      this.scope = localScope;
+      this.visitChildren(ctx);
+      this.scope = this.scope.getParent();
+    }
+  }
+
+  visitValue(ctx: ValueContext) {
+    const ident = ctx.LocalIdent();
+    if (ident && this.positionInTerminal(ident)) {
+      const name = ident.text;
+      const info = this.scope.getEntity(name);
+      if (info) {
+        const ty = info.getType();
+        this.result = new Hover([
+          { language: "llvm-ir", value: ty.getName() }
+        ]);
+      }
+    }
+  }
+  visitParam(ctx: ParamContext) {
+    const ident = ctx.LocalIdent();
+    if (ident && this.positionInTerminal(ident)) {
+      const name = ident.text;
+      const info = this.scope.getEntity(name);
+      if (info) {
+        const ty = info.getType();
+        this.result = new Hover([
+          { language: "llvm-ir", value: ty.getName() }
+        ]);
+      }
+    }
+    else {
+      this.visitChildren(ctx);
+    }
+  }
+  visitLocalDefInst(ctx: LocalDefInstContext) {
+    const ident = ctx.LocalIdent();
+    if (ident && this.positionInTerminal(ident)) {
+      const name = ident.text;
+      const info = this.scope.getEntity(name);
+      if (info) {
+        const ty = info.getType();
+        this.result = new Hover([
+          { language: "llvm-ir", value: ty.getName() }
+        ]);
+      }
+    }
+    else {
+      this.visitChildren(ctx);
+    }
+  }
+
 }
 
 

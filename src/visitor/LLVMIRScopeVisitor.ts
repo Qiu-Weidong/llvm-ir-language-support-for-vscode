@@ -1,102 +1,63 @@
-import { Token } from "antlr4ts";
-import { Diagnostic, DiagnosticSeverity, Position, Range } from "vscode";
-import { AttrGroupDefContext, BasicBlockContext, ComdatDefContext, CompilationUnitContext, DiExpressionContext, FuncAttributeContext, FuncBodyContext, FuncDeclContext, FuncDefContext, GlobalDeclContext, GlobalDefContext, IndirectSymbolDefContext, LocalDefInstContext, MetadataDefContext, NamedMetadataDefContext, TypeDefContext } from "../llvmir/LLVMIRParser";
+import { AttrGroupDefContext, BasicBlockContext, ComdatDefContext, CompilationUnitContext, FuncBodyContext, FuncDeclContext, FuncDefContext, GlobalDeclContext, GlobalDefContext, IndirectSymbolDefContext, LocalDefInstContext, MetadataDefContext, NamedMetadataDefContext } from "../llvmir/LLVMIRParser";
 import { LocalScope, Scope } from "./LLVMIRScope";
 import { LLVMIRBaseVisitor } from "./LLVMIRBaseVisitor";
 import { LLVMIRTypeResolver } from "./LLVMIRTypeResolver";
 import { LLVMIRType } from "./LLVMIRType";
 import { LLVMIREntity } from "./LLVMIREntity";
+import { TerminalNode } from "antlr4ts/tree/TerminalNode";
 
 
 
 export class LLVMIRScopeVisitor extends LLVMIRBaseVisitor {
-  // 在遍历过程中将错误信息添加进去
-  private diagnostics: Diagnostic[];
   private scope: Scope;
-  // private localScope: LocalScope | undefined;
   private typeResolver: LLVMIRTypeResolver;
 
-  constructor(diagnostics: Diagnostic[], scope: Scope) {
+  constructor(scope: Scope) {
     super();
-    this.diagnostics = diagnostics;
     this.scope = scope;
-    this.typeResolver = new LLVMIRTypeResolver(this.scope, diagnostics);
+    this.typeResolver = new LLVMIRTypeResolver(this.scope);
 
-  }
-
-  addError(symbol: Token, msg: string) {
-    let diagnostic = new Diagnostic(
-      new Range(
-        new Position(symbol.line - 1, symbol.charPositionInLine),
-        new Position(symbol.line - 1, symbol.charPositionInLine + (symbol.text?.length || 1))
-      ),
-      msg,
-      DiagnosticSeverity.Error
-    );
-    this.diagnostics.push(diagnostic);
   }
 
   visitComdatDef(ctx: ComdatDefContext) {
     const name = ctx.ComdatName().symbol.text;
     const kind = ctx._selectionKind.text;
 
-    if (!name) {
-      this.addError(ctx.ComdatName().symbol, 'no comdat name provide');
-    } else if (!kind) {
-      this.addError(ctx._selectionKind, 'no selectionkind provide');
-    } else if (this.scope.getComdat(name)) {
-      this.addError(ctx.ComdatName().symbol, 'duplicate comdat');
-    }
-    else {
+    if (name && kind && !this.scope.getComdat(name)) {
       const content = `${name} = comdat ${kind}`;
       this.scope.addComdat(name, content);
     }
-
   }
   visitAttrGroupDef(ctx: AttrGroupDefContext) {
     const name = ctx.AttrGroupId().symbol.text;
 
-    if (!name) {
-      this.addError(ctx.AttrGroupId().symbol, 'no attrgroup id provide');
-    } else if (this.scope.getAttrGroup(name)) {
-      this.addError(ctx.AttrGroupId().symbol, 'duplicate attrgroup');
-    }
-    else {
+    if (name && !this.scope.getAttrGroup(name)) {
       let funcattr = '';
       ctx.funcAttribute().forEach(attr => {
         funcattr += attr.text + ', ';
       });
-      if(funcattr.endsWith(', ')) funcattr = funcattr.slice(0, funcattr.length-2);
+      if (funcattr.endsWith(', ')) funcattr = funcattr.slice(0, funcattr.length - 2);
       const content = `attributes ${name} = { ${funcattr} }`;
       this.scope.addAttrGroup(name, content);
     }
   }
   visitNamedMetadataDef(ctx: NamedMetadataDefContext) {
     const symbol = ctx.MetadataName().symbol;
-    if (!symbol.text) {
-      this.addError(symbol, 'no metadata name or id provide');
-    }
-    else if (this.scope.getMetadata(symbol.text)) {
-      this.addError(symbol, 'duplicate metadata');
-    }
-    else {
+    const name = symbol.text;
+
+    if (name && !this.scope.getMetadata(name)) {
       let info = '';
       ctx.metadataNode().forEach(node => {
         info += node.text + ', ';
       });
-      if(info.endsWith(', ')) info = info.slice(0, info.length-2);
+      if (info.endsWith(', ')) info = info.slice(0, info.length - 2);
       this.scope.addMetadata(symbol.text, `${symbol.text} = ! { ${info} }`);
     }
   }
   visitMetadataDef(ctx: MetadataDefContext) {
     const symbol = ctx.MetadataId().symbol;
-    if (!symbol.text) {
-      this.addError(symbol, 'no metadata name or id provide');
-    }
-    else if (this.scope.getMetadata(symbol.text)) {
-      this.addError(symbol, 'duplicate metadata');
-    }
-    else {
+    const name = symbol.text;
+    if (name && !this.scope.getMetadata(name)) {
       const info = ctx.mdTuple()?.text || ctx.specializedMDNode()?.text || '';
       this.scope.addMetadata(symbol.text, `${symbol.text} = ${ctx.distinct() ? 'distinct ' : ""}${info}`);
     }
@@ -186,7 +147,7 @@ export class LLVMIRScopeVisitor extends LLVMIRBaseVisitor {
       this.scope.addLabel(label);
     }
     ctx.instruction().forEach(inst => inst.accept(this));
-    // ctx.terminator().accept(this);
+    ctx.terminator().accept(this);
   }
 
   visitLocalDefInst(ctx: LocalDefInstContext) {
@@ -197,7 +158,9 @@ export class LLVMIRScopeVisitor extends LLVMIRBaseVisitor {
 
 
 
-  // 全部转换为字符串
+  visitTerminal(node: TerminalNode) {
+    
+  }
 }
 
 

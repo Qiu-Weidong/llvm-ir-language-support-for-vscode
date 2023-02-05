@@ -13,8 +13,8 @@ define void @main(i8* noundef %0, i8* noundef %1, ...) #0 #1 {
   ; 注释
   ; fence acquire 
   ; 再来一条注释
-  ; fence syncscope("singlethread") seq_cst 
-  ; fence syncscope("agent") seq_cst 
+  fence syncscope("singlethread") seq_cst 
+  fence syncscope("agent") seq_cst 
   
   ret void 
   ; 注释
