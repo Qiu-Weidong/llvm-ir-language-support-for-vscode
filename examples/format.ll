@@ -20,14 +20,18 @@ define void @main(i8* noundef %0, i8* noundef %1, ...) #0 #1 {
   ; 注释
   uselistorder i32 %arg1, { 1, 0, 2 } 
   uselistorder label %bb, { 1, 0 } 
-}
+} 
 
 $foo = comdat largest
 @foo = global i32 2, comdat($foo)
 
 %mytype = type { %mytype*, i32 } 
+%my.type = type void
+%functype = type i32 (i32, i1)
+%int = type i32
+
 ; 只能有一个 metadataname
-define i32 @add(i32 %p1, i32 %p2) !name !0  {
+define i32 @add(i32 %p1, i32 %p2, %my.type %4, %functype %6) !name !0  {
   %3 = add i32 %p1, %p2 
 
   ret void 
@@ -50,6 +54,7 @@ attributes #1 = { alwaysinline alignstack = 4 }
 !0 = distinct ! { ! "zero" }
 !1 = ! { ! "one" }
 !2 = ! { ! "two" }
+!17 = !{}
 uselistorder ptr @global, { 1, 2, 0 }
 uselistorder i32 7, { 1, 0 }
 ; uselistorder i32 (i32) @bar, { 1, 0 }

@@ -7,7 +7,7 @@ import {
   StructType,
   OpaquePointerType, OpaqueType, PointerType, VoidType
 } from "./LLVMIRType";
-import { ArrayTypeContext, FloatTypeContext, IntTypeContext, LabelTypeContext, MetadataTypeContext, MmxTypeContext, OpaquePointerTypeContext, OpaqueTypeContext, StructTypeContext, TokenTypeContext, TypeContext, VectorTypeContext, VoidTypeContext } from "../llvmir/LLVMIRParser";
+import { ArrayTypeContext, FloatTypeContext, IntTypeContext, LabelTypeContext, MetadataTypeContext, MmxTypeContext, OpaquePointerTypeContext, OpaqueTypeContext, ParamContext, StructTypeContext, TokenTypeContext, TypeContext, VectorTypeContext, VoidTypeContext } from "../llvmir/LLVMIRParser";
 
 
 // 主要对 type 这个非终结符进行解析
@@ -57,6 +57,9 @@ export class LLVMIRBasicTypeResolver extends LLVMIRBaseVisitor {
         ;
       return ret;
     }
+  }
+  visitParam(ctx: ParamContext): LLVMIRType {
+    return ctx.type().accept(this);
   }
 
   visitVoidType(ctx: VoidTypeContext) {

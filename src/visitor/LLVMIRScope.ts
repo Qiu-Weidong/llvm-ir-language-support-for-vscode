@@ -1,5 +1,5 @@
 import { LLVMIRType } from "./LLVMIRType";
-import { LLVMIREitity } from "./LLVMIREntity";
+import { LLVMIREntity } from "./LLVMIREntity";
 
 // 符号表查询接口
 export interface Scope {
@@ -12,7 +12,7 @@ export interface Scope {
   getMetadata(name: string): string | undefined;
 
 
-  getEntity(name: string): LLVMIREitity | undefined;
+  getEntity(name: string): LLVMIREntity | undefined;
   containsLabel(name: string): boolean;
 
 
@@ -22,7 +22,7 @@ export interface Scope {
   addAttrGroup(name: string, content: string): void;
   addMetadata(name: string, content: string): void;
 
-  addEntity(name: string, entity: LLVMIREitity): void;
+  addEntity(name: string, entity: LLVMIREntity): void;
 
 
   setTypeTable(types: Map<string, LLVMIRType>): void ;
@@ -37,7 +37,7 @@ export class GlobalScope implements Scope {
   protected metadatas: Map<string, string>;
   
   // 变量和函数表
-  protected entities: Map<string, LLVMIREitity>;
+  protected entities: Map<string, LLVMIREntity>;
 
   constructor() { 
     this.children = new Map(); 
@@ -68,7 +68,7 @@ export class GlobalScope implements Scope {
   addMetadata(name: string, content: string): void {
     this.metadatas.set(name, content);
   }
-  addEntity(name: string, entity: LLVMIREitity): void {
+  addEntity(name: string, entity: LLVMIREntity): void {
     this.entities.set(name, entity);
   }
   containsLabel(name: string): boolean {
@@ -86,7 +86,7 @@ export class GlobalScope implements Scope {
   getMetadata(name: string): string | undefined {
     return this.metadatas.get(name);
   }
-  getEntity(name: string): LLVMIREitity | undefined {
+  getEntity(name: string): LLVMIREntity | undefined {
     return this.entities.get(name);
   }
 
@@ -113,7 +113,7 @@ export class GlobalScope implements Scope {
 
 export class LocalScope implements Scope {
   protected parent: Scope;
-  protected entities: Map<string, LLVMIREitity>;
+  protected entities: Map<string, LLVMIREntity>;
   protected labels: Set<string>;
 
   constructor(parent: Scope) { 
@@ -146,7 +146,7 @@ export class LocalScope implements Scope {
   getMetadata(name: string): string | undefined {
     return this.parent.getMetadata(name);
   }
-  getEntity(name: string): LLVMIREitity | undefined {
+  getEntity(name: string): LLVMIREntity | undefined {
     return this.entities.get(name) || this.parent.getEntity(name);
   }
 
@@ -166,7 +166,7 @@ export class LocalScope implements Scope {
   addMetadata(name: string, content: string): void {
     this.parent.addMetadata(name, content);
   }
-  addEntity(name: string, entity: LLVMIREitity): void {
+  addEntity(name: string, entity: LLVMIREntity): void {
     this.entities.set(name, entity);
   }
 }

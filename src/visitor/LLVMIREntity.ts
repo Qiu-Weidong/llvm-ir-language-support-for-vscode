@@ -1,7 +1,7 @@
 // 变量和函数、ifunc、alias
 import { LLVMIRType } from "./LLVMIRType";
 
-export class LLVMIREitity {
+export class LLVMIREntity {
   private name: string;
   private referCnt: number;
   private type: LLVMIRType;

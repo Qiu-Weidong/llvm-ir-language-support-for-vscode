@@ -2,7 +2,7 @@ import { ParserRuleContext, Token } from "antlr4ts";
 import { RuleNode } from "antlr4ts/tree/RuleNode";
 import { TerminalNode } from "antlr4ts/tree/TerminalNode";
 import { Hover, MarkdownString, Position } from "vscode";
-import { ComdatContext, CompilationUnitContext, FuncAttrContext, FuncAttributeContext, MetadataAttachmentContext } from "../llvmir/LLVMIRParser";
+import { ComdatContext, CompilationUnitContext, FuncAttrContext, FuncAttributeContext, MdNodeContext, MetadataAttachmentContext, MetadataContext, MetadataNodeContext, NamedTypeContext, TypeContext } from "../llvmir/LLVMIRParser";
 import { LLVMIRBaseVisitor } from "./LLVMIRBaseVisitor";
 import { Scope } from "./LLVMIRScope";
 
@@ -106,9 +106,59 @@ export class LLVMIRHoverVisitor extends LLVMIRBaseVisitor {
         ]);
       }
     }
-
+    
+    if(this.positionInContext(ctx.mdNode())) {
+      ctx.mdNode().accept(this);
+    }
+  }
+  visitMetadataNode(ctx: MetadataNodeContext) {
+    const id = ctx.MetadataId();
+    if(id && this.positionInTerminal(id)) {
+      const name = id.text;
+      const info = this.scope.getMetadata(name);
+      if(info) {
+        this.result = new Hover([
+          { language: "llvm-ir", value: info }
+        ]);
+      }
+    }
+  }
+  visitMdNode(ctx: MdNodeContext) {
+    const id = ctx.MetadataId();
+    if(id && this.positionInTerminal(id)) {
+      const name = id.text;
+      const info = this.scope.getMetadata(name);
+      if(info) {
+        this.result = new Hover([
+          { language: "llvm-ir", value: info }
+        ]);
+      }
+    }
+  }
+  visitMetadata(ctx: MetadataContext) {
+    const id = ctx.MetadataId();
+    if(id && this.positionInTerminal(id)) {
+      const name = id.text;
+      const info = this.scope.getMetadata(name);
+      if(info) {
+        this.result = new Hover([
+          { language: "llvm-ir", value: info }
+        ]);
+      }
+    }
   }
 
+  visitNamedType(ctx: NamedTypeContext) {
+    if(this.positionInTerminal(ctx.LocalIdent())) {
+      const name = ctx.LocalIdent().text;
+      const ty = this.scope.getNamedType(name);
+      if(ty ) {
+        this.result = new Hover([
+          { language: 'llvm-ir', value: ty.getName() }
+        ]);
+      }
+    }
+  }
 }
 
 

@@ -239,8 +239,9 @@ export class StructType extends LLVMIRType {
 
   private resetName() {
     let name = '';
-    this.members.forEach(t => name += t.getName() + ',');
-    name = this.packed ? `<{${name}}>` : `{${name}}`;
+    this.members.forEach(t => name += t.getName() + ', ');
+    if(name.endsWith(', ')) name = name.slice(0, name.length-2);
+    name = this.packed ? `<{ ${name} }>` : `{ ${name} }`;
     this.name = name;
   }
 
@@ -296,8 +297,9 @@ export class FuncType extends LLVMIRType {
 
   resetName() {
     let name = this.retType.getName() + '(';
-    this.params.forEach(param => name += param.getName() + ',');
-    if (this.vaarg) name += '...';
+    this.params.forEach(param => name += param.getName() + ', ');
+    if(name.endsWith(', ')) name = name.slice(0, name.length-2);
+    if (this.vaarg) name += ', ...';
     name += ')';
     this.name = name;
   }

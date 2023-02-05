@@ -49,8 +49,6 @@ export class LLVMIRTypeDefResolver extends LLVMIRBasicTypeResolver {
       const ty: LLVMIRType = ctx.type().accept(this);
       this.types.set(name, ty);
     }
-
-
   }
   // 如果没有定义，则返回一个 undefined type
   visitNamedType(ctx: NamedTypeContext) {

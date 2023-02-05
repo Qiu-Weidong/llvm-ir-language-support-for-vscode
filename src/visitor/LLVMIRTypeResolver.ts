@@ -1,10 +1,9 @@
 import { Token } from "antlr4ts";
-import { TerminalNode } from "antlr4ts/tree/TerminalNode";
 import { Diagnostic, DiagnosticSeverity, Position, Range } from "vscode";
-import { AddExprContext, AddInstContext, AddrSpaceCastExprContext, AddrSpaceContext, AllocaInstContext, AndExprContext, AndInstContext, ArrayConstContext, AShrExprContext, AShrInstContext, BitCastExprContext, BlockAddressConstContext, BoolConstContext, ConcreteTypeContext, ConstantContext, ConstantExprContext, DsoLocalEquivalentConstContext, ExtractElementExprContext, ExtractElementInstContext, FAddInstContext, FCmpExprContext, FDivInstContext, FirstClassTypeContext, FloatConstContext, FMulInstContext, FNegExprContext, FNegInstContext, FpExtExprContext, FpToSiExprContext, FpToUiExprContext, FpTruncExprContext, FRemInstContext, FSubInstContext, FuncHeaderContext, GetElementPtrExprContext, ICmpExprContext, InsertElementExprContext, InsertElementInstContext, IntConstContext, IntToPtrExprContext, LoadInstContext, LShrExprContext, LShrInstContext, MulExprContext, MulInstContext, NoCFIConstContext, NoneConstContext, NullConstContext, OrExprContext, OrInstContext, ParamContext, PoisonConstContext, PtrToIntExprContext, SDivInstContext, SelectExprContext, SExtExprContext, ShlExprContext, ShlInstContext, ShuffleVectorExprContext, ShuffleVectorInstContext, SiToFpExprContext, SRemInstContext, StructConstContext, SubExprContext, SubInstContext, TruncExprContext, TypeConstContext, TypeValueContext, UDivInstContext, UiToFpExprContext, UndefConstContext, URemInstContext, ValueContext, ValueInstructionContext, VectorConstContext, XorExprContext, XorInstContext, ZeroInitializerConstContext, ZExtExprContext } from "../llvmir/LLVMIRParser";
+import { AddExprContext, AddInstContext, AddrSpaceCastExprContext, AllocaInstContext, AndExprContext, AndInstContext, ArrayConstContext, AShrExprContext, AShrInstContext, BitCastExprContext, BlockAddressConstContext, BoolConstContext, ConcreteTypeContext, ConstantContext, ConstantExprContext, DsoLocalEquivalentConstContext, ExtractElementExprContext, ExtractElementInstContext, FAddInstContext, FCmpExprContext, FDivInstContext, FirstClassTypeContext, FloatConstContext, FMulInstContext, FNegExprContext, FNegInstContext, FpExtExprContext, FpToSiExprContext, FpToUiExprContext, FpTruncExprContext, FRemInstContext, FSubInstContext, FuncHeaderContext, GetElementPtrExprContext, ICmpExprContext, InsertElementExprContext, InsertElementInstContext, IntConstContext, IntToPtrExprContext, LoadInstContext, LShrExprContext, LShrInstContext, MulExprContext, MulInstContext, NamedTypeContext, NoCFIConstContext, NoneConstContext, NullConstContext, OrExprContext, OrInstContext, ParamContext, PoisonConstContext, PtrToIntExprContext, SDivInstContext, SelectExprContext, SExtExprContext, ShlExprContext, ShlInstContext, ShuffleVectorExprContext, ShuffleVectorInstContext, SiToFpExprContext, SRemInstContext, StructConstContext, SubExprContext, SubInstContext, TruncExprContext, TypeConstContext, TypeValueContext, UDivInstContext, UiToFpExprContext, UndefConstContext, URemInstContext, ValueContext, ValueInstructionContext, VectorConstContext, XorExprContext, XorInstContext, ZeroInitializerConstContext, ZExtExprContext } from "../llvmir/LLVMIRParser";
 import { LLVMIRBasicTypeResolver } from "./LLVMIRBasicTypeResolver";
 import { Scope } from "./LLVMIRScope";
-import { ArrayType, FloatType, FuncType, IntType, LLVMIRType, PointerType, StructType, VectorType, VoidType } from "./LLVMIRType";
+import { ArrayType, FloatType, FuncType, IntType, LLVMIRType, PointerType, StructType, UnknownType, VectorType, VoidType } from "./LLVMIRType";
 
 
 export class LLVMIRTypeResolver extends LLVMIRBasicTypeResolver {
@@ -32,6 +31,12 @@ export class LLVMIRTypeResolver extends LLVMIRBasicTypeResolver {
     this.diagnostics.push(diagnostic);
   }
 
+  visitNamedType(ctx: NamedTypeContext) {
+    const name = ctx.LocalIdent().text;
+    const ty = this.scope.getNamedType(name);
+    if(ty) return ty;
+    return new UnknownType();
+  }
   visitFuncHeader(ctx: FuncHeaderContext) {
     const retType: LLVMIRType = ctx.type().accept(this);
     const vaarg = ctx.params().Ellipsis() ? true : false;
