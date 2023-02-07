@@ -2,6 +2,7 @@ import { workspace, ExtensionContext, languages } from "vscode";
 import { LLVMCache } from "./LLVMCache";
 import { LLVMIRCodeLensProvider } from "./provider/LLVMIRCodeLensProvider";
 import { LLVMIRCompletionItemProvider } from "./provider/LLVMIRCompletionItemProvider";
+import { LLVMIRDefinitionProvider } from "./provider/LLVMIRDefinitionProvider";
 import { LLVMIRFormattingEditProvider } from "./provider/LLVMIRFormattingEditProvider";
 import { LLVMIRHoverProvider } from "./provider/LLVMIRHoverProvider";
 import { LLVMIRSemanticTokensProvider } from "./provider/LLVMIRSemanticTokensProvider";
@@ -45,6 +46,7 @@ export function activate(context: ExtensionContext) {
     languages.registerDocumentSymbolProvider(selector, symbolProvider),
     languages.registerReferenceProvider(selector, symbolProvider),
     languages.registerRenameProvider(selector, symbolProvider),
+    languages.registerDefinitionProvider(selector, new LLVMIRDefinitionProvider())
   );
 }
 

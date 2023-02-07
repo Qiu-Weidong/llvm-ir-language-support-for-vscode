@@ -51,7 +51,7 @@ export class LLVMCache {
     const scope: Scope = new GlobalScope();
     scope.setTypeTable(types);
 
-    const scopeVisitor = new LLVMIRScopeVisitor(scope);
+    const scopeVisitor = new LLVMIRScopeVisitor(scope, document);
     try { ast.accept(scopeVisitor); } catch(err) { console.log(err); }
 
     this.documents.set(document.uri.toString(), { content, ast, tokens, scope });

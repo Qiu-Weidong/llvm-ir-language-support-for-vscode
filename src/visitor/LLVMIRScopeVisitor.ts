@@ -3,20 +3,22 @@ import { LocalScope, Scope } from "./LLVMIRScope";
 import { LLVMIRBaseVisitor } from "./LLVMIRBaseVisitor";
 import { LLVMIRTypeResolver } from "./LLVMIRTypeResolver";
 import { LLVMIRType } from "./LLVMIRType";
-import { LLVMIREntity } from "./LLVMIREntity";
+import { LLVMIRBaseEntity, LLVMIREntity } from "./LLVMIREntity";
 import { TerminalNode } from "antlr4ts/tree/TerminalNode";
+import { Definition, Location, TextDocument } from "vscode";
 
 
 
 export class LLVMIRScopeVisitor extends LLVMIRBaseVisitor {
   private scope: Scope;
   private typeResolver: LLVMIRTypeResolver;
+  private document: TextDocument;
 
-  constructor(scope: Scope) {
+  constructor(scope: Scope, document: TextDocument) {
     super();
     this.scope = scope;
     this.typeResolver = new LLVMIRTypeResolver(this.scope);
-
+    this.document = document;
   }
 
   visitComdatDef(ctx: ComdatDefContext) {
@@ -25,7 +27,7 @@ export class LLVMIRScopeVisitor extends LLVMIRBaseVisitor {
 
     if (name && kind && !this.scope.getComdat(name)) {
       const content = `${name} = comdat ${kind}`;
-      this.scope.addComdat(name, content);
+      this.scope.addComdat(name, new LLVMIRBaseEntity(name, content, new Location(this.document.uri, this.getSymbolRange(ctx.ComdatName().symbol))));
     }
   }
   visitAttrGroupDef(ctx: AttrGroupDefContext) {
@@ -38,7 +40,7 @@ export class LLVMIRScopeVisitor extends LLVMIRBaseVisitor {
       });
       if (funcattr.endsWith(', ')) funcattr = funcattr.slice(0, funcattr.length - 2);
       const content = `attributes ${name} = { ${funcattr} }`;
-      this.scope.addAttrGroup(name, content);
+      this.scope.addAttrGroup(name, new LLVMIRBaseEntity(name, content, new Location(this.document.uri, this.getSymbolRange(ctx.AttrGroupId().symbol))));
     }
   }
   visitNamedMetadataDef(ctx: NamedMetadataDefContext) {
@@ -51,7 +53,10 @@ export class LLVMIRScopeVisitor extends LLVMIRBaseVisitor {
         info += node.text + ', ';
       });
       if (info.endsWith(', ')) info = info.slice(0, info.length - 2);
-      this.scope.addMetadata(symbol.text, `${symbol.text} = ! { ${info} }`);
+      const content = `${symbol.text} = ! { ${info} }`
+      this.scope.addMetadata(symbol.text, new LLVMIRBaseEntity(
+        name, content, new Location(this.document.uri, this.getSymbolRange(symbol))
+      ));
     }
   }
   visitMetadataDef(ctx: MetadataDefContext) {
@@ -59,7 +64,10 @@ export class LLVMIRScopeVisitor extends LLVMIRBaseVisitor {
     const name = symbol.text;
     if (name && !this.scope.getMetadata(name)) {
       const info = ctx.mdTuple()?.text || ctx.specializedMDNode()?.text || '';
-      this.scope.addMetadata(symbol.text, `${symbol.text} = ${ctx.distinct() ? 'distinct ' : ""}${info}`);
+      const msg = `${symbol.text} = ${ctx.distinct() ? 'distinct ' : ""}${info}`;
+      this.scope.addMetadata(symbol.text, new LLVMIRBaseEntity(
+        name, msg, new Location(this.document.uri, this.getSymbolRange(symbol))
+      ));
     }
   }
 
@@ -89,14 +97,18 @@ export class LLVMIRScopeVisitor extends LLVMIRBaseVisitor {
     const name = ctx.GlobalIdent().text;
     // this.typeResolver.setScope(this.scope);
     const ty: LLVMIRType = ctx.type().accept(this.typeResolver);
-    const entity = new LLVMIREntity(name, ty);
+    const entity = new LLVMIREntity(name, 'todo', ty, new Location(
+      this.document.uri, this.getSymbolRange(ctx.GlobalIdent().symbol)
+    ));
     this.scope.addEntity(name, entity);
   }
   visitGlobalDef(ctx: GlobalDefContext) {
     const name = ctx.GlobalIdent().text;
     // this.typeResolver.setScope(this.scope);
     const ty: LLVMIRType = ctx.type().accept(this.typeResolver);
-    const entity = new LLVMIREntity(name, ty);
+    const entity = new LLVMIREntity(name, 'todo', ty, new Location(
+      this.document.uri, this.getSymbolRange(ctx.GlobalIdent().symbol)
+    ));
     this.scope.addEntity(name, entity);
   }
 
@@ -104,20 +116,26 @@ export class LLVMIRScopeVisitor extends LLVMIRBaseVisitor {
     const name = ctx.GlobalIdent().text;
     // this.typeResolver.setScope(this.scope);
     const ty: LLVMIRType = ctx.type().accept(this.typeResolver);
-    const entity = new LLVMIREntity(name, ty);
+    const entity = new LLVMIREntity(name, 'todo', ty, new Location(
+      this.document.uri, this.getSymbolRange(ctx.GlobalIdent().symbol)
+    ));
     this.scope.addEntity(name, entity);
   }
 
   visitFuncDecl(ctx: FuncDeclContext) {
     const ty: LLVMIRType = ctx.funcHeader().accept(this.typeResolver);
     const name = ctx.funcHeader().GlobalIdent().text;
-    this.scope.addEntity(name, new LLVMIREntity(name, ty));
+    this.scope.addEntity(name, new LLVMIREntity(name, 'todo', ty, new Location(
+      this.document.uri, this.getSymbolRange(ctx.funcHeader().GlobalIdent().symbol)
+    )));
   }
 
   visitFuncDef(ctx: FuncDefContext) {
     const ty: LLVMIRType = ctx.funcHeader().accept(this.typeResolver);
     const name = ctx.funcHeader().GlobalIdent().text;
-    this.scope.addEntity(name, new LLVMIREntity(name, ty));
+    this.scope.addEntity(name, new LLVMIREntity(name, 'todo',ty, new Location(
+      this.document.uri, this.getSymbolRange(ctx.funcHeader().GlobalIdent().symbol)
+    )));
     const localscope = new LocalScope(this.scope);
     this.scope.addChild(name, localscope);
 
@@ -126,10 +144,13 @@ export class LLVMIRScopeVisitor extends LLVMIRBaseVisitor {
     this.typeResolver.setScope(this.scope);
     // 首先要讲参数添加到符号表
     ctx.funcHeader().params().param().forEach(param => {
-      const name = param.LocalIdent()?.text;
-      if (name) {
+      const symbol = param.LocalIdent();
+      if(symbol) {
+        const name = symbol.text;
         const ty: LLVMIRType = param.type().accept(this.typeResolver);
-        this.scope.addEntity(name, new LLVMIREntity(name, ty));
+        this.scope.addEntity(name, new LLVMIREntity(name,'todo', ty, new Location(
+          this.document.uri, this.getSymbolRange(symbol.symbol)
+        )));
       }
     });
     ctx.funcBody().accept(this);
@@ -153,7 +174,9 @@ export class LLVMIRScopeVisitor extends LLVMIRBaseVisitor {
   visitLocalDefInst(ctx: LocalDefInstContext) {
     const ty: LLVMIRType = ctx.valueInstruction().accept(this.typeResolver);
     const name = ctx.LocalIdent().text;
-    this.scope.addEntity(name, new LLVMIREntity(name, ty));
+    this.scope.addEntity(name, new LLVMIREntity(name,'todo', ty, new Location(
+      this.document.uri, this.getSymbolRange(ctx.LocalIdent().symbol)
+    )));
   }
 
 

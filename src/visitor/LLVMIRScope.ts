@@ -1,5 +1,5 @@
 import { LLVMIRType } from "./LLVMIRType";
-import { LLVMIREntity } from "./LLVMIREntity";
+import { LLVMIRBaseEntity, LLVMIREntity } from "./LLVMIREntity";
 
 // 符号表查询接口
 export interface Scope {
@@ -7,9 +7,9 @@ export interface Scope {
   getParent(): Scope;
 
   getNamedType(name: string): LLVMIRType | undefined;
-  getComdat(name: string): string | undefined;
-  getAttrGroup(name: string): string | undefined;
-  getMetadata(name: string): string | undefined;
+  getComdat(name: string): LLVMIRBaseEntity | undefined;
+  getAttrGroup(name: string): LLVMIRBaseEntity | undefined;
+  getMetadata(name: string): LLVMIRBaseEntity | undefined;
 
 
   getEntity(name: string): LLVMIREntity | undefined;
@@ -18,9 +18,9 @@ export interface Scope {
 
   addLabel(name: string): void ;
   addNamedType(name: string, namedType: LLVMIRType): void;
-  addComdat(name: string, content: string): void;
-  addAttrGroup(name: string, content: string): void;
-  addMetadata(name: string, content: string): void;
+  addComdat(name: string, entity: LLVMIRBaseEntity): void;
+  addAttrGroup(name: string, entity: LLVMIRBaseEntity): void;
+  addMetadata(name: string, entity: LLVMIRBaseEntity): void;
 
   addEntity(name: string, entity: LLVMIREntity): void;
 
@@ -33,9 +33,9 @@ export class GlobalScope implements Scope {
   // 需要保存类型定义、comdat、全局变量、indirectSymbol、函数、attrgroup、metadata
   protected children: Map<string, Scope>;
   protected namedTypes: Map<string, LLVMIRType>;
-  protected comdats: Map<string, string>;
-  protected attrGroups: Map<string, string>;
-  protected metadatas: Map<string, string>;
+  protected comdats: Map<string, LLVMIRBaseEntity>;
+  protected attrGroups: Map<string, LLVMIRBaseEntity>;
+  protected metadatas: Map<string, LLVMIRBaseEntity>;
   
   // 变量和函数表
   protected entities: Map<string, LLVMIREntity>;
@@ -63,14 +63,14 @@ export class GlobalScope implements Scope {
   addNamedType(name: string, namedType: LLVMIRType): void {
     this.namedTypes.set(name, namedType);
   }
-  addComdat(name: string, content: string): void {
-    this.comdats.set(name, content);
+  addComdat(name: string, entity: LLVMIRBaseEntity): void {
+    this.comdats.set(name, entity);
   }
-  addAttrGroup(name: string, content: string): void {
-    this.attrGroups.set(name, content);
+  addAttrGroup(name: string, entity: LLVMIRBaseEntity): void {
+    this.attrGroups.set(name, entity);
   }
-  addMetadata(name: string, content: string): void {
-    this.metadatas.set(name, content);
+  addMetadata(name: string, entity: LLVMIRBaseEntity): void {
+    this.metadatas.set(name, entity);
   }
   addEntity(name: string, entity: LLVMIREntity): void {
     this.entities.set(name, entity);
@@ -81,13 +81,13 @@ export class GlobalScope implements Scope {
   getNamedType(name: string): LLVMIRType | undefined {
     return this.namedTypes.get(name);
   }
-  getComdat(name: string): string | undefined {
+  getComdat(name: string): LLVMIRBaseEntity | undefined {
     return this.comdats.get(name);
   }
-  getAttrGroup(name: string): string | undefined {
+  getAttrGroup(name: string): LLVMIRBaseEntity | undefined {
     return this.attrGroups.get(name);
   }
-  getMetadata(name: string): string | undefined {
+  getMetadata(name: string): LLVMIRBaseEntity | undefined {
     return this.metadatas.get(name);
   }
   getEntity(name: string): LLVMIREntity | undefined {
@@ -144,13 +144,13 @@ export class LocalScope implements Scope {
   getNamedType(name: string): LLVMIRType | undefined {
     return this.parent.getNamedType(name);
   }
-  getComdat(name: string): string | undefined {
+  getComdat(name: string): LLVMIRBaseEntity | undefined {
     return this.parent.getComdat(name);
   }
-  getAttrGroup(name: string): string | undefined {
+  getAttrGroup(name: string): LLVMIRBaseEntity | undefined {
     return this.parent.getAttrGroup(name);
   }
-  getMetadata(name: string): string | undefined {
+  getMetadata(name: string): LLVMIRBaseEntity | undefined {
     return this.parent.getMetadata(name);
   }
   getEntity(name: string): LLVMIREntity | undefined {
@@ -164,14 +164,14 @@ export class LocalScope implements Scope {
   addNamedType(name: string, namedType: LLVMIRType): void {
     this.parent.addNamedType(name, namedType);
   }
-  addComdat(name: string, content: string): void {
-    this.parent.addComdat(name, content);
+  addComdat(name: string, entity: LLVMIRBaseEntity): void {
+    this.parent.addComdat(name, entity);
   }
-  addAttrGroup(name: string, content: string): void {
-    this.parent.addAttrGroup(name, content);
+  addAttrGroup(name: string, entity: LLVMIRBaseEntity): void {
+    this.parent.addAttrGroup(name, entity);
   }
-  addMetadata(name: string, content: string): void {
-    this.parent.addMetadata(name, content);
+  addMetadata(name: string, entity: LLVMIRBaseEntity): void {
+    this.parent.addMetadata(name, entity);
   }
   addEntity(name: string, entity: LLVMIREntity): void {
     this.entities.set(name, entity);
