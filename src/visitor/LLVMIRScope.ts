@@ -13,10 +13,10 @@ export interface Scope {
 
 
   getEntity(name: string): LLVMIREntity | undefined;
-  containsLabel(name: string): boolean;
+  getLabel(name: string): LLVMIRBaseEntity | undefined;
 
 
-  addLabel(name: string): void ;
+  addLabel(name: string, entity: LLVMIRBaseEntity): void ;
   addNamedType(name: string, namedType: LLVMIRType): void;
   addComdat(name: string, entity: LLVMIRBaseEntity): void;
   addAttrGroup(name: string, entity: LLVMIRBaseEntity): void;
@@ -57,7 +57,7 @@ export class GlobalScope implements Scope {
   addChild(name: string, scope: Scope): void {
     this.children.set(name, scope);
   }
-  addLabel(name: string): void {
+  addLabel(name: string, entity: LLVMIRBaseEntity): void {
     throw new Error("can't add label in global scope");
   }
   addNamedType(name: string, namedType: LLVMIRType): void {
@@ -75,8 +75,9 @@ export class GlobalScope implements Scope {
   addEntity(name: string, entity: LLVMIREntity): void {
     this.entities.set(name, entity);
   }
-  containsLabel(name: string): boolean {
-    return false;
+  
+  getLabel(name: string): LLVMIRBaseEntity | undefined {
+    return undefined;
   }
   getNamedType(name: string): LLVMIRType | undefined {
     return this.namedTypes.get(name);
@@ -118,12 +119,12 @@ export class GlobalScope implements Scope {
 export class LocalScope implements Scope {
   protected parent: Scope;
   protected entities: Map<string, LLVMIREntity>;
-  protected labels: Set<string>;
+  protected labels: Map<string, LLVMIRBaseEntity>;
 
   constructor(parent: Scope) { 
     this.parent = parent; 
     this.entities = new Map();
-    this.labels = new Set();
+    this.labels = new Map();
   }
   getChild(name: string): Scope | undefined {
     return this.parent.getChild(name);
@@ -138,8 +139,8 @@ export class LocalScope implements Scope {
     this.parent.setTypeTable(types);
   }
 
-  containsLabel(name: string): boolean {
-    return this.labels.has(name);
+  getLabel(name: string): LLVMIRBaseEntity | undefined {
+    return this.labels.get(name);
   }
   getNamedType(name: string): LLVMIRType | undefined {
     return this.parent.getNamedType(name);
@@ -158,8 +159,8 @@ export class LocalScope implements Scope {
   }
 
 
-  addLabel(name: string): void {
-    this.labels.add(name);
+  addLabel(name: string, entity: LLVMIRBaseEntity): void {
+    this.labels.set(name, entity);
   }
   addNamedType(name: string, namedType: LLVMIRType): void {
     this.parent.addNamedType(name, namedType);

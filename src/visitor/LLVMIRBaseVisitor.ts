@@ -422,11 +422,13 @@ export class LLVMIRBaseVisitor implements LLVMIRVisitor<any> {
     return tree.accept(this);
   }
   visitChildren(node: RuleNode): any {
-    for(let i=0; i<node.childCount; i++) node.getChild(i).accept(this);
-    return null;
+    let result = null;
+    for(let i=0; i<node.childCount; i++) 
+      result = node.getChild(i).accept(this);
+    return result;
   }
   visitTerminal(node: TerminalNode): any {
-    throw new Error('method not implement');
+    return null;
   }
   visitErrorNode(node: ErrorNode): any {
     return this.visitTerminal(node);

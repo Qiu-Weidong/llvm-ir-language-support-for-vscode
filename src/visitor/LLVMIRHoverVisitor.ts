@@ -2,7 +2,7 @@ import { ParserRuleContext, Token } from "antlr4ts";
 import { RuleNode } from "antlr4ts/tree/RuleNode";
 import { TerminalNode } from "antlr4ts/tree/TerminalNode";
 import { Hover, MarkdownString, Position } from "vscode";
-import { CallInstContext, ComdatContext, CompilationUnitContext, FuncAttrContext, FuncAttributeContext, FuncDefContext, FuncHeaderContext, LocalDefInstContext, MdNodeContext, MetadataAttachmentContext, MetadataContext, MetadataNodeContext, NamedTypeContext, ParamContext, ParamsContext, TypeContext, ValueContext } from "../llvmir/LLVMIRParser";
+import { CallInstContext, ComdatContext, CompilationUnitContext, FuncAttrContext, FuncAttributeContext, FuncDefContext, FuncHeaderContext, LabelContext, LocalDefInstContext, MdNodeContext, MetadataAttachmentContext, MetadataContext, MetadataNodeContext, NamedTypeContext, ParamContext, ParamsContext, TypeContext, ValueContext } from "../llvmir/LLVMIRParser";
 import { LLVMIRBaseVisitor } from "./LLVMIRBaseVisitor";
 import { Scope } from "./LLVMIRScope";
 
@@ -237,5 +237,11 @@ export class LLVMIRHoverVisitor extends LLVMIRBaseVisitor {
         ]);
       }
     }
+  }
+  visitLabel(ctx: LabelContext) {
+    let name = ctx.LocalIdent().text;
+    if(name.startsWith('%')) name = name.slice(1, name.length);
+    const label = this.scope.getLabel(name);
+    if(label) this.result = new Hover(new MarkdownString(label.getHoverMsg()));
   }
 }

@@ -163,9 +163,11 @@ export class LLVMIRScopeVisitor extends LLVMIRBaseVisitor {
     ctx.basicBlock().forEach(block => block.accept(this));
   }
   visitBasicBlock(ctx: BasicBlockContext) {
-    const label = ctx.LabelIdent()?.text;
-    if (label) {
-      this.scope.addLabel(label);
+    const symbol = ctx.LabelIdent();
+    if (symbol) {
+      let label = symbol.text;
+      if(label.endsWith(':')) label = label.slice(0, label.length-1).trim();
+      this.scope.addLabel(label, new LLVMIRBaseEntity(label, `(label) ${label}`, new Location(this.document.uri, this.getSymbolRange(symbol.symbol))));
     }
     ctx.instruction().forEach(inst => inst.accept(this));
     ctx.terminator().accept(this);

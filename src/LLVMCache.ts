@@ -1,6 +1,6 @@
 // llvm文件缓存
 
-import { Diagnostic, DiagnosticCollection, languages, TextDocument, Uri } from "vscode";
+import { Diagnostic, DiagnosticCollection, DocumentSymbol, languages, TextDocument, Uri } from "vscode";
 import { ParseTree } from "antlr4ts/tree/ParseTree";
 import { CharStreams, CommonTokenStream } from "antlr4ts";
 import { LLVMIRDiagnosticListener } from "./listener/LLVMIRDiagnosticListener";
@@ -9,6 +9,7 @@ import { LLVMIRParser } from "./llvmir/LLVMIRParser";
 import { LLVMIRTypeDefResolver } from "./visitor/LLVMIRTypeDefResolver";
 import { GlobalScope, Scope } from "./visitor/LLVMIRScope";
 import { LLVMIRScopeVisitor } from "./visitor/LLVMIRScopeVisitor";
+import { LLVMIRSymbolVisitor } from "./visitor/LLVMIRSymbolVisitor";
 
 
 export class LLVMCache {
@@ -20,6 +21,7 @@ export class LLVMCache {
     ast: ParseTree, // 语法树
     tokens: CommonTokenStream, // token 流
     scope: Scope, // 符号表
+    symbols: DocumentSymbol[]
   }>;
   public static getInstance(): LLVMCache {
     if (!LLVMCache.instance) {
@@ -53,8 +55,10 @@ export class LLVMCache {
 
     const scopeVisitor = new LLVMIRScopeVisitor(scope, document);
     try { ast.accept(scopeVisitor); } catch(err) { console.log(err); }
-
-    this.documents.set(document.uri.toString(), { content, ast, tokens, scope });
+    const symbolVisitor = new LLVMIRSymbolVisitor();
+    try { ast.accept(symbolVisitor); } catch(err) { console.log(err); }
+    const symbols: DocumentSymbol[] = symbolVisitor.getSymbols();
+    this.documents.set(document.uri.toString(), { content, ast, tokens, scope, symbols });
     this.diangostics.set(document.uri, diagnostics);
   }
 

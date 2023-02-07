@@ -2,7 +2,7 @@ import { ParserRuleContext } from "antlr4ts";
 import { RuleNode } from "antlr4ts/tree/RuleNode";
 import { TerminalNode } from "antlr4ts/tree/TerminalNode";
 import { Definition, Position } from "vscode";
-import { CallInstContext, ComdatContext, FuncDefContext, FuncHeaderContext, LocalDefInstContext, MdNodeContext, MetadataAttachmentContext, MetadataContext, MetadataNodeContext, ParamContext, ValueContext } from "../llvmir/LLVMIRParser";
+import { CallInstContext, ComdatContext, FuncDefContext, FuncHeaderContext, LabelContext, LocalDefInstContext, MdNodeContext, MetadataAttachmentContext, MetadataContext, MetadataNodeContext, ParamContext, ValueContext } from "../llvmir/LLVMIRParser";
 import { LLVMIRBaseVisitor } from "./LLVMIRBaseVisitor";
 import { Scope } from "./LLVMIRScope";
 
@@ -178,6 +178,12 @@ export class LLVMIRDefinitionVisitor extends LLVMIRBaseVisitor {
         this.result = func.getDefinition();
       }
     }
+  }
+  visitLabel(ctx: LabelContext) {
+    let name = ctx.LocalIdent().text;
+    if(name.startsWith('%')) name = name.slice(1, name.length);
+    const label = this.scope.getLabel(name);
+    if(label) this.result = label.getDefinition();
   }
 
 
