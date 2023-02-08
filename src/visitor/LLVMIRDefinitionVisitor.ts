@@ -2,7 +2,7 @@ import { ParserRuleContext } from "antlr4ts";
 import { RuleNode } from "antlr4ts/tree/RuleNode";
 import { TerminalNode } from "antlr4ts/tree/TerminalNode";
 import { Definition, Position } from "vscode";
-import { BasicBlockContext, CallInstContext, ComdatContext, FuncBodyContext, FuncDefContext, FuncHeaderContext, InstructionContext, LabelContext, LocalDefInstContext, MdNodeContext, MetadataAttachmentContext, MetadataContext, MetadataNodeContext, ParamContext, RetTermContext, TerminatorContext, ValueContext } from "../llvmir/LLVMIRParser";
+import { CallInstContext, ComdatContext, FuncDefContext, FuncHeaderContext, LabelContext, LocalDefInstContext, MdNodeContext, MetadataAttachmentContext, MetadataContext, MetadataNodeContext, ValueContext } from "../llvmir/LLVMIRParser";
 import { LLVMIRBaseVisitor } from "./LLVMIRBaseVisitor";
 import { Scope } from "./LLVMIRScope";
 
