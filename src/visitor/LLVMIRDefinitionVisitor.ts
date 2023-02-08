@@ -17,42 +17,44 @@ export class LLVMIRDefinitionVisitor extends LLVMIRBaseVisitor {
     this.position = position;
     this.scope = scope;
   }
+  visitTerminal(node: TerminalNode) {
+    switch (node.symbol.type) {
+      case 34: /**globalident */
+        this.result = this.scope.getEntity(node.text)?.getDefinition();
+        break;
+      case 35: /**localident */
+        this.result = this.scope.getEntity(node.text)?.getDefinition()
+          || this.scope.getNamedType(node.text)?.getDefinition();
+        break;
+      case 36: /**labelident */
+        // label 需要掐头去尾
+        let name = node.text;
+        if(name.startsWith('%')) name = name.substring(1);
+        if(name.endsWith(':')) name = name.substring(0, name.length-1);
+        this.result = this.scope.getLabel(name)?.getDefinition();
+        break;
+      case 37:/**attrgroupid */
+        this.result = this.scope.getAttrGroup(node.text)?.getDefinition();
+        break;
+      case 38:/**comdatname */
+        this.result = this.scope.getComdat(node.text)?.getDefinition();
+        break;
+      case 39:/**matadataname */
+      case 40:/**metadataid */
+        this.result = this.scope.getMetadata(node.text)?.getDefinition();
+        break;
+      default:
+        break;
+    }
+  }
 
-  positionInContext(ctx: ParserRuleContext): boolean {
-    const start = ctx.start;
-    const stop = ctx.stop;
-    if (stop == undefined) return false;
-    else if (this.position.line < start.line - 1 || this.position.line > stop.line - 1) return false;
-    else if (this.position.line == start.line - 1 && this.position.line == stop.line - 1) {
-      // start 和 stop 位于同一行
-      return this.position.character >= start.charPositionInLine && this.position.character <= stop.charPositionInLine + (stop.text?.length || 0);
-    }
-    else if (this.position.line == start.line - 1) {
-      // stop 不在这一行
-      return this.position.character >= start.charPositionInLine;
-    }
-    else if (this.position.line == stop.line - 1) {
-      return this.position.character <= stop.charPositionInLine + (stop.text?.length || 0);
-    }
-    else {
-      // 在 start 和 stop 中间的某一行
-      return true;
-    }
-  }
-  positionInTerminal(node: TerminalNode): boolean {
-    const token = node.symbol;
-    const line = token.line - 1;
-    const character = token.charPositionInLine;
-    const end = token.charPositionInLine + (token.text?.length || 0);
-    return (this.position.line === line && this.position.character >= character && this.position.character <= end)
-  }
   visitChildren(node: RuleNode) {
     for (let i = 0; i < node.childCount; i++) {
       const child = node.getChild(i);
-      if (child instanceof ParserRuleContext && this.positionInContext(child)) {
+      if (child instanceof ParserRuleContext && this.positionInContext(child, this.position)) {
         child.accept(this);
       }
-      else if (child instanceof TerminalNode && this.positionInTerminal(child)) {
+      else if (child instanceof TerminalNode && this.positionInTerminal(child, this.position)) {
         child.accept(this);
       }
     }
@@ -61,14 +63,14 @@ export class LLVMIRDefinitionVisitor extends LLVMIRBaseVisitor {
 
   visitComdat(ctx: ComdatContext) {
     const name = ctx.ComdatName();
-    if(name && this.positionInTerminal(name)) {
+    if(name && this.positionInTerminal(name, this.position)) {
       const info = this.scope.getComdat(name.text);
       if (info) // this.result = new Hover(new MarkdownString(info));
         this.result = info.getDefinition();
     }
   }
   visitMetadataAttachment(ctx: MetadataAttachmentContext) {
-    if (this.positionInTerminal(ctx.MetadataName())) {
+    if (this.positionInTerminal(ctx.MetadataName(), this.position)) {
       const name = ctx.MetadataName().text;
       const info = this.scope.getMetadata(name);
       if (info) {
@@ -76,13 +78,13 @@ export class LLVMIRDefinitionVisitor extends LLVMIRBaseVisitor {
       }
     }
 
-    if (this.positionInContext(ctx.mdNode())) {
+    if (this.positionInContext(ctx.mdNode(), this.position)) {
       ctx.mdNode().accept(this);
     }
   }
   visitMetadataNode(ctx: MetadataNodeContext) {
     const id = ctx.MetadataId();
-    if (id && this.positionInTerminal(id)) {
+    if (id && this.positionInTerminal(id, this.position)) {
       const name = id.text;
       const info = this.scope.getMetadata(name);
       if (info) {
@@ -92,7 +94,7 @@ export class LLVMIRDefinitionVisitor extends LLVMIRBaseVisitor {
   }
   visitMdNode(ctx: MdNodeContext) {
     const id = ctx.MetadataId();
-    if (id && this.positionInTerminal(id)) {
+    if (id && this.positionInTerminal(id, this.position)) {
       const name = id.text;
       const info = this.scope.getMetadata(name);
       if (info) {
@@ -102,7 +104,7 @@ export class LLVMIRDefinitionVisitor extends LLVMIRBaseVisitor {
   }
   visitMetadata(ctx: MetadataContext) {
     const id = ctx.MetadataId();
-    if (id && this.positionInTerminal(id)) {
+    if (id && this.positionInTerminal(id, this.position)) {
       const name = id.text;
       const info = this.scope.getMetadata(name);
       if (info) {
@@ -111,18 +113,8 @@ export class LLVMIRDefinitionVisitor extends LLVMIRBaseVisitor {
     }
   }
 
-  // visitNamedType(ctx: NamedTypeContext) {
-  //   if (this.positionInTerminal(ctx.LocalIdent())) {
-  //     const name = ctx.LocalIdent().text;
-  //     const ty = this.scope.getNamedType(name);
-  //     if (ty) {
-  //       this.result = 
-  //     }
-  //   }
-  // }
-
   visitFuncHeader(ctx: FuncHeaderContext) {
-    if(this.positionInTerminal(ctx.GlobalIdent())) {
+    if(this.positionInTerminal(ctx.GlobalIdent(), this.position)) {
       const name = ctx.GlobalIdent().text;
       const func = this.scope.getEntity(name);
       if(func) {
@@ -149,7 +141,7 @@ export class LLVMIRDefinitionVisitor extends LLVMIRBaseVisitor {
 
   visitValue(ctx: ValueContext) {
     const ident = ctx.LocalIdent();
-    if (ident && this.positionInTerminal(ident)) {
+    if (ident && this.positionInTerminal(ident, this.position)) {
       const name = ident.text;
       const info = this.scope.getEntity(name);
       if (info) {
@@ -159,7 +151,7 @@ export class LLVMIRDefinitionVisitor extends LLVMIRBaseVisitor {
   }
   visitLocalDefInst(ctx: LocalDefInstContext) {
     const ident = ctx.LocalIdent();
-    if (ident && this.positionInTerminal(ident)) {
+    if (ident && this.positionInTerminal(ident, this.position)) {
       const name = ident.text;
       const info = this.scope.getEntity(name);
       if (info) {

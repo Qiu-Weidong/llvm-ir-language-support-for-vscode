@@ -9,7 +9,7 @@ import { Scope } from "./LLVMIRScope";
 
 
 export class LLVMIRHoverVisitor extends LLVMIRBaseVisitor {
-  public result: Hover | null;
+  public result: Hover | null | undefined;
   private readonly position: Position;
   private scope: Scope;
   constructor(position: Position, scope: Scope) {
@@ -20,7 +20,34 @@ export class LLVMIRHoverVisitor extends LLVMIRBaseVisitor {
   }
 
   visitTerminal(node: TerminalNode) {
-    /**todo */
+    switch (node.symbol.type) {
+      case 34: /**globalident */
+        this.result = this.scope.getEntity(node.text)?.getHoverMsg();
+        break;
+      case 35: /**localident */
+        this.result = this.scope.getEntity(node.text)?.getHoverMsg()
+          || this.scope.getNamedType(node.text)?.getHoverMsg();
+        break;
+      case 36: /**labelident */
+        // label 需要掐头去尾
+        let name = node.text;
+        if(name.startsWith('%')) name = name.substring(1);
+        if(name.endsWith(':')) name = name.substring(0, name.length-1);
+        this.result = this.scope.getLabel(name)?.getHoverMsg();
+        break;
+      case 37:/**attrgroupid */
+        this.result = this.scope.getAttrGroup(node.text)?.getHoverMsg();
+        break;
+      case 38:/**comdatname */
+        this.result = this.scope.getComdat(node.text)?.getHoverMsg();
+        break;
+      case 39:/**matadataname */
+      case 40:/**metadataid */
+        this.result = this.scope.getMetadata(node.text)?.getHoverMsg();
+        break;
+      default:
+        break;
+    }
   }
   visitChildren(node: RuleNode) {
     for (let i = 0; i < node.childCount; i++) {
@@ -104,7 +131,7 @@ export class LLVMIRHoverVisitor extends LLVMIRBaseVisitor {
   }
 
   visitNamedType(ctx: NamedTypeContext) {
-    if (this.positionInTerminal(ctx.LocalIdent(),this.position)) {
+    if (this.positionInTerminal(ctx.LocalIdent(), this.position)) {
       const name = ctx.LocalIdent().text;
       const ty = this.scope.getNamedType(name);
       if (ty) {
@@ -114,10 +141,10 @@ export class LLVMIRHoverVisitor extends LLVMIRBaseVisitor {
   }
 
   visitFuncHeader(ctx: FuncHeaderContext) {
-    if(this.positionInTerminal(ctx.GlobalIdent(), this.position)) {
+    if (this.positionInTerminal(ctx.GlobalIdent(), this.position)) {
       const name = ctx.GlobalIdent().text;
       const func = this.scope.getEntity(name);
-      if(func) {
+      if (func) {
         const ty = func.getType();
         this.result = func.getHoverMsg();
       }
@@ -128,9 +155,9 @@ export class LLVMIRHoverVisitor extends LLVMIRBaseVisitor {
   }
 
   visitGlobalDecl(ctx: GlobalDeclContext) {
-    if(this.positionInTerminal(ctx.GlobalIdent(), this.position)) {
+    if (this.positionInTerminal(ctx.GlobalIdent(), this.position)) {
       const entity = this.scope.getEntity(ctx.GlobalIdent().text);
-      if(entity) {
+      if (entity) {
         this.result = entity.getHoverMsg();
       }
     }
@@ -139,9 +166,9 @@ export class LLVMIRHoverVisitor extends LLVMIRBaseVisitor {
     }
   }
   visitGlobalDef(ctx: GlobalDefContext) {
-    if(this.positionInTerminal(ctx.GlobalIdent(), this.position)) {
+    if (this.positionInTerminal(ctx.GlobalIdent(), this.position)) {
       const entity = this.scope.getEntity(ctx.GlobalIdent().text);
-      if(entity) {
+      if (entity) {
         this.result = entity.getHoverMsg();
       }
     }
@@ -154,7 +181,7 @@ export class LLVMIRHoverVisitor extends LLVMIRBaseVisitor {
     const header = ctx.funcHeader();
     const name = header.GlobalIdent().text;
     const localScope = this.scope.getChild(name);
-    if(localScope) {
+    if (localScope) {
       this.scope = localScope;
       this.visitChildren(ctx);
       this.scope = this.scope.getParent();
@@ -201,26 +228,26 @@ export class LLVMIRHoverVisitor extends LLVMIRBaseVisitor {
   }
   visitCallInst(ctx: CallInstContext) {
     const name = ctx.value().constant()?.GlobalIdent()?.text;
-    if(name) {
+    if (name) {
       const func = this.scope.getEntity(name);
-      if(func) {
+      if (func) {
         this.result = func.getHoverMsg();
       }
     }
   }
   visitLabel(ctx: LabelContext) {
     let name = ctx.LocalIdent().text;
-    if(name.startsWith('%')) name = name.slice(1, name.length);
+    if (name.startsWith('%')) name = name.slice(1, name.length);
     const label = this.scope.getLabel(name);
-    if(label) this.result = label.getHoverMsg();
+    if (label) this.result = label.getHoverMsg();
   }
   visitBasicBlock(ctx: BasicBlockContext) {
     const label = ctx.LabelIdent();
-    if(label && this.positionInTerminal(label, this.position)) {
+    if (label && this.positionInTerminal(label, this.position)) {
       let name = label.text;
-      if(name.endsWith(':')) name = name.slice(0, name.length-1);
+      if (name.endsWith(':')) name = name.slice(0, name.length - 1);
       const info = this.scope.getLabel(name);
-      if(info) this.result = info.getHoverMsg();
+      if (info) this.result = info.getHoverMsg();
     }
     else {
       this.visitChildren(ctx);
