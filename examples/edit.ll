@@ -2,12 +2,15 @@
 module asm "inline asm code goes here"
 module asm "more can go here"  
 
+@K = external dso_preemptable protected  dllimport  global i32 
+@G = thread_local(initialexec) global i32 0, align 4
+
 %hello = type {  i32, i64, %world }
 %world = type { %hello, i32 }
 %integer = type i32
 ; %hello = type {}
 
-define dso_local void @main() { 
+define dso_local fastcc void @main() { 
   fence acquire 
   fence syncscope("singlethread") seq_cst 
   fence syncscope("agent") seq_cst 

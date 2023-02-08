@@ -2154,13 +2154,108 @@ When a \`cleanuppad\` has been “entered” but not yet “exited” (as descri
 \`\`\`
 `;
 
-
 export const operators = raw.split('## `').map(value => {
   const text = '## `' + value;
   const re = /## `(.*?)` Instruction/;
   const match = re.exec(text);
-  if(match) {
+  if (match) {
     return { name: match[1], detail: text };
   }
 });
+
+
+export const linkagetypes = [
+  { name: 'private', detail: 'Global values with “private” linkage are only directly accessible by objects in the current module. In particular, linking code into a module with a private global value may cause the private to be renamed as necessary to avoid collisions. Because the symbol is private to the module, all references can be updated. This doesn’t show up in any symbol table in the object file.' },
+  { name: 'internal', detail: 'Similar to private, but the value shows as a local symbol (STB_LOCAL in the case of ELF) in the object file. This corresponds to the notion of the ‘static’ keyword in C.' },
+  { name: 'available_externally', detail: 'Globals with “available_externally” linkage are never emitted into the object file corresponding to the LLVM module. From the linker’s perspective, an available_externally global is equivalent to an external declaration. They exist to allow inlining and other optimizations to take place given knowledge of the definition of the global, which is known to be somewhere outside the module. Globals with available_externally linkage are allowed to be discarded at will, and allow inlining and other optimizations. This linkage type is only allowed on definitions, not declarations.' },
+  { name: 'linkonce', detail: 'Globals with “linkonce” linkage are merged with other globals of the same name when linkage occurs. This can be used to implement some forms of inline functions, templates, or other code which must be generated in each translation unit that uses it, but where the body may be overridden with a more definitive definition later. Unreferenced linkonce globals are allowed to be discarded. Note that linkonce linkage does not actually allow the optimizer to inline the body of this function into callers because it doesn’t know if this definition of the function is the definitive definition within the program or whether it will be overridden by a stronger definition. To enable inlining and other optimizations, use “linkonce_odr” linkage.' },
+  { name: 'weak', detail: '“weak” linkage has the same merging semantics as linkonce linkage, except that unreferenced globals with weak linkage may not be discarded. This is used for globals that are declared “weak” in C source code.' },
+  { name: 'common', detail: '“common” linkage is most similar to “weak” linkage, but they are used for tentative definitions in C, such as “int X;” at global scope. Symbols with “common” linkage are merged in the same way as weak symbols, and they may not be deleted if unreferenced. common symbols may not have an explicit section, must have a zero initializer, and may not be marked ‘constant’. Functions and aliases may not have common linkage.' },
+  { name: 'appending', detail: '“appending” linkage may only be applied to global variables of pointer to array type. When two global variables with appending linkage are linked together, the two global arrays are appended together. This is the LLVM, typesafe, equivalent of having the system linker append together “sections” with identical names when .o files are linked. Unfortunately this doesn’t correspond to any feature in .o files, so it can only be used for variables like llvm.global_ctors which llvm interprets specially.' },
+  { name: 'extern_weak', detail: 'The semantics of this linkage follow the ELF object file model: the symbol is weak until linked, if not linked, the symbol becomes null instead of being an undefined reference.' },
+  { name: 'linkonce_odr', detail: 'Some languages allow differing globals to be merged, such as two functions with different semantics. Other languages, such as C++, ensure that only equivalent globals are ever merged (the “one definition rule” — “ODR”). Such languages can use the linkonce_odr and weak_odr linkage types to indicate that the global will only be merged with equivalent globals. These linkage types are otherwise the same as their non-odr versions.' },
+  { name: 'weak_odr', detail: 'Some languages allow differing globals to be merged, such as two functions with different semantics. Other languages, such as C++, ensure that only equivalent globals are ever merged (the “one definition rule” — “ODR”). Such languages can use the linkonce_odr and weak_odr linkage types to indicate that the global will only be merged with equivalent globals. These linkage types are otherwise the same as their non-odr versions.' },
+  { name: 'external', detail: 'If none of the above identifiers are used, the global is externally visible, meaning that it participates in linkage and can be used to resolve external symbol references.' }
+];
+
+export const visibilitystyles = [
+  { name: 'default', detail: 'On targets that use the ELF object file format, default visibility means that the declaration is visible to other modules and, in shared libraries, means that the declared entity may be overridden. On Darwin, default visibility means that the declaration is visible to other modules. On XCOFF, default visibility means no explicit visibility bit will be set and whether the symbol is visible (i.e “exported”) to other modules depends primarily on export lists provided to the linker. Default visibility corresponds to “external linkage” in the language.' },
+  { name: 'hidden', detail: 'Two declarations of an object with hidden visibility refer to the same object if they are in the same shared object. Usually, hidden visibility indicates that the symbol will not be placed into the dynamic symbol table, so no other module (executable or shared library) can reference it directly.' },
+  { name: 'protected', detail: 'On ELF, protected visibility indicates that the symbol will be placed in the dynamic symbol table, but that references within the defining module will bind to the local symbol. That is, the symbol cannot be overridden by another module.' }
+];
+
+export const dllstorageclasses: {name: string, detail: string}[] = [
+  { name: 'dllimport', detail: '“dllimport” causes the compiler to reference a function or variable via a global pointer to a pointer that is set up by the DLL exporting the symbol. On Microsoft Windows targets, the pointer name is formed by combining __imp_ and the function or variable name.' },
+  { name: 'dllexport', detail: 'On Microsoft Windows targets, “dllexport” causes the compiler to provide a global pointer to a pointer in a DLL, so that it can be referenced with the dllimport attribute. the pointer name is formed by combining __imp_ and the function or variable name. On XCOFF targets, dllexport indicates that the symbol will be made visible to other modules using “exported” visibility and thus placed by the linker in the loader section symbol table. Since this storage class exists for defining a dll interface, the compiler, assembler and linker know it is externally referenced and must refrain from deleting the symbol.' }
+];
+
+export const threadLocalStorageModels: { name: string, detail: string }[] = [
+  { name: 'localdynamic', detail: 'For variables that are only used within the current shared library.'},
+  { name: 'initialexec', detail: 'For variables in modules that will not be loaded dynamically.' },
+  { name: 'localexec', detail: 'For variables defined in the executable and only used within it.' }
+];
+
+export const runtimePreemptionSpecifiers = [
+  { name: 'dso_preemptable', detail: 'Indicates that the function or variable may be replaced by a symbol from outside the linkage unit at runtime.' },
+  { name: 'dso_local', detail: 'The compiler may assume that a function or variable marked as dso_local will resolve to a symbol within the same linkage unit. Direct access will be generated even if the definition is not within this compilation unit.' },
+];
+export const callingConventions = [
+  { name: 'ccc', detail: 'The C calling convention', document: 'This calling convention (the default if no other calling convention is specified) matches the target C calling conventions. This calling convention supports varargs function calls and tolerates some mismatch in the declared prototype and implemented declaration of the function (as does normal C).' },
+  { name: 'fastcc', detail: 'The fast calling convention', document: 'This calling convention attempts to make calls as fast as possible (e.g. by passing things in registers). This calling convention allows the target to use whatever tricks it wants to produce fast code for the target, without having to conform to an externally specified ABI (Application Binary Interface). Tail calls can only be optimized when this, the tailcc, the GHC or the HiPE convention is used. This calling convention does not support varargs and requires the prototype of all callees to exactly match the prototype of the function definition.' },
+  { name: 'coldcc', detail: 'The cold calling convention', document: 'This calling convention attempts to make code in the caller as efficient as possible under the assumption that the call is not commonly executed. As such, these calls often preserve all registers so that the call does not break any live ranges in the caller side. This calling convention does not support varargs and requires the prototype of all callees to exactly match the prototype of the function definition. Furthermore the inliner doesn’t consider such function calls for inlining.' },
+  { name: 'webkit_jscc', detail: 'WebKit’s JavaScript calling convention', document: 'This calling convention has been implemented for WebKit FTL JIT. It passes arguments on the stack right to left (as cdecl does), and returns a value in the platform’s customary return register.' },
+  { name: 'anyregcc', detail: 'Dynamic calling convention for code patching', document: 'This is a special convention that supports patching an arbitrary code sequence in place of a call site. This convention forces the call arguments into registers but allows them to be dynamically allocated. This can currently only be used with calls to llvm.experimental.patchpoint because only this intrinsic records the location of its arguments in a side table. See Stack maps and patch points in LLVM.' },
+  { name: 'preserve_mostcc', detail: 'The `PreserveMost` calling convention', document: `
+This calling convention attempts to make the code in the caller as unintrusive as possible. This convention behaves identically to the C calling convention on how arguments and return values are passed, but it uses a different set of caller/callee-saved registers. This alleviates the burden of saving and recovering a large register set before and after the call in the caller. If the arguments are passed in callee-saved registers, then they will be preserved by the callee across the call. This doesn’t apply for values returned in callee-saved registers.
+
+  - On X86-64 the callee preserves all general purpose registers, except for R11. R11 can be used as a scratch register. Floating-point registers (XMMs/YMMs) are not preserved and need to be saved by the caller.
+The idea behind this convention is to support calls to runtime functions that have a hot path and a cold path. The hot path is usually a small piece of code that doesn’t use many registers. The cold path might need to call out to another function and therefore only needs to preserve the caller-saved registers, which haven’t already been saved by the caller. The PreserveMost calling convention is very similar to the cold calling convention in terms of caller/callee-saved registers, but they are used for different types of function calls. coldcc is for function calls that are rarely executed, whereas preserve_mostcc function calls are intended to be on the hot path and definitely executed a lot. Furthermore preserve_mostcc doesn’t prevent the inliner from inlining the function call.
+
+This calling convention will be used by a future version of the ObjectiveC runtime and should therefore still be considered experimental at this time. Although this convention was created to optimize certain runtime calls to the ObjectiveC runtime, it is not limited to this runtime and might be used by other runtimes in the future too. The current implementation only supports X86-64, but the intention is to support more architectures in the future.
+` },
+  { name: 'preserve_allcc', detail: 'The `PreserveAll` calling convention', document: `
+This calling convention attempts to make the code in the caller even less intrusive than the PreserveMost calling convention. This calling convention also behaves identical to the C calling convention on how arguments and return values are passed, but it uses a different set of caller/callee-saved registers. This removes the burden of saving and recovering a large register set before and after the call in the caller. If the arguments are passed in callee-saved registers, then they will be preserved by the callee across the call. This doesn’t apply for values returned in callee-saved registers.
+
+ - On X86-64 the callee preserves all general purpose registers, except for R11. R11 can be used as a scratch register. Furthermore it also preserves all floating-point registers (XMMs/YMMs).
+The idea behind this convention is to support calls to runtime functions that don’t need to call out to any other functions.
+
+This calling convention, like the PreserveMost calling convention, will be used by a future version of the ObjectiveC runtime and should be considered experimental at this time.
+  ` },
+  { name: 'cxx_fast_tlscc', detail: 'The `CXX_FAST_TLS` calling convention for access functions', document: `
+Clang generates an access function to access C++-style TLS. The access function generally has an entry block, an exit block and an initialization block that is run at the first time. The entry and exit blocks can access a few TLS IR variables, each access will be lowered to a platform-specific sequence.
+
+This calling convention aims to minimize overhead in the caller by preserving as many registers as possible (all the registers that are preserved on the fast path, composed of the entry and exit blocks).
+
+This calling convention behaves identical to the C calling convention on how arguments and return values are passed, but it uses a different set of caller/callee-saved registers.
+
+Given that each platform has its own lowering sequence, hence its own set of preserved registers, we can’t use the existing PreserveMost.
+
+ - On X86-64 the callee preserves all general purpose registers, except for RDI and RAX.
+  ` },
+  { name: 'tailcc', detail: 'Tail callable calling convention', document: 'This calling convention ensures that calls in tail position will always be tail call optimized. This calling convention is equivalent to fastcc, except for an additional guarantee that tail calls will be produced whenever possible. Tail calls can only be optimized when this, the fastcc, the GHC or the HiPE convention is used. This calling convention does not support varargs and requires the prototype of all callees to exactly match the prototype of the function definition.' },
+  { name: 'swiftcc', detail: 'This calling convention is used for Swift language.', document: `
+ - On X86-64 RCX and R8 are available for additional integer returns, and XMM2 and XMM3 are available for additional FP/vector returns.
+ - On iOS platforms, we use AAPCS-VFP calling convention.
+  ` },
+  { name: 'swifttailcc', detail: '', document: 'This calling convention is like swiftcc in most respects, but also the callee pops the argument area of the stack so that mandatory tail calls are possible as in tailcc.' },
+  { name: 'cfguard_checkcc', detail: 'Windows Control Flow Guard (Check mechanism)', document: `
+This calling convention is used for the Control Flow Guard check function, calls to which can be inserted before indirect calls to check that the call target is a valid function address. The check function has no return value, but it will trigger an OS-level error if the address is not a valid target. The set of registers preserved by the check function, and the register containing the target address are architecture-specific.
+
+ - On X86 the target address is passed in ECX.
+ - On ARM the target address is passed in R0.
+ - On AArch64 the target address is passed in X15.  
+` },
+  { name: 'cc <n>', detail: 'Numbered convention', document: 'Any calling convention may be specified by number, allowing target-specific calling conventions to be used. Target specific calling conventions start at 64.' },
+  { name: 'cc 11', detail: 'The HiPE calling convention', document: 'This calling convention has been implemented specifically for use by the High-Performance Erlang (HiPE) compiler, the native code compiler of the Ericsson’s Open Source Erlang/OTP system. It uses more registers for argument passing than the ordinary C calling convention and defines no callee-saved registers. The calling convention properly supports tail call optimization but requires that both the caller and the callee use it. It uses a register pinning mechanism, similar to GHC’s convention, for keeping frequently accessed runtime components pinned to specific hardware registers. At the moment only X86 supports this convention (both 32 and 64 bit).' },
+  { name: 'cc 10', detail: 'GHC convention', document: `
+This calling convention has been implemented specifically for use by the Glasgow Haskell Compiler (GHC). It passes everything in registers, going to extremes to achieve this by disabling callee save registers. This calling convention should not be used lightly but only for specific situations such as an alternative to the register pinning performance technique often used when implementing functional programming languages. At the moment only X86 supports this convention and it has the following limitations:
+
+ - On X86-32 only supports up to 4 bit type parameters. No floating-point types are supported.
+ - On X86-64 only supports up to 10 bit type parameters and 6 floating-point parameters.
+This calling convention supports tail call optimization but requires both the caller and callee are using it.
+  ` }
+];
+
+
+
 

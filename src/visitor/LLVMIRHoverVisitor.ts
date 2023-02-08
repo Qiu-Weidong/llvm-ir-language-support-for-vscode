@@ -2,10 +2,10 @@ import { ParserRuleContext } from "antlr4ts";
 import { RuleNode } from "antlr4ts/tree/RuleNode";
 import { TerminalNode } from "antlr4ts/tree/TerminalNode";
 import { Hover, MarkdownString, Position } from "vscode";
-import { BasicBlockContext, CallInstContext, ComdatContext, CompilationUnitContext, FuncAttributeContext, FuncDefContext, FuncHeaderContext, GlobalDeclContext, GlobalDefContext, LabelContext, LocalDefInstContext, MdNodeContext, MetadataAttachmentContext, MetadataContext, MetadataNodeContext, NamedTypeContext, ParamContext, ValueContext } from "../llvmir/LLVMIRParser";
+import { BasicBlockContext, CallingConvEnumContext, CallingConvIntContext, CallInstContext, ComdatContext, CompilationUnitContext, DllStorageClassContext, ExternalLinkageContext, FuncAttributeContext, FuncDefContext, FuncHeaderContext, GlobalDeclContext, GlobalDefContext, InternalLinkageContext, LabelContext, LinkageContext, LocalDefInstContext, MdNodeContext, MetadataAttachmentContext, MetadataContext, MetadataNodeContext, NamedTypeContext, ParamContext, PreemptionContext, TlsModelContext, ValueContext, VisibilityContext } from "../llvmir/LLVMIRParser";
 import { LLVMIRBaseVisitor } from "./LLVMIRBaseVisitor";
 import { Scope } from "./LLVMIRScope";
-import { operators } from "../llvmir/Operator";
+import { operators, linkagetypes, dllstorageclasses, visibilitystyles, threadLocalStorageModels, runtimePreemptionSpecifiers, callingConventions } from "../llvmir/LLVMIRDocument";
 
 
 export class LLVMIRHoverVisitor extends LLVMIRBaseVisitor {
@@ -50,9 +50,9 @@ export class LLVMIRHoverVisitor extends LLVMIRBaseVisitor {
     }
 
     // 对运算符提示 73 个运算符
-    if(node.symbol.type >= 52 && node.symbol.type <= 124) {
+    if (node.symbol.type >= 52 && node.symbol.type <= 124) {
       const result = operators.find(item => item?.name == node.text);
-      if(result) {
+      if (result) {
         this.result = new Hover(new MarkdownString(result.detail));
       }
     }
@@ -292,5 +292,50 @@ export class LLVMIRHoverVisitor extends LLVMIRBaseVisitor {
     else {
       this.visitChildren(ctx);
     }
+  }
+
+
+
+
+  visitCallingConvInt(ctx: CallingConvIntContext) {
+    const n = this.parseIntLit(ctx.IntLit().text);
+    const index = n === 10 ? 'cc 10' : n === 11 ? 'cc 11' : 'cc <n>';
+
+    const doc = callingConventions.find(item => item.name === index);
+    if (doc) {
+      this.result = new Hover([new MarkdownString(doc.detail), new MarkdownString(doc.document)]);
+    }
+
+  }
+  visitCallingConvEnum(ctx: CallingConvEnumContext) {
+    const doc = callingConventions.find(item => item.name === ctx.text);
+    if (doc) {
+      this.result = new Hover([new MarkdownString(doc.detail), new MarkdownString(doc.document)]);
+    }
+  }
+  visitVisibility(ctx: VisibilityContext) {
+    const doc = visibilitystyles.find(item => item.name === ctx.text);
+    if (doc) this.result = new Hover(new MarkdownString(doc.detail));
+  }
+
+  visitExternalLinkage(ctx: ExternalLinkageContext) {
+    const doc = linkagetypes.find(item => item.name === ctx.text);
+    if (doc) this.result = new Hover(new MarkdownString(doc.detail));
+  }
+  visitInternalLinkage(ctx: InternalLinkageContext) {
+    const doc = linkagetypes.find(item => item.name === ctx.text);
+    if (doc) this.result = new Hover(new MarkdownString(doc.detail));
+  }
+  visitTlsModel(ctx: TlsModelContext) {
+    const doc = threadLocalStorageModels.find(item => item.name === ctx.text);
+    if (doc) this.result = new Hover(new MarkdownString(doc.detail));
+  }
+  visitDllStorageClass(ctx: DllStorageClassContext) {
+    const doc = dllstorageclasses.find(item => item.name === ctx.text);
+    if (doc) this.result = new Hover(new MarkdownString(doc.detail));
+  }
+  visitPreemption(ctx: PreemptionContext) {
+    const doc = runtimePreemptionSpecifiers.find(item => item.name === ctx.text);
+    if (doc) this.result = new Hover(new MarkdownString(doc.detail));
   }
 }
