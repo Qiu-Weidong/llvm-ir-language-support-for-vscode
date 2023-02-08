@@ -1,4 +1,7 @@
 # llvm-ir-language-support
+
+[中國語](README.zh.md)
+
 This plugin provides functions such as syntax highlighting, code formatting, and hover prompts for the `llvm ir` language.
 
 ## features
