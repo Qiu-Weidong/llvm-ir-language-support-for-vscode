@@ -2,7 +2,7 @@ import { ParserRuleContext } from "antlr4ts";
 import { RuleNode } from "antlr4ts/tree/RuleNode";
 import { TerminalNode } from "antlr4ts/tree/TerminalNode";
 import { Definition, Position } from "vscode";
-import { CallInstContext, ComdatContext, FuncDefContext, FuncHeaderContext, LabelContext, LocalDefInstContext, MdNodeContext, MetadataAttachmentContext, MetadataContext, MetadataNodeContext, ParamContext, ValueContext } from "../llvmir/LLVMIRParser";
+import { BasicBlockContext, CallInstContext, ComdatContext, FuncBodyContext, FuncDefContext, FuncHeaderContext, InstructionContext, LabelContext, LocalDefInstContext, MdNodeContext, MetadataAttachmentContext, MetadataContext, MetadataNodeContext, ParamContext, RetTermContext, TerminatorContext, ValueContext } from "../llvmir/LLVMIRParser";
 import { LLVMIRBaseVisitor } from "./LLVMIRBaseVisitor";
 import { Scope } from "./LLVMIRScope";
 
@@ -29,8 +29,8 @@ export class LLVMIRDefinitionVisitor extends LLVMIRBaseVisitor {
       case 36: /**labelident */
         // label 需要掐头去尾
         let name = node.text;
-        if(name.startsWith('%')) name = name.substring(1);
-        if(name.endsWith(':')) name = name.substring(0, name.length-1);
+        if (name.startsWith('%')) name = name.substring(1);
+        if (name.endsWith(':')) name = name.substring(0, name.length - 1);
         this.result = this.scope.getLabel(name)?.getDefinition();
         break;
       case 37:/**attrgroupid */
@@ -63,10 +63,12 @@ export class LLVMIRDefinitionVisitor extends LLVMIRBaseVisitor {
 
   visitComdat(ctx: ComdatContext) {
     const name = ctx.ComdatName();
-    if(name && this.positionInTerminal(name, this.position)) {
+    if (name && this.positionInTerminal(name, this.position)) {
       const info = this.scope.getComdat(name.text);
       if (info) // this.result = new Hover(new MarkdownString(info));
         this.result = info.getDefinition();
+    }else {
+      this.visitChildren(ctx);
     }
   }
   visitMetadataAttachment(ctx: MetadataAttachmentContext) {
@@ -78,8 +80,10 @@ export class LLVMIRDefinitionVisitor extends LLVMIRBaseVisitor {
       }
     }
 
-    if (this.positionInContext(ctx.mdNode(), this.position)) {
+    else if (this.positionInContext(ctx.mdNode(), this.position)) {
       ctx.mdNode().accept(this);
+    }else {
+      this.visitChildren(ctx);
     }
   }
   visitMetadataNode(ctx: MetadataNodeContext) {
@@ -90,6 +94,8 @@ export class LLVMIRDefinitionVisitor extends LLVMIRBaseVisitor {
       if (info) {
         this.result = info.getDefinition();
       }
+    }else {
+      this.visitChildren(ctx);
     }
   }
   visitMdNode(ctx: MdNodeContext) {
@@ -100,6 +106,8 @@ export class LLVMIRDefinitionVisitor extends LLVMIRBaseVisitor {
       if (info) {
         this.result = info.getDefinition();
       }
+    }else {
+      this.visitChildren(ctx);
     }
   }
   visitMetadata(ctx: MetadataContext) {
@@ -110,14 +118,16 @@ export class LLVMIRDefinitionVisitor extends LLVMIRBaseVisitor {
       if (info) {
         this.result = info.getDefinition();
       }
+    }else {
+      this.visitChildren(ctx);
     }
   }
 
   visitFuncHeader(ctx: FuncHeaderContext) {
-    if(this.positionInTerminal(ctx.GlobalIdent(), this.position)) {
+    if (this.positionInTerminal(ctx.GlobalIdent(), this.position)) {
       const name = ctx.GlobalIdent().text;
       const func = this.scope.getEntity(name);
-      if(func) {
+      if (func) {
         const ty = func.getType();
         this.result = func.getDefinition();
       }
@@ -132,7 +142,7 @@ export class LLVMIRDefinitionVisitor extends LLVMIRBaseVisitor {
     const header = ctx.funcHeader();
     const name = header.GlobalIdent().text;
     const localScope = this.scope.getChild(name);
-    if(localScope) {
+    if (localScope) {
       this.scope = localScope;
       this.visitChildren(ctx);
       this.scope = this.scope.getParent();
@@ -147,6 +157,9 @@ export class LLVMIRDefinitionVisitor extends LLVMIRBaseVisitor {
       if (info) {
         this.result = info.getDefinition();
       }
+    }
+    else {
+      this.visitChildren(ctx);
     }
   }
   visitLocalDefInst(ctx: LocalDefInstContext) {
@@ -163,22 +176,29 @@ export class LLVMIRDefinitionVisitor extends LLVMIRBaseVisitor {
     }
   }
   visitCallInst(ctx: CallInstContext) {
-    const name = ctx.value().constant()?.GlobalIdent()?.text;
-    if(name) {
+    const ident = ctx.value().constant()?.GlobalIdent();
+    if (ident && this.positionInTerminal(ident, this.position)) {
+      const name = ident.text;
       const func = this.scope.getEntity(name);
-      if(func) {
+      if (func) {
         this.result = func.getDefinition();
       }
     }
+    else {
+      this.visitChildren(ctx);
+    }
   }
   visitLabel(ctx: LabelContext) {
-    let name = ctx.LocalIdent().text;
-    if(name.startsWith('%')) name = name.slice(1, name.length);
-    const label = this.scope.getLabel(name);
-    if(label) this.result = label.getDefinition();
+    if (this.positionInTerminal(ctx.LocalIdent(), this.position)) {
+      let name = ctx.LocalIdent().text;
+      if (name.startsWith('%')) name = name.slice(1, name.length);
+      const label = this.scope.getLabel(name);
+      if (label) this.result = label.getDefinition();
+    }else {
+      this.visitChildren(ctx);
+    }
+
   }
-
-
   getResult() { return this.result; }
 }
 
