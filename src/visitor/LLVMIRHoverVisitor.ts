@@ -1,10 +1,11 @@
 import { ParserRuleContext } from "antlr4ts";
 import { RuleNode } from "antlr4ts/tree/RuleNode";
 import { TerminalNode } from "antlr4ts/tree/TerminalNode";
-import { Hover, Position } from "vscode";
+import { Hover, MarkdownString, Position } from "vscode";
 import { BasicBlockContext, CallInstContext, ComdatContext, CompilationUnitContext, FuncAttributeContext, FuncDefContext, FuncHeaderContext, GlobalDeclContext, GlobalDefContext, LabelContext, LocalDefInstContext, MdNodeContext, MetadataAttachmentContext, MetadataContext, MetadataNodeContext, NamedTypeContext, ParamContext, ValueContext } from "../llvmir/LLVMIRParser";
 import { LLVMIRBaseVisitor } from "./LLVMIRBaseVisitor";
 import { Scope } from "./LLVMIRScope";
+import { operators } from "../llvmir/Operator";
 
 
 export class LLVMIRHoverVisitor extends LLVMIRBaseVisitor {
@@ -50,7 +51,10 @@ export class LLVMIRHoverVisitor extends LLVMIRBaseVisitor {
 
     // 对运算符提示 73 个运算符
     if(node.symbol.type >= 52 && node.symbol.type <= 124) {
-
+      const result = operators.find(item => item?.name == node.text);
+      if(result) {
+        this.result = new Hover(new MarkdownString(result.detail));
+      }
     }
   }
   visitChildren(node: RuleNode) {
