@@ -24,7 +24,6 @@ export class LLVMIRSemanticTokensProvider implements DocumentSemanticTokensProvi
     const documents = LLVMCache.getInstance();
     documents.updateDocument(document);
 
-    console.log(document.fileName);
     const builder = new SemanticTokensBuilder(this.legend);
     const visitor = new LLVMIRSemanticTokensVisitor(builder);
 

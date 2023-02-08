@@ -1,6 +1,7 @@
 import { ParserRuleContext, Token } from "antlr4ts";
 import { RuleNode } from "antlr4ts/tree/RuleNode";
 import { TerminalNode } from "antlr4ts/tree/TerminalNode";
+import { info } from "console";
 import { Hover, MarkdownString, Position } from "vscode";
 import { CallInstContext, ComdatContext, CompilationUnitContext, FuncAttrContext, FuncAttributeContext, FuncDefContext, FuncHeaderContext, LabelContext, LocalDefInstContext, MdNodeContext, MetadataAttachmentContext, MetadataContext, MetadataNodeContext, NamedTypeContext, ParamContext, ParamsContext, TypeContext, ValueContext } from "../llvmir/LLVMIRParser";
 import { LLVMIRBaseVisitor } from "./LLVMIRBaseVisitor";
@@ -19,51 +20,24 @@ export class LLVMIRHoverVisitor extends LLVMIRBaseVisitor {
   }
 
   visitTerminal(node: TerminalNode) {
+    /**todo */
   }
   visitChildren(node: RuleNode) {
     for (let i = 0; i < node.childCount; i++) {
       const child = node.getChild(i);
-      if (child instanceof ParserRuleContext && this.positionInContext(child)) {
+      if (child instanceof ParserRuleContext && this.positionInContext(child, this.position)) {
         child.accept(this);
       }
-      else if (child instanceof TerminalNode && this.positionInTerminal(child)) {
+      else if (child instanceof TerminalNode && this.positionInTerminal(child, this.position)) {
         child.accept(this);
       }
     }
   }
 
-  positionInContext(ctx: ParserRuleContext): boolean {
-    const start = ctx.start;
-    const stop = ctx.stop;
-    if (stop == undefined) return false;
-    else if (this.position.line < start.line - 1 || this.position.line > stop.line - 1) return false;
-    else if (this.position.line == start.line - 1 && this.position.line == stop.line - 1) {
-      // start 和 stop 位于同一行
-      return this.position.character >= start.charPositionInLine && this.position.character <= stop.charPositionInLine + (stop.text?.length || 0);
-    }
-    else if (this.position.line == start.line - 1) {
-      // stop 不在这一行
-      return this.position.character >= start.charPositionInLine;
-    }
-    else if (this.position.line == stop.line - 1) {
-      return this.position.character <= stop.charPositionInLine + (stop.text?.length || 0);
-    }
-    else {
-      // 在 start 和 stop 中间的某一行
-      return true;
-    }
-  }
-  positionInTerminal(node: TerminalNode): boolean {
-    const token = node.symbol;
-    const line = token.line - 1;
-    const character = token.charPositionInLine;
-    const end = token.charPositionInLine + (token.text?.length || 0);
-    return (this.position.line === line && this.position.character >= character && this.position.character <= end)
-  }
 
   visitCompilationUnit(ctx: CompilationUnitContext) {
     ctx.topLevelEntity().forEach(entity => {
-      if (this.positionInContext(entity)) {
+      if (this.positionInContext(entity, this.position)) {
         entity.accept(this);
       }
     });
@@ -71,78 +45,66 @@ export class LLVMIRHoverVisitor extends LLVMIRBaseVisitor {
 
   visitFuncAttribute(ctx: FuncAttributeContext) {
     const attr = ctx.AttrGroupId();
-    if (attr && this.positionInTerminal(attr)) {
+    if (attr && this.positionInTerminal(attr, this.position)) {
       // 悬浮提示
       const info = this.scope.getAttrGroup(attr.text);
-      if (info) this.result = new Hover([
-        { language: "llvm-ir", value: info.getHoverMsg() },
-      ]);
+      if (info) this.result = info.getHoverMsg();
     }
   }
   visitComdat(ctx: ComdatContext) {
     const name = ctx.ComdatName();
-    if (name && this.positionInTerminal(name)) {
+    if (name && this.positionInTerminal(name, this.position)) {
       const info = this.scope.getComdat(name.text);
       if (info) // this.result = new Hover(new MarkdownString(info));
-        this.result = new Hover([
-          { language: "llvm-ir", value: info.getHoverMsg() },
-        ]);
+        this.result = info.getHoverMsg();
     }
   }
   visitMetadataAttachment(ctx: MetadataAttachmentContext) {
-    if (this.positionInTerminal(ctx.MetadataName())) {
+    if (this.positionInTerminal(ctx.MetadataName(), this.position)) {
       const name = ctx.MetadataName().text;
       const info = this.scope.getMetadata(name);
       if (info) {
-        this.result = new Hover([
-          { language: "llvm-ir", value: info.getHoverMsg() }
-        ]);
+        this.result = info.getHoverMsg();
       }
     }
 
-    if (this.positionInContext(ctx.mdNode())) {
+    if (this.positionInContext(ctx.mdNode(), this.position)) {
       ctx.mdNode().accept(this);
     }
   }
   visitMetadataNode(ctx: MetadataNodeContext) {
     const id = ctx.MetadataId();
-    if (id && this.positionInTerminal(id)) {
+    if (id && this.positionInTerminal(id, this.position)) {
       const name = id.text;
       const info = this.scope.getMetadata(name);
       if (info) {
-        this.result = new Hover([
-          { language: "llvm-ir", value: info.getHoverMsg() }
-        ]);
+        this.result = info.getHoverMsg();
       }
     }
   }
   visitMdNode(ctx: MdNodeContext) {
     const id = ctx.MetadataId();
-    if (id && this.positionInTerminal(id)) {
+    if (id && this.positionInTerminal(id, this.position)) {
       const name = id.text;
       const info = this.scope.getMetadata(name);
       if (info) {
-        this.result = new Hover([
-          { language: "llvm-ir", value: info.getHoverMsg() }
-        ]);
+        this.result = info.getHoverMsg();
       }
     }
   }
   visitMetadata(ctx: MetadataContext) {
     const id = ctx.MetadataId();
-    if (id && this.positionInTerminal(id)) {
+    if (id && this.positionInTerminal(id, this.position)) {
       const name = id.text;
       const info = this.scope.getMetadata(name);
       if (info) {
-        this.result = new Hover([
-          { language: "llvm-ir", value: info.getHoverMsg() }
-        ]);
+        this.result = info.getHoverMsg();
       }
     }
   }
 
   visitNamedType(ctx: NamedTypeContext) {
-    if (this.positionInTerminal(ctx.LocalIdent())) {
+    if (this.positionInTerminal(ctx.LocalIdent(),this.position)) {
       const name = ctx.LocalIdent().text;
       const ty = this.scope.getNamedType(name);
       if (ty) {
@@ -154,14 +116,12 @@ export class LLVMIRHoverVisitor extends LLVMIRBaseVisitor {
   }
 
   visitFuncHeader(ctx: FuncHeaderContext) {
-    if(this.positionInTerminal(ctx.GlobalIdent())) {
+    if(this.positionInTerminal(ctx.GlobalIdent(), this.position)) {
       const name = ctx.GlobalIdent().text;
       const func = this.scope.getEntity(name);
       if(func) {
         const ty = func.getType();
-        this.result = new Hover([
-          { language: "llvm-ir", value: `(function) ${name}: ${ty.getName()}` }
-        ]);
+        this.result = func.getHoverMsg();
       }
     }
     else {
@@ -183,27 +143,22 @@ export class LLVMIRHoverVisitor extends LLVMIRBaseVisitor {
 
   visitValue(ctx: ValueContext) {
     const ident = ctx.LocalIdent();
-    if (ident && this.positionInTerminal(ident)) {
+    if (ident && this.positionInTerminal(ident, this.position)) {
       const name = ident.text;
       const info = this.scope.getEntity(name);
       if (info) {
-        const ty = info.getType();
-        this.result = new Hover([
-          { language: "llvm-ir", value: ty.getName() }
-        ]);
+        this.result = info.getHoverMsg();
       }
     }
   }
   visitParam(ctx: ParamContext) {
     const ident = ctx.LocalIdent();
-    if (ident && this.positionInTerminal(ident)) {
+    if (ident && this.positionInTerminal(ident, this.position)) {
       const name = ident.text;
       const info = this.scope.getEntity(name);
       if (info) {
         const ty = info.getType();
-        this.result = new Hover([
-          { language: "llvm-ir", value: `(param) ${name}: ${ty.getName()}` }
-        ]);
+        this.result = info.getHoverMsg();
       }
     }
     else {
@@ -212,14 +167,12 @@ export class LLVMIRHoverVisitor extends LLVMIRBaseVisitor {
   }
   visitLocalDefInst(ctx: LocalDefInstContext) {
     const ident = ctx.LocalIdent();
-    if (ident && this.positionInTerminal(ident)) {
+    if (ident && this.positionInTerminal(ident, this.position)) {
       const name = ident.text;
       const info = this.scope.getEntity(name);
       if (info) {
         const ty = info.getType();
-        this.result = new Hover([
-          { language: "llvm-ir", value: `${name}: ${ty.getName()}` }
-        ]);
+        this.result = info.getHoverMsg();
       }
     }
     else {
@@ -231,10 +184,7 @@ export class LLVMIRHoverVisitor extends LLVMIRBaseVisitor {
     if(name) {
       const func = this.scope.getEntity(name);
       if(func) {
-        const ty = func.getType();
-        this.result = new Hover([
-          { language: "llvm-ir", value: `(function) ${name}: ${ty.getName()}` }
-        ]);
+        this.result = func.getHoverMsg();
       }
     }
   }
@@ -242,6 +192,6 @@ export class LLVMIRHoverVisitor extends LLVMIRBaseVisitor {
     let name = ctx.LocalIdent().text;
     if(name.startsWith('%')) name = name.slice(1, name.length);
     const label = this.scope.getLabel(name);
-    if(label) this.result = new Hover(new MarkdownString(label.getHoverMsg()));
+    if(label) this.result = label.getHoverMsg();
   }
 }

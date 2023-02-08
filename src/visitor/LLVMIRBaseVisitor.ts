@@ -1,9 +1,9 @@
-import { Token } from "antlr4ts";
+import { ParserRuleContext, Token } from "antlr4ts";
 import { ErrorNode } from "antlr4ts/tree/ErrorNode";
 import { ParseTree } from "antlr4ts/tree/ParseTree";
 import { RuleNode } from "antlr4ts/tree/RuleNode";
 import { TerminalNode } from "antlr4ts/tree/TerminalNode";
-import { Position, Range } from "vscode";
+import { Position, Range, Terminal } from "vscode";
 import { CompilationUnitContext, TargetDefContext, SourceFilenameContext, TargetDataLayoutContext, TargetTripleContext, TopLevelEntityContext, ModuleAsmContext, TypeDefContext, ComdatDefContext, GlobalDeclContext, GlobalDefContext, IndirectSymbolDefContext, FuncDeclContext, FuncDefContext, AttrGroupDefContext, NamedMetadataDefContext, MetadataDefContext, UseListOrderContext, UseListOrderBBContext, FuncHeaderContext, IndirectSymbolContext, CallingConvContext, CallingConvIntContext, FuncHdrFieldContext, GcContext, PrefixContext, PrologueContext, PersonalityContext, ReturnAttributeContext, FuncBodyContext, BasicBlockContext, InstructionContext, TerminatorContext, LocalDefTermContext, ValueTerminatorContext, RetTermContext, BrTermContext, CondBrTermContext, SwitchTermContext, IndirectBrTermContext, ResumeTermContext, CatchRetTermContext, CleanupRetTermContext, UnreachableTermContext, InvokeTermContext, CallBrTermContext, CatchSwitchTermContext, LabelContext, CaseContext, UnwindTargetContext, HandlersContext, MetadataNodeContext, DiExpressionContext, DiExpressionFieldContext, GlobalFieldContext, SectionContext, ComdatContext, PartitionContext, ConstantContext, BoolConstContext, IntConstContext, FloatConstContext, NullConstContext, NoneConstContext, StructConstContext, ArrayConstContext, VectorConstContext, ZeroInitializerConstContext, UndefConstContext, PoisonConstContext, BlockAddressConstContext, DsoLocalEquivalentConstContext, NoCFIConstContext, ConstantExprContext, TypeConstContext, MetadataAttachmentContext, MdNodeContext, MdTupleContext, MetadataContext, DiArgListContext, TypeValueContext, ValueContext, InlineAsmContext, MdStringContext, MdFieldOrIntContext, DiSPFlagContext, FuncAttributeContext, TypeContext, ParamsContext, ParamContext, ParamAttributeContext, AttrStringContext, AttrPairContext, AlignContext, AlignPairContext, AlignStackContext, AlignStackPairContext, AllocKindContext, AllocSizeContext, UnwindTableContext, VectorScaleRangeContext, ByRefAttrContext, ByvalContext, DereferenceableContext, ElementTypeContext, InAllocaContext, ParamAttrContext, PreallocatedContext, StructRetAttrContext, FirstClassTypeContext, ConcreteTypeContext, IntTypeContext, FloatTypeContext, PointerTypeContext, VectorTypeContext, LabelTypeContext, ArrayTypeContext, StructTypeContext, NamedTypeContext, MmxTypeContext, TokenTypeContext, OpaquePointerTypeContext, AddrSpaceContext, ThreadLocalContext, MetadataTypeContext, BitCastExprContext, GetElementPtrExprContext, GepIndexContext, AddrSpaceCastExprContext, IntToPtrExprContext, ICmpExprContext, FCmpExprContext, SelectExprContext, TruncExprContext, ZExtExprContext, SExtExprContext, FpTruncExprContext, FpExtExprContext, FpToUiExprContext, FpToSiExprContext, UiToFpExprContext, SiToFpExprContext, PtrToIntExprContext, ExtractElementExprContext, InsertElementExprContext, ShuffleVectorExprContext, ShlExprContext, LShrExprContext, AShrExprContext, AndExprContext, OrExprContext, XorExprContext, AddExprContext, SubExprContext, MulExprContext, FNegExprContext, LocalDefInstContext, ValueInstructionContext, StoreInstContext, SyncScopeContext, FenceInstContext, FNegInstContext, AddInstContext, FAddInstContext, SubInstContext, FSubInstContext, MulInstContext, FMulInstContext, UDivInstContext, SDivInstContext, FDivInstContext, URemInstContext, SRemInstContext, FRemInstContext, ShlInstContext, LShrInstContext, AShrInstContext, AndInstContext, OrInstContext, XorInstContext, ExtractElementInstContext, InsertElementInstContext, ShuffleVectorInstContext, ExtractValueInstContext, InsertValueInstContext, AllocaInstContext, LoadInstContext, CmpXchgInstContext, AtomicRMWInstContext, GetElementPtrInstContext, TruncInstContext, ZExtInstContext, SExtInstContext, FpTruncInstContext, FpExtInstContext, FpToUiInstContext, FpToSiInstContext, UiToFpInstContext, SiToFpInstContext, PtrToIntInstContext, IntToPtrInstContext, BitCastInstContext, AddrSpaceCastInstContext, ICmpInstContext, FCmpInstContext, PhiInstContext, SelectInstContext, FreezeInstContext, CallInstContext, VaargInstContext, LandingPadInstContext, CatchPadInstContext, CleanupPadInstContext, IncContext, OperandBundleContext, ClauseContext, ArgsContext, ArgContext, ExceptionArgContext, ExceptionPadContext, ExternalLinkageContext, InternalLinkageContext, LinkageContext, PreemptionContext, VisibilityContext, DllStorageClassContext, TlsModelContext, UnnamedAddrContext, ExternallyInitializedContext, ImmutableContext, FuncAttrContext, DistinctContext, InBoundsContext, ReturnAttrContext, OverflowFlagContext, IPredContext, FPredContext, AtomicOrderingContext, CallingConvEnumContext, FastMathFlagContext, AtomicOpContext, FloatKindContext, SpecializedMDNodeContext, DiBasicTypeContext, DiCommonBlockContext, DiCompileUnitContext, DiCompositeTypeContext, DiCompositeTypeFieldContext, DiDerivedTypeContext, DiDerivedTypeFieldContext, DiEnumeratorContext, DiEnumeratorFieldContext, DiFileContext, DiFileFieldContext, DiGlobalVariableContext, DiGlobalVariableFieldContext, DiGlobalVariableExpressionContext, DiGlobalVariableExpressionFieldContext, DiImportedEntityContext, DiImportedEntityFieldContext, DiLabelContext, DiLabelFieldContext, DiLexicalBlockContext, DiLexicalBlockFieldContext, DiLexicalBlockFileContext, DiLexicalBlockFileFieldContext, DiLocalVariableContext, DiLocalVariableFieldContext, DiLocationContext, DiLocationFieldContext, DiMacroContext, DiMacroFieldContext, DiMacroFileContext, DiMacroFileFieldContext, DiModuleContext, DiModuleFieldContext, DiNamespaceContext, DiNamespaceFieldContext, DiObjCPropertyContext, DiObjCPropertyFieldContext, DiStringTypeContext, DiStringTypeFieldContext, DiSubprogramContext, DiSubprogramFieldContext, DiSubrangeContext, DiSubrangeFieldContext, DiSubroutineTypeContext, DiTemplateTypeParameterContext, DiTemplateValueParameterContext, GenericDiNodeContext, DiTemplateTypeParameterFieldContext, DiCompileUnitFieldContext, DiCommonBlockFieldContext, DiBasicTypeFieldContext, GenericDINodeFieldContext, TagFieldContext, HeaderFieldContext, OperandsFieldContext, DiTemplateValueParameterFieldContext, NameFieldContext, TypeFieldContext, DefaultedFieldContext, ValueFieldContext, MdFieldContext, DiSubroutineTypeFieldContext, FlagsFieldContext, DiFlagsContext, CcFieldContext, AlignFieldContext, AllocatedFieldContext, AnnotationsFieldContext, ArgFieldContext, AssociatedFieldContext, AttributesFieldContext, BaseTypeFieldContext, ChecksumFieldContext, ChecksumkindFieldContext, ColumnFieldContext, ConfigMacrosFieldContext, ContainingTypeFieldContext, CountFieldContext, DebugInfoForProfilingFieldContext, DeclarationFieldContext, DirectoryFieldContext, DiscriminatorFieldContext, DataLocationFieldContext, DiscriminatorIntFieldContext, DwarfAddressSpaceFieldContext, DwoIdFieldContext, ElementsFieldContext, EmissionKindFieldContext, EncodingFieldContext, EntityFieldContext, EnumsFieldContext, ExportSymbolsFieldContext, ExprFieldContext, ExtraDataFieldContext, FileFieldContext, FilenameFieldContext, FlagsStringFieldContext, GetterFieldContext, GlobalsFieldContext, IdentifierFieldContext, ImportsFieldContext, IncludePathFieldContext, InlinedAtFieldContext, IsDeclFieldContext, IsDefinitionFieldContext, IsImplicitCodeFieldContext, IsLocalFieldContext, IsOptimizedFieldContext, IsUnsignedFieldContext, ApiNotesFieldContext, LanguageFieldContext, LineFieldContext, LinkageNameFieldContext, LowerBoundFieldContext, MacrosFieldContext, NameTableKindFieldContext, NodesFieldContext, OffsetFieldContext, ProducerFieldContext, RangesBaseAddressFieldContext, RankFieldContext, RetainedNodesFieldContext, RetainedTypesFieldContext, RuntimeLangFieldContext, RuntimeVersionFieldContext, ScopeFieldContext, ScopeLineFieldContext, SdkFieldContext, SetterFieldContext, SizeFieldContext, SourceFieldContext, SpFlagsFieldContext, SplitDebugFilenameFieldContext, SplitDebugInliningFieldContext, StrideFieldContext, StringLengthFieldContext, StringLengthExpressionFieldContext, StringLocationExpressionFieldContext, SysrootFieldContext, TargetFuncNameFieldContext, TemplateParamsFieldContext, ThisAdjustmentFieldContext, ThrownTypesFieldContext, TypeMacinfoFieldContext, TypesFieldContext, UnitFieldContext, UpperBoundFieldContext, ValueIntFieldContext, ValueStringFieldContext, VarFieldContext, VirtualIndexFieldContext, VirtualityFieldContext, VtableHolderFieldContext, VoidTypeContext, OpaqueTypeContext } from "../llvmir/LLVMIRParser";
 import { LLVMIRVisitor } from "../llvmir/LLVMIRVisitor";
 
@@ -435,12 +435,71 @@ export class LLVMIRBaseVisitor implements LLVMIRVisitor<any> {
   }
   
 
-  // 添加一个 字符串转整数的方法 todo
+  // 一些辅助函数
   getSymbolRange(symbol: Token): Range {
     return new Range(
       new Position(symbol.line-1, symbol.charPositionInLine),
       new Position(symbol.line-1, symbol.charPositionInLine + (symbol.text?.length || 0))
     );
+  }
+  getTerminalRange(node: TerminalNode): Range {
+    return this.getSymbolRange(node.symbol);
+  }
+  getContextRange(ctx: ParserRuleContext): Range {
+    const start = ctx.start;
+    const stop = ctx.stop;
+    if(! stop) {
+      return new Range(
+        start.line-1, start.charPositionInLine, start.line-1, start.charPositionInLine
+      );
+    }
+    else {
+      return new Range(
+        start.line-1, start.charPositionInLine, stop.line-1, stop.charPositionInLine + (stop.text?.length || 0)
+      );
+    }
+  }
+  positionInContext(ctx: ParserRuleContext, position: Position): boolean {
+    const start = ctx.start;
+    const stop = ctx.stop;
+    if (stop == undefined) return false;
+    else if (position.line < start.line - 1 || position.line > stop.line - 1) return false;
+    else if (position.line == start.line - 1 && position.line == stop.line - 1) {
+      // start 和 stop 位于同一行
+      return position.character >= start.charPositionInLine && position.character <= stop.charPositionInLine + (stop.text?.length || 0);
+    }
+    else if (position.line == start.line - 1) {
+      // stop 不在这一行
+      return position.character >= start.charPositionInLine;
+    }
+    else if (position.line == stop.line - 1) {
+      return position.character <= stop.charPositionInLine + (stop.text?.length || 0);
+    }
+    else {
+      // 在 start 和 stop 中间的某一行
+      return true;
+    }
+  }
+  positionInTerminal(node: TerminalNode, position: Position): boolean {
+    return this.positionInSymbol(node.symbol, position);
+  }
+  positionInSymbol(symbol: Token, position: Position): boolean {
+    const line = symbol.line - 1;
+    const character = symbol.charPositionInLine;
+    const end = symbol.charPositionInLine + (symbol.text?.length || 0);
+    return (position.line === line && position.character >= character && position.character <= end);
+  }
+  parseIntLit(intlit: string): number {
+    if (intlit.startsWith('u0x') || intlit.startsWith('s0x') || intlit.startsWith('0x')) {
+      // 16 进制 todo
+      if (intlit.startsWith('0x')) intlit = intlit.slice(2, intlit.length);
+      else intlit = intlit.slice(3, intlit.length);
+      const ret = parseInt(intlit, 16);
+      return ret;
+    }
+    else {
+      return parseInt(intlit);
+    }
   }
 }
 

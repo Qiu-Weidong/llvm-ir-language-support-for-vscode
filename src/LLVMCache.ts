@@ -47,7 +47,7 @@ export class LLVMCache {
 
     const ast = parser.compilationUnit();
     // 使用 LLVMIRTypeDefResolver 解析类型表
-    const typeDefResolver = new LLVMIRTypeDefResolver(diagnostics);
+    const typeDefResolver = new LLVMIRTypeDefResolver(diagnostics, document);
     try { ast.accept(typeDefResolver); } catch(err) { console.log(err); }
     const types = typeDefResolver.getTypeTable();
     const scope: Scope = new GlobalScope();

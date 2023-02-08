@@ -85,7 +85,7 @@ export class LLVMIRBasicTypeResolver extends LLVMIRBaseVisitor {
   visitOpaquePointerType(ctx: OpaquePointerTypeContext) {
     const intlit = ctx.addrSpace()?.IntLit().text;
     if (intlit) {
-      const addrspace = LLVMIRBasicTypeResolver.parseIntLit(intlit);
+      const addrspace = this.parseIntLit(intlit);
       return new OpaquePointerType(addrspace);
     }
     return new OpaquePointerType();
@@ -94,7 +94,7 @@ export class LLVMIRBasicTypeResolver extends LLVMIRBaseVisitor {
   visitVectorType(ctx: VectorTypeContext) {
     const scalable = ctx.KwVscale() ? true : false;
     const baseType: LLVMIRType = ctx.type().accept(this);
-    const len = LLVMIRBasicTypeResolver.parseIntLit(ctx.IntLit().text);
+    const len = this.parseIntLit(ctx.IntLit().text);
 
     return new VectorType(len, scalable, baseType);
   }
@@ -102,7 +102,7 @@ export class LLVMIRBasicTypeResolver extends LLVMIRBaseVisitor {
   visitArrayType(ctx: ArrayTypeContext) {
     const ty: LLVMIRType = ctx.type().accept(this);
     const intlit = ctx.IntLit().text;
-    const len = LLVMIRBasicTypeResolver.parseIntLit(intlit);
+    const len = this.parseIntLit(intlit);
     return new ArrayType(len, ty);
   }
 
@@ -126,18 +126,6 @@ export class LLVMIRBasicTypeResolver extends LLVMIRBaseVisitor {
     return new MetadataType();
   }
 
-  static parseIntLit(intlit: string): number {
-    if (intlit.startsWith('u0x') || intlit.startsWith('s0x') || intlit.startsWith('0x')) {
-      // 16 进制 todo
-      if (intlit.startsWith('0x')) intlit = intlit.slice(2, intlit.length);
-      else intlit = intlit.slice(3, intlit.length);
-      const ret = parseInt(intlit, 16);
-      // console.log('parseInt:', ret);
-      return ret;
-    }
-    else {
-      return parseInt(intlit);
-    }
-  }
+
 }
 

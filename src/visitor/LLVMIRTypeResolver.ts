@@ -444,7 +444,7 @@ export class LLVMIRTypeResolver extends LLVMIRBasicTypeResolver {
   visitAllocaInst(ctx: AllocaInstContext) {
     const baseType: LLVMIRType = ctx.type().accept(this);
     const addrspace = ctx.addrSpace()?.IntLit().text;
-    const i = addrspace ? LLVMIRBasicTypeResolver.parseIntLit(addrspace) : undefined;
+    const i = addrspace ? this.parseIntLit(addrspace) : undefined;
     return new PointerType(baseType, i);
   }
   visitLoadInst(ctx: LoadInstContext) {

@@ -7,6 +7,7 @@ import { LLVMIRBaseVisitor } from "./LLVMIRBaseVisitor";
 export class LLVMIRSymbolVisitor extends LLVMIRBaseVisitor {
   // 填写 symbols 列表，需要填写 comdat、attrgroup、metadata、函数、变量、类型定义
   // globalident、labelident、localident、attrgroup、comdat、metadata
+  // 不应该这样写，这样写会污染作用域，应该在 LLVMIRBaseEntity里面增加一个 reference 列表，类型为 DocumentSymbol
   private symbols: DocumentSymbol[];
   constructor() {
     super();

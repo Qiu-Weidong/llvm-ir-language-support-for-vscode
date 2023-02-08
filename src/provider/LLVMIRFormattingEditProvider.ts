@@ -20,12 +20,6 @@ export class LLVMIRFormattingEditProvider implements DocumentFormattingEditProvi
         ast.accept(visitor);
       } catch (err) { console.log(err); }
 
-      const results = visitor.getResult();
-
-      for(const result of results) {
-        console.log(result.range);
-        console.log(result.newText, result.newText.length);
-      }
       return visitor.getResult();
     }
     else {

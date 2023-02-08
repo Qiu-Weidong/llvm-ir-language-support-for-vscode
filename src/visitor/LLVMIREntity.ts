@@ -1,42 +1,31 @@
 // 变量和函数、ifunc、alias
 import { LLVMIRType } from "./LLVMIRType";
-import { Definition } from "vscode";
+import { Definition, Hover } from "vscode";
 
 
-export class LLVMIRBaseEntity {
-  protected name: string;
-  protected hoverMsg: string;
-  protected referCnt: number;
-  protected definition: Definition | undefined;
 
-  constructor(name: string, hoverMsg: string, definition?: Definition) {
+export class LLVMIREntity {
+  private name: string;
+  private hoverMsg: Hover;
+  private definition: Definition | undefined;
+  private type: LLVMIRType | undefined;
+
+  constructor(name: string, hoverMsg: Hover, definition?: Definition, type?: LLVMIRType) {
     this.name = name;
     this.definition = definition;
-    this.referCnt = 0;
     this.hoverMsg = hoverMsg;
-  }
-
-  refer() { this.referCnt++; }
-  setName(name: string) { this.name = name; }
-  setDefinition(definiton: Definition) { this.definition = definiton;}
-  setHoverMsg(msg: string) { this.hoverMsg = msg; }
-
-  getName(): string { return this.name;}
-  isRefered() { return this.referCnt > 0; }
-  getDefinition() { return this.definition; }
-  getHoverMsg() { return this.hoverMsg; }
-}
-
-export class LLVMIREntity extends LLVMIRBaseEntity {
-  protected type: LLVMIRType;
-
-  constructor(name: string, hoverMsg: string,  type: LLVMIRType, definition?: Definition) {
-    super(name, hoverMsg, definition);
     this.type = type;
   }
 
 
   setType(type: LLVMIRType) { this.type = type; }
-  getType(): LLVMIRType { return this.type; }
-  
+  setName(name: string) { this.name = name; }
+  setDefinition(definiton: Definition) { this.definition = definiton; }
+  setHoverMsg(msg: Hover) { this.hoverMsg = msg; }
+
+  getName(): string { return this.name; }
+  getDefinition() { return this.definition; }
+  getHoverMsg() { return this.hoverMsg; }
+  getType(): LLVMIRType | undefined { return this.type; }
+
 }

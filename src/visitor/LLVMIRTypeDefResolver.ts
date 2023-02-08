@@ -7,18 +7,21 @@ import {
   PointerType, UndefinedType
 } from "./LLVMIRType";
 import { CompilationUnitContext, NamedTypeContext, TypeDefContext, } from "../llvmir/LLVMIRParser";
-import { Diagnostic, DiagnosticSeverity, Position, Range } from "vscode";
+import { Diagnostic, DiagnosticSeverity, Hover, Location, Position, Range, TextDocument } from "vscode";
 import { Token } from "antlr4ts";
+import { LLVMIREntity } from "./LLVMIREntity";
 
 
 export class LLVMIRTypeDefResolver extends LLVMIRBasicTypeResolver {
-  private types: Map<string, LLVMIRType>;
-  private diagnostics: Diagnostic[];;
+  private types: Map<string, LLVMIREntity>;
+  private diagnostics: Diagnostic[];
+  private document: TextDocument;
 
-  constructor(diagnostics: Diagnostic[]) {
+  constructor(diagnostics: Diagnostic[], document: TextDocument) {
     super();
     this.types = new Map();
     this.diagnostics = diagnostics;
+    this.document = document;
   }
 
   addError(symbol: Token, msg: string) {
@@ -43,17 +46,19 @@ export class LLVMIRTypeDefResolver extends LLVMIRBasicTypeResolver {
   }
   visitTypeDef(ctx: TypeDefContext) {
     const name = ctx.LocalIdent().symbol.text;
-    if (!name) { this.addError(ctx.LocalIdent().symbol, 'name is empty string') ;}
+    if (!name) { this.addError(ctx.LocalIdent().symbol, 'name is empty string'); }
     else if (this.types.get(name)) { this.addError(ctx.LocalIdent().symbol, 'duplicate define type'); }
     else {
       const ty: LLVMIRType = ctx.type().accept(this);
-      this.types.set(name, ty);
+      const definition = new Location(this.document.uri, this.getSymbolRange(ctx.LocalIdent().symbol));
+      const entity = new LLVMIREntity(name, new Hover(`todo`), definition, ty);
+      this.types.set(name, entity);
     }
   }
   // 如果没有定义，则返回一个 undefined type
   visitNamedType(ctx: NamedTypeContext) {
     const name = ctx.LocalIdent().symbol.text || '';
-    if (!name) { this.addError(ctx.LocalIdent().symbol, 'name is empty string') ;}
+    if (!name) { this.addError(ctx.LocalIdent().symbol, 'name is empty string'); }
 
     const ty = this.types.get(name);
     return ty || new UndefinedType(name);
@@ -64,7 +69,8 @@ export class LLVMIRTypeDefResolver extends LLVMIRBasicTypeResolver {
   }
 
   resolveUndefinedTypes() {
-    for (const type of this.types.values()) {
+    for (const entity of this.types.values()) {
+      const type = entity.getType();
       if (type instanceof UndefinedType) {
         console.log(`未定义的类型 ${type.getName()}`);
       }
@@ -73,7 +79,7 @@ export class LLVMIRTypeDefResolver extends LLVMIRBasicTypeResolver {
         || type instanceof PointerType) && !type.getBaseType().isDefined()) {
         console.log(`${type.getName()} 中有未定义的类型 ${type.getBaseType().getName()}`);
         const baseTypeName = type.getBaseType().getName();
-        const baseType = this.types.get(baseTypeName);
+        const baseType = this.types.get(baseTypeName)?.getType();
         if (baseType) {
           type.setBaseType(baseType);
         }
@@ -88,7 +94,7 @@ export class LLVMIRTypeDefResolver extends LLVMIRBasicTypeResolver {
           // 要直接在数组上更新
           if (!members[i].isDefined()) {
             const name = members[i].getName();
-            const ty = this.types.get(name);
+            const ty = this.types.get(name)?.getType();
             if (ty) {
               members[i] = ty;
             }
@@ -102,7 +108,7 @@ export class LLVMIRTypeDefResolver extends LLVMIRBasicTypeResolver {
         const retType = type.getRetType();
         if (!retType.isDefined()) {
           const retTypeName = retType.getName();
-          const realRetType = this.types.get(retTypeName);
+          const realRetType = this.types.get(retTypeName)?.getType();
           if (realRetType) {
             type.setRetType(realRetType);
           }
@@ -115,7 +121,7 @@ export class LLVMIRTypeDefResolver extends LLVMIRBasicTypeResolver {
         for (let i = 0; i < params.length; i++) {
           if (!params[i].isDefined()) {
             const name = params[i].getName();
-            const ty = this.types.get(name);
+            const ty = this.types.get(name)?.getType();
             if (ty) {
               params[i] = ty;
             }

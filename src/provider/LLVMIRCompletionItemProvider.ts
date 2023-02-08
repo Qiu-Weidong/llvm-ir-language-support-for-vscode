@@ -5,8 +5,7 @@ import { LLVMCache } from "../LLVMCache";
 
 export class LLVMIRCompletionItemProvider implements CompletionItemProvider {
   provideCompletionItems(document: TextDocument, position: Position, token: CancellationToken, context: CompletionContext): ProviderResult<CompletionItem[] | CompletionList<CompletionItem>> {
-    const text = document.getText();
-    console.log(text);
+
     const documents = LLVMCache.getInstance();
     try {
       documents.updateDocument(document);
