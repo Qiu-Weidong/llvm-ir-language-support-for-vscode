@@ -2,7 +2,6 @@ import { CancellationToken, CompletionContext, CompletionItem, CompletionItemPro
 import { LLVMCache } from "../LLVMCache";
 
 
-
 export class LLVMIRCompletionItemProvider implements CompletionItemProvider {
   provideCompletionItems(document: TextDocument, position: Position, token: CancellationToken, context: CompletionContext): ProviderResult<CompletionItem[] | CompletionList<CompletionItem>> {
 

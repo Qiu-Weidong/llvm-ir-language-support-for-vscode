@@ -51,7 +51,12 @@ export class LLVMIRTypeDefResolver extends LLVMIRBasicTypeResolver {
     else {
       const ty: LLVMIRType = ctx.type().accept(this);
       const definition = new Location(this.document.uri, this.getSymbolRange(ctx.LocalIdent().symbol));
-      const entity = new LLVMIREntity(name, new Hover(`todo`), definition, ty);
+      const range = this.getContextRange(ctx);
+      const st = this.document.offsetAt(range.start);
+      const ed = this.document.offsetAt(range.end);
+      const value = this.document.getText().slice(st, ed);
+      const hover = new Hover({language:'llvm-ir', value});
+      const entity = new LLVMIREntity(name, hover, definition, ty);
       this.types.set(name, entity);
     }
   }

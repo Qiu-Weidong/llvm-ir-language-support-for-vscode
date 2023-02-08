@@ -491,7 +491,6 @@ export class LLVMIRBaseVisitor implements LLVMIRVisitor<any> {
   }
   parseIntLit(intlit: string): number {
     if (intlit.startsWith('u0x') || intlit.startsWith('s0x') || intlit.startsWith('0x')) {
-      // 16 进制 todo
       if (intlit.startsWith('0x')) intlit = intlit.slice(2, intlit.length);
       else intlit = intlit.slice(3, intlit.length);
       const ret = parseInt(intlit, 16);

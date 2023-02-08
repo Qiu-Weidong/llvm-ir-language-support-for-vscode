@@ -3,7 +3,7 @@ import { RuleNode } from "antlr4ts/tree/RuleNode";
 import { TerminalNode } from "antlr4ts/tree/TerminalNode";
 import { info } from "console";
 import { Hover, MarkdownString, Position } from "vscode";
-import { CallInstContext, ComdatContext, CompilationUnitContext, FuncAttrContext, FuncAttributeContext, FuncDefContext, FuncHeaderContext, LabelContext, LocalDefInstContext, MdNodeContext, MetadataAttachmentContext, MetadataContext, MetadataNodeContext, NamedTypeContext, ParamContext, ParamsContext, TypeContext, ValueContext } from "../llvmir/LLVMIRParser";
+import { BasicBlockContext, CallInstContext, ComdatContext, CompilationUnitContext, FuncAttrContext, FuncAttributeContext, FuncDefContext, FuncHeaderContext, GlobalDeclContext, GlobalDefContext, LabelContext, LocalDefInstContext, MdNodeContext, MetadataAttachmentContext, MetadataContext, MetadataNodeContext, NamedTypeContext, ParamContext, ParamsContext, TypeContext, ValueContext } from "../llvmir/LLVMIRParser";
 import { LLVMIRBaseVisitor } from "./LLVMIRBaseVisitor";
 import { Scope } from "./LLVMIRScope";
 
@@ -108,9 +108,7 @@ export class LLVMIRHoverVisitor extends LLVMIRBaseVisitor {
       const name = ctx.LocalIdent().text;
       const ty = this.scope.getNamedType(name);
       if (ty) {
-        this.result = new Hover([
-          { language: 'llvm-ir', value: ty.getName() }
-        ]);
+        this.result = ty.getHoverMsg();
       }
     }
   }
@@ -129,6 +127,28 @@ export class LLVMIRHoverVisitor extends LLVMIRBaseVisitor {
     }
   }
 
+  visitGlobalDecl(ctx: GlobalDeclContext) {
+    if(this.positionInTerminal(ctx.GlobalIdent(), this.position)) {
+      const entity = this.scope.getEntity(ctx.GlobalIdent().text);
+      if(entity) {
+        this.result = entity.getHoverMsg();
+      }
+    }
+    else {
+      this.visitChildren(ctx);
+    }
+  }
+  visitGlobalDef(ctx: GlobalDefContext) {
+    if(this.positionInTerminal(ctx.GlobalIdent(), this.position)) {
+      const entity = this.scope.getEntity(ctx.GlobalIdent().text);
+      if(entity) {
+        this.result = entity.getHoverMsg();
+      }
+    }
+    else {
+      this.visitChildren(ctx);
+    }
+  }
   // 切换符号表
   visitFuncDef(ctx: FuncDefContext) {
     const header = ctx.funcHeader();
@@ -193,5 +213,17 @@ export class LLVMIRHoverVisitor extends LLVMIRBaseVisitor {
     if(name.startsWith('%')) name = name.slice(1, name.length);
     const label = this.scope.getLabel(name);
     if(label) this.result = label.getHoverMsg();
+  }
+  visitBasicBlock(ctx: BasicBlockContext) {
+    const label = ctx.LabelIdent();
+    if(label && this.positionInTerminal(label, this.position)) {
+      let name = label.text;
+      if(name.endsWith(':')) name = name.slice(0, name.length-1);
+      const info = this.scope.getLabel(name);
+      if(info) this.result = info.getHoverMsg();
+    }
+    else {
+      this.visitChildren(ctx);
+    }
   }
 }
