@@ -12,12 +12,15 @@ define dso_local void @main() {
   fence syncscope("singlethread") seq_cst 
   fence syncscope("agent") seq_cst 
   %1 = call i32 @add() 
+  %var1 = add i64 3, 4
+  %4 = add i32 %var1, 3
   ret void 
 }
 
 %mytype = type { %mytype*, i32 }
 
 define i32 @add() !llvm.loop !0 { 
+  %var1 = add i32 1, 2
   %3 = alloca %world, align 4
   ret void 
   uselistorder i32 %arg1, { 1, 0, 2 } 

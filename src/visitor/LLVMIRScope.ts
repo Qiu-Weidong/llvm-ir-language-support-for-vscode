@@ -1,3 +1,4 @@
+import { DocumentSymbol, Position } from "vscode";
 import { LLVMIREntity } from "./LLVMIREntity";
 
 // 符号表查询接口
@@ -26,6 +27,9 @@ export interface Scope {
 
   setTypeTable(types: Map<string, LLVMIREntity>): void ;
   getChild(name: string): Scope | undefined;
+  getAllSymbols(): DocumentSymbol[];
+  getSymbols(): DocumentSymbol[];
+  getRefernces(position: Position): DocumentSymbol[];
 }
 
 export class GlobalScope implements Scope {
@@ -46,6 +50,36 @@ export class GlobalScope implements Scope {
     this.attrGroups = new Map();
     this.metadatas = new Map();
     this.entities = new Map();
+  }
+  getRefernces(position: Position): DocumentSymbol[] {
+    for(const ty of this.namedTypes.values()) if(ty.referd(position)) return ty.getSymbols();
+    for(const comdat of this.comdats.values()) if(comdat.referd(position)) return comdat.getSymbols();
+    for(const attr of this.attrGroups.values()) if(attr.referd(position)) return attr.getSymbols();
+    for(const metadata of this.metadatas.values()) if(metadata.referd(position)) return metadata.getSymbols();
+    for(const entity of this.entities.values()) if(entity.referd(position)) return entity.getSymbols();
+    
+    // 再查询 localscope
+    for(const child of this.children.values()) {
+      const t = child.getRefernces(position);
+      if(t.length > 0) return t;
+    }
+    return [];
+  }
+  getAllSymbols(): DocumentSymbol[] {
+    let result: DocumentSymbol[] = this.getSymbols();
+    for(const child of this.children.values()) {
+      result.push(...child.getSymbols());
+    }
+    return result;
+  }
+  getSymbols(): DocumentSymbol[] {
+    let result: DocumentSymbol[] = [];
+    for(const ty of this.namedTypes.values()) result.push(...ty.getSymbols());
+    for(const comdat of this.comdats.values()) result.push(...comdat.getSymbols());
+    for(const attr of this.attrGroups.values()) result.push(...attr.getSymbols());
+    for(const metadata of this.metadatas.values()) result.push(...metadata.getSymbols());
+    for(const entity of this.entities.values()) result.push(...entity.getSymbols());
+    return result;
   }
   getChild(name: string): Scope| undefined {
     return this.children.get(name)
@@ -124,6 +158,29 @@ export class LocalScope implements Scope {
     this.parent = parent; 
     this.entities = new Map();
     this.labels = new Map();
+  }
+  getRefernces(position: Position): DocumentSymbol[] {
+    for(const label of this.labels.values()) {
+      if(label.referd(position)) return label.getSymbols();
+    }
+    for(const entity of this.entities.values()) {
+      if(entity.referd(position)) return entity.getSymbols();
+    }
+    return [];
+  }
+
+  getAllSymbols(): DocumentSymbol[] {
+    return this.parent.getAllSymbols();
+  }
+  getSymbols(): DocumentSymbol[] {
+    let result: DocumentSymbol[] = [];
+    for(const label of this.labels.values()) {
+      result.push(...label.getSymbols());
+    }
+    for(const entity of this.entities.values()) {
+      result.push(...entity.getSymbols());
+    }
+    return result;
   }
   getChild(name: string): Scope | undefined {
     return this.parent.getChild(name);

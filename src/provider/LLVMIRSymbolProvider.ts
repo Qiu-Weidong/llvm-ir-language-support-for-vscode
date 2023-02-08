@@ -11,10 +11,8 @@ export class LLVMIRSymbolProvider
     // 首先确定是什么符号 函数、comdat、attrgroup、变量、参数、自定义类型、metadata
     const data = documents.getAllData(document.uri);
     if (data) {
-      const { symbols } = data;
-      const symbol = symbols.find(item => item.range.contains(position));
-      if (symbol)
-        return symbols.filter(item => item.name === symbol.name && item.detail === symbol.detail).map(item => new Location(document.uri, item.range));
+      const { scope } = data;
+      return scope.getRefernces(position).map(item => new Location(document.uri, item.range));
     }
     else {
       throw new Error('file not found');
@@ -26,13 +24,9 @@ export class LLVMIRSymbolProvider
 
     const data = documents.getAllData(document.uri);
     if (data) {
-      const { symbols } = data;
-      const symbol = symbols.find(item => item.range.contains(position));
-      if(! symbol) throw new Error('no Symbol at this positon');
+      const { scope } = data;
+      const edits = scope.getRefernces(position).map(item => new TextEdit(item.range, newName));
       let result = new WorkspaceEdit();
-      const edits = symbols.filter(item => item.name == symbol.name && item.detail == symbol.detail).map(item =>
-        new TextEdit(item.range, newName)
-      );
       result.set(document.uri, edits);
       return result;
     }
@@ -45,7 +39,8 @@ export class LLVMIRSymbolProvider
     documents.updateDocument(document);
     const data = documents.getAllData(document.uri);
     if (data) {
-      const { symbols } = data;
+      const { scope } = data;
+      const symbols = scope.getRefernces(position);
       const symbol = symbols.find(item => item.range.contains(position));
       if (symbol)
         return symbol.range;
@@ -59,8 +54,8 @@ export class LLVMIRSymbolProvider
     documents.updateDocument(document);
     const data = documents.getAllData(document.uri);
     if (data) {
-      const { symbols } = data;
-      return symbols;
+      const { scope } = data;
+      return scope.getAllSymbols();
     }
     else {
       throw new Error('file not found');

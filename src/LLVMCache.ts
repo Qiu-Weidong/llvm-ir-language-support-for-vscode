@@ -21,7 +21,7 @@ export class LLVMCache {
     ast: ParseTree, // 语法树
     tokens: CommonTokenStream, // token 流
     scope: Scope, // 符号表
-    symbols: DocumentSymbol[]
+    // symbols: DocumentSymbol[]
   }>;
   public static getInstance(): LLVMCache {
     if (!LLVMCache.instance) {
@@ -55,10 +55,10 @@ export class LLVMCache {
 
     const scopeVisitor = new LLVMIRScopeVisitor(scope, document);
     try { ast.accept(scopeVisitor); } catch(err) { console.log(err); }
-    const symbolVisitor = new LLVMIRSymbolVisitor();
+    const symbolVisitor = new LLVMIRSymbolVisitor(scope);
     try { ast.accept(symbolVisitor); } catch(err) { console.log(err); }
-    const symbols: DocumentSymbol[] = symbolVisitor.getSymbols();
-    this.documents.set(document.uri.toString(), { content, ast, tokens, scope, symbols });
+    // const symbols: DocumentSymbol[] = symbolVisitor.getSymbols();
+    this.documents.set(document.uri.toString(), { content, ast, tokens, scope });
     this.diangostics.set(document.uri, diagnostics);
   }
 

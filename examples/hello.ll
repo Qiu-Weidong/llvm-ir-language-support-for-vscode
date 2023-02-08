@@ -22,18 +22,18 @@ define dso_local i32 @main(i32 noundef %0, i8** noundef %1) #0 {
   %8 = load i32, i32* %6, align 4
   %9 = load i32, i32* %7, align 4
   %10 = icmp sgt i32 %8, true
-  %hello = add nsw i32 %8, %9
-  br i1 %10, label %11, label %12
+  %happy = add nsw i32 %8, %9
+  br i1 %10, label %11, label %tmp
 
 11:                                               ; preds = %2
   ; 可以引用 前面的 block 中的符号
   %tmp = load i32, i32* %7, align 4
-  %foo = mul nsw i32 %tmp, %hello
-  %label = mul nsw i32 %tmp, %hello
+  %foo = mul nsw i32 %tmp, %happy
+  %label = mul nsw i32 %tmp, %happy
   store i32 7, i32* %6, align 4
   br label %13
   
-12:                                               ; preds = %2
+tmp:                                               ; preds = %2
   store i32 2, i32* %7, align 4
   ;%haha = mul nsw i32 %tmp, %foo
   br label %13
@@ -42,7 +42,7 @@ define dso_local i32 @main(i32 noundef %0, i8** noundef %1) #0 {
   %14 = load i32, i32* %6, align 4
   %15 = load i32, i32* %7, align 4
   %16 = add nsw i32 %14, %15
-  %haha = mul nsw i32 %hello, %9
+  %haha = mul nsw i32 %happy, %9
   ret i32 %16
 }
 
