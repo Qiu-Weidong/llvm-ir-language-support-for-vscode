@@ -10,6 +10,9 @@ module asm "more can go here"
 %integer = type i32
 ; %hello = type {}
 
+
+
+
 define dso_local fastcc void @main() { 
   fence acquire 
   fence syncscope("singlethread") seq_cst 

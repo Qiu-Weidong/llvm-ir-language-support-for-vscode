@@ -49,6 +49,7 @@ attributes #0 = { #1 #2 #14 }
 attributes #1 = { alwaysinline alignstack = 4 }
 
 
+
 ; named metadata
 !name = ! { !0, !1, !2 }
 !0 = distinct ! { ! "zero" }
@@ -59,6 +60,7 @@ uselistorder ptr @global, { 1, 2, 0 }
 uselistorder i32 7, { 1, 0 }
 ; uselistorder i32 (i32) @bar, { 1, 0 }
 uselistorder_bb @foo, %bb, { 5, 1, 3, 2, 0, 4 }
+
 
 
 
