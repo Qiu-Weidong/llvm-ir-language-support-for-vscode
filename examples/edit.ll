@@ -2,6 +2,10 @@
 module asm "inline asm code goes here"
 module asm "more can go here"  
 
+target triple = ""
+target datalayout = ""
+
+
 @K = external dso_preemptable protected  dllimport  global i32 
 @G = thread_local(initialexec) global i32 0, align 4
 
