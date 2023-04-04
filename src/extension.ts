@@ -10,7 +10,7 @@ import { LLVMIRSymbolProvider } from "./provider/LLVMIRSymbolProvider";
 
 // 要先编译再运行
 export function activate(context: ExtensionContext) {
-  const documents = LLVMCache.getInstance();
+  // const documents = LLVMCache.getInstance();
 
   // workspace.findFiles('**/*.ll').then(uris => {
   //   // 获取工作空间中所有的 ll 文件, 并缓存
@@ -22,16 +22,16 @@ export function activate(context: ExtensionContext) {
   // });
 
   // 绑定事件
-  context.subscriptions.push(
-    workspace.onDidRenameFiles(e => {
-      for (const file of e.files) {
-        documents.renameDocument(file.oldUri, file.newUri);
-      }
-    }),
-    workspace.onDidChangeTextDocument(e => {
-      documents.updateDocument(e.document);
-    })
-  );
+  // context.subscriptions.push(
+  //   workspace.onDidRenameFiles(e => {
+  //     for (const file of e.files) {
+  //       documents.renameDocument(file.oldUri, file.newUri);
+  //     }
+  //   }),
+  //   workspace.onDidChangeTextDocument(e => {
+  //     documents.updateDocument(e.document);
+  //   })
+  // );
 
   const selector = 'llvm-ir';
   // 下面开始注册 provider

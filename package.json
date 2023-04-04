@@ -23,9 +23,6 @@
     "type": "git",
     "url": "https://github.com/Qiu-Weidong/llvm-ir-language-support-for-vscode.git"
   },
-  "activationEvents": [
-    "onLanguage:llvm-ir"
-  ],
   "icon": "asset/icon.jpg",
   "main": "./dist/extension.js",
   "contributes": {
